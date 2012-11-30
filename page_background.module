@@ -198,6 +198,7 @@ function page_background_node_delete($node){
 }
 
 function page_background_admin_form($form,&$form_state){
+	global $user;
 	$query = db_select('url_background_images','bg')->fields('bg')->orderBy('created');
 	$query->extend('PagerDefault')->limit(50);
 	$result=$query->execute()->fetchAll();
