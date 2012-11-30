@@ -20,7 +20,7 @@ function page_background_menu(){
 		'access callback'=>'_page_background_check_access',
 	  	'access arguments' => array('administer page_background'),
 	);
-
+	
 	return $items;
 }
 
@@ -59,6 +59,143 @@ function page_background_theme($existing, $type, $theme, $path) {
 	);
 }
 
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ * Alter the node forms.
+ */
+function page_background_form_node_form_alter(&$form, &$form_state, $form_id) {
+	// Add the Location fields on the node edit form.
+	$node = $form['#node'];
+	$form['page_backgrounds'] = array('#type'=>'fieldset','#title'=>t('Page Backgrounds'));
+	$form['page_backgrounds']['#group'] = 'additional_settings';
+		
+	if(isset($node->nid)){
+		$query = db_select('url_background_images','bg')->fields('bg')->condition('path','node/'.$node->nid,'=')->orderBy('created');
+		$result=$query->execute()->fetchAll();
+		if(count($result)>0){
+			$form['page_backgrounds']['existing']=array('#markup'=>'<strong>'.t('Mark for deletion of an existing background.').'</strong>');
+		}
+		foreach($result as $bkg){
+		
+			$file=file_load($bkg->fid);
+			$themed_image=array(
+					'path'=>$file->uri,
+					'style_name'=>'thumbnail',
+			);
+		
+			$form['page_backgrounds']['page_background_bkg_'.$bkg->bid]=array(
+					'#type'=>'checkbox',
+					'#title'=>theme('image_style',$themed_image),
+			);
+		
+		}
+		
+		$max_upload = (int)(ini_get('upload_max_filesize'));
+		$max_post = (int)(ini_get('post_max_size'));
+		$memory_limit = (int)(ini_get('memory_limit'));
+		$upload_mb = min($max_upload, $max_post, $memory_limit);
+		
+		$extensions=explode(' ','jpg jpeg png');
+		foreach($extensions as &$ext) $ext='.'.trim($ext);
+		
+		$num_uploads = !empty($form_state['values']['page_backgrounds_num_uploads']) ? $form_state['values']['page_backgrounds_num_uploads']+1 : 1;
+		
+		$form['page_backgrounds']['page_backgrounds_num_uploads']=array('#type'=>'value','#value'=>$num_uploads);
+		$form['page_backgrounds']['uploads_fieldset'] = array(
+				'#title' => t('Upload New Background'),
+				// The prefix/suffix provide the div that we're replacing, named by
+				// #ajax['wrapper'] below.
+				'#type' => 'container',
+				'#id'=>'page_background-uploads-div',
+		);
+		$form['page_backgrounds']['uploads_fieldset']['new-title']=array('#markup'=>'<strong>'.t('Add new backgrounds.').'</strong>');
+		for ($i = 1; $i <= $num_uploads; $i++) {
+			$form['page_backgrounds']['uploads_fieldset']["page_backgrounds_uploadfile$i"] = array(
+					'#type'=>'managed_file',
+					'#upload_validators' => array(
+							'file_validate_extensions' => array('jpg jpeg png'),
+							// Pass the maximum file size in bytes
+							'file_validate_size' => array($upload_mb * 1024 * 1024),
+					),
+					'#upload_location'=>'public://page_backgrounds/',
+					'#description'=>t('extensions allowed: !extension_list , max file size: !maxfilesize MB',Array('!extension_list'=>implode(' ',$extensions),'!maxfilesize'=>$upload_mb)),
+			);
+		}
+		
+		$form['page_backgrounds']['add-new-file']=array(
+				'#type'=>'button',
+				'#value'=>t('Add more'),
+				'#ajax' => array(
+						'callback' => 'page_background_addmore_uploads_callback',
+						'wrapper' => 'page_background-uploads-div',
+						//'method' defaults to replaceWith, but valid values also include
+						// append, prepend, before and after.
+						// 'method' => 'replaceWith',
+						'method' => 'append',
+						// 'effect' defaults to none. Other valid values are 'fade' and 'slide'.
+						'effect' => 'fade',
+						// 'speed' defaults to 'slow'. You can also use 'fast'
+						// or a number of milliseconds for the animation to last.
+						// 'speed' => 'slow',
+						// Don't show any throbber...
+						'progress' => array('type' => 'none'),
+				),
+		);
+		
+	}else{
+		$form['page_backgrounds']['alert']=array('#markup'=>t('Page backgrounds can be added only to existing nodes.'));
+	}
+	$form['#validate'][]='page_background_form_node_form_validate';
+}
+
+function page_background_addmore_uploads_callback($form, $form_state) {
+  return $form['page_backgrounds']['uploads_fieldset']['page_backgrounds_uploadfile'.$form['page_backgrounds']['page_backgrounds_num_uploads']['#value']];
+}
+
+function page_background_form_node_form_validate($form, &$form_state){
+	foreach($form_state['values'] as $key=>$value){
+		if( preg_match('/^page_backgrounds_uploadfile[0-9]+$/i',$key) ){
+		}
+	}
+}
+
+function page_background_node_submit($node, $form, &$form_state){
+	global $user;
+	if($form_state['values']['op']==t('Save')){
+		foreach($form_state['values'] as $key=>$value){
+			if( preg_match('/^page_backgrounds_uploadfile[0-9]+$/i',$key) ){
+				if( ($file = file_load($form_state['values'][$key])) !== false ){
+					$file->status = FILE_STATUS_PERMANENT;
+					$file->uid = $user->uid;
+					file_save($file);
+	
+					db_insert('url_background_images')
+					->fields(array(
+					'path'=>'node/'.$form_state['values']['nid'],
+					'fid'=>$file->fid,
+					'created'=>time(),
+					))->execute();
+				}
+			}
+		}
+	
+		//trovo checkbox selezionati per eliminazione
+		$bids=array();
+		foreach($form_state['values'] as $key=>$elem){
+			if(stripos($key,'page_background_bkg_')===0 && !empty($elem)){
+				$bids[]=preg_replace("/^page_background_bkg_/i","",$key);
+			}
+		}
+		$numdeleted = 0;
+		if(count($bids)>0){
+			$numdeleted = db_delete('url_background_images')->condition('bid',$bids,'IN')->execute();
+		}
+	}
+}
+
+function page_background_node_delete($node){
+	$numdeleted = db_delete('url_background_images')->condition('path','node/'.$node->nid,'=')->execute();
+}
 
 function page_background_admin_form($form,&$form_state){
 	$query = db_select('url_background_images','bg')->fields('bg')->orderBy('created');
@@ -152,7 +289,7 @@ function page_background_admin_form_submit($form,&$form_state){
 			}
 		}
 		$numdeleted = 0;
-		if(count(bids)>0){
+		if(count($bids)>0){
 			$numdeleted = db_delete('url_background_images')->condition('bid',$bids,'IN')->execute();
 		}
 
@@ -339,7 +476,7 @@ function _page_background_get_fids_markup($fids=array()){
 	$cw=trim($cw);
 	$ch=trim($ch);
 
-	$out['#css'].='
+	$out['#css']='
 			#page_background_container{
 				height: '.$ch.((!preg_match('/%$/i',$ch))?'px':'').';
 				width: '.$cw.((!preg_match('/%$/i',$cw))?'px':'').';
@@ -369,7 +506,7 @@ function _page_background_get_fids_markup($fids=array()){
 		}
 	}
 	//var_dump($fids);
-	$out['#markup'].='<div id="page_background_container">';
+	$out['#markup']='<div id="page_background_container">';
 	$slides=array();
 	$pager=array();
 	foreach($fids as $key=>$fid){
