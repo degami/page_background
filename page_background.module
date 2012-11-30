@@ -1,0 +1,476 @@
+<?php
+
+function page_background_menu(){
+	$items=array();
+
+	$items['admin/config/page_background'] = array(
+	    'title' => t('Page Backgrounds'),
+	    'description' => t('Page Backgrounds'),
+	    'page callback' => 'drupal_get_form',
+	    'page arguments' => array('page_background_admin_form'),
+		'access callback'=>'_page_background_check_access',
+	  	'access arguments' => array('administer page_background'),
+	);
+
+	$items['admin/config/page_background/settings'] = array(
+	    'title' => t('Page Backgrounds Settings'),
+	    'description' => t('Page Backgrounds Settings'),
+	    'page callback' => 'drupal_get_form',
+	    'page arguments' => array('page_background_settings_form'),
+		'access callback'=>'_page_background_check_access',
+	  	'access arguments' => array('administer page_background'),
+	);
+
+	return $items;
+}
+
+
+/**
+ * Implements hook_permission().
+ */
+function page_background_permission() {
+	return array(
+	    'administer page_background' =>  array(
+			'title' => t('Administer Page Background'),
+			'description' => t('Perform administration tasks for Page Background.'),
+		),
+	);
+}
+
+function _page_background_check_access($access){
+	global $user;
+	if($user->uid==1) return true;
+	if(!is_array($access)) $access=array($access);
+	foreach($access as $string)
+	if( user_access($string,$user) ) return true;
+
+	return false;
+}
+
+
+/**
+ * Implements hook_theme().
+ */
+function page_background_theme($existing, $type, $theme, $path) {
+	return array(
+		'page_background_admin_form' => array(
+			'render element' => 'form',
+		),
+	);
+}
+
+
+function page_background_admin_form($form,&$form_state){
+	$query = db_select('url_background_images','bg')->fields('bg')->orderBy('created');
+	$query->extend('PagerDefault')->limit(50);
+	$result=$query->execute()->fetchAll();
+
+	$form['#validate'][]='page_background_admin_form_validate';
+	foreach($result as $bkg){
+		$form['bkg_'.$bkg->bid]=array(
+			'#type'=>'checkbox',
+			'#infos'=>serialize($bkg),
+		);
+	}
+	if($result) $form['delete_selected']=array('#type'=>'submit','#value'=>t('Delete Selected'));
+
+	$form['addfile'] = array('#type'=>'fieldset','#title'=>t('Upload a new file'));
+
+	$max_upload = (int)(ini_get('upload_max_filesize'));
+	$max_post = (int)(ini_get('post_max_size'));
+	$memory_limit = (int)(ini_get('memory_limit'));
+	$upload_mb = min($max_upload, $max_post, $memory_limit);
+
+	$extensions=explode(' ','jpg jpeg png');
+	foreach($extensions as &$ext) $ext='.'.trim($ext);
+
+	$form['uid']=array('#type'=>'hidden','#value'=>$user->uid);
+
+	$form['addfile']['path']=array('#type'=>'textfield','#title'=>t('Path'));
+	$form['addfile']['uploadfile']=array(
+		'#type'=>'managed_file',
+		'#title'=>t('Upload New Background'),
+		'#upload_validators' => array(
+		'file_validate_extensions' => array('jpg jpeg png'),
+		// Pass the maximum file size in bytes
+		    'file_validate_size' => array($upload_mb * 1024 * 1024),
+		),
+		'#upload_location'=>'public://page_backgrounds/',
+		'#description'=>t('extensions allowed: !extension_list , max file size: !maxfilesize MB',Array('!extension_list'=>implode(' ',$extensions),'!maxfilesize'=>$upload_mb)),
+	);
+
+	$form['addfile']['default']=array('#type'=>'checkbox','#title'=>t('Add to defaults'));
+	$form['addfile']['submit']=array('#type'=>'submit','#value'=>t('Submit'));
+	return $form;
+}
+
+function page_background_admin_form_validate($form,&$form_state){
+	if($form_state['values']['op']==t('Submit')){
+		if( ($file = file_load($form_state['values']['uploadfile'])) === false ){
+			form_set_error('uploadfile',t('A background image is necessary'));
+		}
+		if($form_state['values']['default']!=1 && (trim($form_state['values']['path'])=='' || !drupal_valid_path($form_state['values']['path'],true)) ) {
+			form_set_error('path',t('Invalid path'));
+		}
+	}elseif($form_state['values']['op']==t('Delete Selected')){
+		$count=0;
+		foreach($form_state['values'] as $key=>$elem){
+			if(stripos($key,'bkg_')===0 && !empty($elem)){
+				$count++;
+			}
+		}
+		if($count==0){
+			form_set_error('',t('No image selected for deletion.'));
+		}
+	}
+}
+
+function page_background_admin_form_submit($form,&$form_state){
+	if($form_state['values']['op']==t('Submit')){
+		if( ($file = file_load($form_state['values']['uploadfile'])) !== false ){
+			$file->status = FILE_STATUS_PERMANENT;
+			$file->uid = $form_state['values']['uid'];
+			file_save($file);
+
+			if($form_state['values']['default']==1) $form_state['values']['path']=null;
+
+			db_insert('url_background_images')
+			->fields(array(
+				'path'=>$form_state['values']['path'],
+				'fid'=>$file->fid,
+				'created'=>time(),
+			))->execute();
+
+			drupal_set_message(t('File uploaded succesfully'));
+		}
+
+	}elseif($form_state['values']['op']==t('Delete Selected')){
+		$bids=array();
+		foreach($form_state['values'] as $key=>$elem){
+			if(stripos($key,'bkg_')===0 && !empty($elem)){
+				$bids[]=preg_replace("/^bkg_/i","",$key);
+			}
+		}
+		$numdeleted = 0;
+		if(count(bids)>0){
+			$numdeleted = db_delete('url_background_images')->condition('bid',$bids,'IN')->execute();
+		}
+
+		drupal_set_message(t('!numdeleted files deleted',array('!numdeleted'=>$numdeleted)));
+	}
+	drupal_goto('admin/config/page_background');
+}
+
+function theme_page_background_admin_form($variables){
+	$form=$variables['form'];
+	$out="";
+	$rows=array();
+	$header=array('',t('Path'),t('Url'),t('Thumb'));
+	foreach($form as $key=>&$elem){
+		if(stripos($key,'bkg_')===0){
+			$infos=unserialize($elem['#infos']);unset($elem['#infos']);
+			$file=file_load($infos->fid);
+			$themed_image=array(
+				'path'=>$file->uri,
+				'style_name'=>'thumbnail',
+			);
+			$row = array(
+				array('data'	=>	render($elem)),
+				array('data'	=>	$infos->path==null?t('Default'):(($infos->path=='<front>')?'frontpage':$infos->path)),
+				array('data'	=>	url( file_create_url($file->uri), array('absolute'=>true) )),
+				array('data'	=>	theme('image_style',$themed_image)),
+			);
+			$rows[]=array('data'=>$row);
+		}
+	}
+	$out.=theme('table',array('header'=>$header,'rows'=>$rows)).render($form['delete_selected']).'<br />';
+	return $out.=drupal_render_children($form);
+}
+
+
+
+function page_background_settings_form($form,&$form_state){
+
+	$form['page_background_container_width']=array(
+		'#type'=>'textfield',
+		'#title'=>t('Container width'),
+		'#default_value'=>variable_get('page_background_container_width',''),
+	);
+
+	$form['page_background_container_height']=array(
+		'#type'=>'textfield',
+		'#title'=>t('Container height'),
+		'#default_value'=>variable_get('page_background_container_height',''),
+	);
+
+	$form['page_background_animation_effect']=array(
+		'#type'=>'select',
+		'#options'=>array(
+			'none'			=>	'none',
+			'blindX'		=>	'blindX',
+			'blindY'		=>	'blindY',
+			'blindZ'		=>	'blindZ',
+			'cover'			=>	'cover',
+			'curtainX'		=>	'curtainX',
+			'curtainY'		=>	'curtainY',
+			'fade'			=>	'fade',
+			'fadeZoom'		=>	'fadeZoom',
+			'growX'			=>	'growX',
+			'growY'			=>	'growY',
+			'scrollUp'		=>	'scrollUp',
+			'scrollDown'	=>	'scrollDown',
+			'scrollLeft'	=>	'scrollLeft',
+			'scrollRight'	=>	'scrollRight',
+			'scrollHorz'	=>	'scrollHorz',
+			'scrollVert'	=>	'scrollVert',
+			'shuffle'		=>	'shuffle',
+			'slideX'		=>	'slideX',
+			'slideY'		=>	'slideY',
+			'toss'			=>	'toss',
+			'turnUp'		=>	'turnUp',
+			'turnDown'		=>	'turnDown',
+			'turnLeft'		=>	'turnLeft',
+			'turnRight'		=>	'turnRight',
+			'uncover'		=>	'uncover',
+			'wipe'			=>	'wipe',
+			'zoom'			=>	'zoom',
+		),
+		'#title'=>t('Animation effect'),
+		'#default_value'=>variable_get('page_background_animation_effect','scrollHorz'),
+	);
+
+
+	$form['page_background_animation_timeout']=array(
+		'#type'=>'textfield',
+		'#title'=>t('Animation timeout'),
+		'#default_value'=>variable_get('page_background_animation_timeout',5000),
+	);
+
+	$form['#validate'][]='page_background_settings_form_validate';
+
+	return system_settings_form($form);
+}
+
+function page_background_settings_form_validate($form,&$form_state){
+	if(trim($form_state['values']['page_background_container_height'])!='' && !is_numeric($form_state['values']['page_background_container_height']) && !preg_match('/%$/i',$form_state['values']['page_background_container_height'])){
+		form_set_error('page_background_container_height',t('Height: Only numeric or percentage values accepted.'));
+	}
+
+	if(trim($form_state['values']['page_background_container_width'])!='' && !is_numeric($form_state['values']['page_background_container_width']) && !preg_match('/%$/i',$form_state['values']['page_background_container_width'])){
+		form_set_error('page_background_container_width',t('Width: Only numeric or percentage values accepted.'));
+	}
+
+	if(!is_numeric($form_state['values']['page_background_animation_timeout']) || $form_state['values']['page_background_animation_timeout']<0 ){
+		form_set_error('page_background_animation_timeout',t('Timeout: Only numeric positive values.'));
+	}
+}
+
+function page_background_preprocess_html(&$variables){
+	$out=_page_background_get_markup_by_path($_GET['q']=='frontpage'?'<front>':$_GET['q']);
+
+	foreach(module_implements('alter_page_background') as $module){
+		$out = module_invoke($module, 'alter_page_background',$out);
+	}
+
+	if(!isset($out['#markup']) || trim($out['#markup'])=='') return;
+
+	if(isset($out['#js']) && is_array($out['#js'])){
+		foreach($out['#js'] as $elem){
+			if(count($elem)==0) continue;
+			if(count($elem)>1){
+				drupal_add_js($elem[0],$elem[1]);
+			}else drupal_add_js($elem[0]);
+		}
+	}
+
+	if(isset($out['#css']))	drupal_add_css($out['#css'],'inline');
+
+	$variables['page']['page_top']['page_background'] = $out;
+}
+
+function _page_background_get_fids_markup($fids=array()){
+	$out=array();
+	if(!$fids || count($fids)==0){
+		$fids=_page_background_get_default_fids();
+		if(count($fids)>1){
+			shuffle($fids);
+			$fids=array( array_shift($fids) );
+		}
+	}else{
+		$internal_fids=array();
+		
+		//controllo che siano tutti oggetti
+		foreach($fids as $fid){
+			if(!is_object($fid) && is_numeric($fid)){
+				$o=new stdClass();
+				$o->fid=$fid;
+				$internal_fids[]=$o;
+			}else if(is_object($fid) && isset($fid->fid)){
+				$internal_fids[]=$fid;
+			}
+		}
+		if(count($internal_fids)>0) 
+			$fids=$internal_fids;
+	}
+	
+	foreach($fids as $fid){
+		$fid->file=file_load($fid->fid);
+		if(!isset($fid->file->image_dimensions)){
+			$fid->file->image_dimensions=image_get_info($fid->file->uri);
+		}
+	}
+
+	$cw=variable_get('page_background_container_width','');
+	$ch=variable_get('page_background_container_height','');
+	$fx=variable_get('page_background_animation_effect','scrollHorz');
+	$timeout=variable_get('page_background_animation_timeout',5000);
+
+	if($cw==''){
+		foreach($fids as $fid){
+			$cw = (is_numeric($cw)&&$cw<$fid->file->image_dimensions['width'])? $cw : $fid->file->image_dimensions['width'];
+		}
+	}
+	if($ch==''){
+		foreach($fids as $fid){
+			$ch= (is_numeric($ch)&&$ch<$fid->file->image_dimensions['height'])? $ch : $fid->file->image_dimensions['height'];
+		}
+	}
+
+	$cw=trim($cw);
+	$ch=trim($ch);
+
+	$out['#css'].='
+			#page_background_container{
+				height: '.$ch.((!preg_match('/%$/i',$ch))?'px':'').';
+				width: '.$cw.((!preg_match('/%$/i',$cw))?'px':'').';
+				overflow: hidden;
+				position:absolute;
+				z-index: -1;
+				top: 0;
+			}
+		';
+
+	if($cw!='100%'){
+		if(!preg_match('/%$/i',$cw)){
+			$out['#css'].='
+						#page_background_container{
+							left: 50%;
+							margin-left: -'.round($cw/2).'px;
+						}
+						';
+		}else{
+			$percent=str_replace('%','',$cw);
+			$margin=round(100-$percent)/2;
+			$out['#css'].='
+						#page_background_container{
+							left: '.$margin.'%;
+						}
+						';
+		}
+	}
+	//var_dump($fids);
+	$out['#markup'].='<div id="page_background_container">';
+	$slides=array();
+	$pager=array();
+	foreach($fids as $key=>$fid){
+		$slides[]='<div id="page_background_slide_'.$key.'" class="page_background_slide"></div>';
+		$out['#css'].='
+			#page_background_slide_'.$key.'{
+				background: url('.url( file_create_url($fid->file->uri), array('absolute'=>true) ).') no-repeat center top;
+				width: '.$fid->file->image_dimensions['width'].'px;
+				height: '.$fid->file->image_dimensions['height'].'px;
+				position: absolute;top: 50%;left: 50%;
+				margin-left: -'.(round($fid->file->image_dimensions['width']/2)).'px;
+				margin-top: -'.(round($fid->file->image_dimensions['height']/2)).'px;
+			}
+			';
+		$pager[]='<li class="pager_elem'.(($key==0)?' active':'').'" id="pager_element_'.$key.'">'.($key+1).'</li>';
+	}
+	if(is_array($fids) && count($fids)>0){
+		if(count($fids)==1){
+			//immagine statica
+		}else{
+			if ($cycle_path = _page_background_cycle_library_path()) {
+				//slideshow
+				$out['#js'][]=array($cycle_path);
+				$out['#css'].='
+					.page_background_slide{
+						margin: auto !important;
+						position: relative !important;
+					}
+					';
+				$out['#js'][]=array('jQuery(document).ready(function($){
+						$(\'#page_background_container\').cycle({
+							fx: \''.$fx.'\',
+							timeout: '.$timeout.',
+							pager:	\'#page_background_pager\',
+							pagerAnchorBuilder: function(){}
+						});
+					});','inline');
+			}else{
+				//immagine statica. la prima
+				$slides=array_slice($slides, 0,1);
+			}
+		}
+		$out['#markup'].=implode('',$slides);
+	}
+	$out['#markup'].='</div>';
+	if(count($slides)>1)
+	$out['#markup'].='<ul id="page_background_pager" class="pager">'.implode('',$pager).'</ul>';
+
+	$out['#fids']=$fids;
+	return $out;
+}
+
+
+function _page_background_get_markup_by_path($path){
+	global $theme_key;
+	$admintheme=variable_get('admin_theme','');
+	if(trim(strtolower($theme_key)) == trim(strtolower($admintheme))) return "";
+
+	$out=array();
+	$out['#markup']='';
+	$out['#css']='';
+
+	$fids=_page_background_get_fids($path);
+	$out=_page_background_get_fids_markup($fids);
+
+	return $out;
+}
+
+function _page_background_get_fids($path='<front>'){
+	return db_select('url_background_images','bg')->fields('bg')->condition('path',$path,'=')->orderBy('created')->execute()->fetchAll();
+}
+
+function _page_background_get_default_fids(){
+	return db_select('url_background_images','bg')->fields('bg')->condition('path',null,'IS')->orderBy('created')->execute()->fetchAll();
+}
+
+/**
+* Gets the path to the jQuery cycle library.
+*
+* @return
+*   The path to the cycle library js file, or FALSE if not found.
+*/
+function _page_background_cycle_library_path() {
+	$cycle_path = libraries_get_path('jquery.cycle');
+
+	if (!empty($cycle_path)) {
+		// Attempt to use minified version of jQuery cycle plugin.
+		if (file_exists($cycle_path . '/jquery.cycle.all.min.js')) {
+			$cycle_path .= '/jquery.cycle.all.min.js';
+		}
+		// Otherwise use non-minified version if available.
+		elseif (file_exists($cycle_path . '/jquery.cycle.all.js')) {
+			$cycle_path .= '/jquery.cycle.all.js';
+		}
+		else {
+			$cycle_path = FALSE;
+		}
+	}
+	else {
+		$cycle_path = FALSE;
+	}
+
+	return $cycle_path;
+}

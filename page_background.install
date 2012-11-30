@@ -1,0 +1,40 @@
+<?php 
+/**
+* Implements hook_schema().
+*/
+function page_background_schema() {
+	$schema['url_background_images'] = array(
+		'fields' => array(
+			'bid' => array(
+				'type' => 'serial',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+				'description' => 'Association ID',
+			),
+			'path' => array(
+				'type' => 'varchar',
+				'length' => 255,
+				'not null' => FALSE,
+				'default' => '',
+				'description' => 'Page path',
+			),
+			'fid' => array(
+				'type' => 'int',
+				'default' => 0,
+				'description' => 'File ID',
+			),
+			'created' => array(
+				'type' => 'int',
+				'not null' => TRUE,
+				'description' => 'unix time',
+			),			
+		),
+		'description' => 'Store Paths Background Images',
+		'primary key' => array('bid'),
+		'indexes' => array(
+			'path' => array('path'),
+		),	
+	);
+	
+	return $schema;
+}
