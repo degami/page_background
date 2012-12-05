@@ -377,6 +377,15 @@ function page_background_settings_form($form,&$form_state){
 		'#default_value'=>variable_get('page_background_animation_effect','scrollHorz'),
 	);
 
+	$form['page_background_slides_type']=array(
+			'#type'=>'select',
+			'#options'=>array(
+					'styled_divs'	=>	t('as divs'),
+					'images'			=> t('as images'),
+			),
+			'#title'=>t('Slides rendered'),
+			'#default_value'=>variable_get('page_background_slides_type','styled_divs'),
+	);
 
 	$form['page_background_animation_timeout']=array(
 		'#type'=>'textfield',
@@ -384,6 +393,30 @@ function page_background_settings_form($form,&$form_state){
 		'#default_value'=>variable_get('page_background_animation_timeout',5000),
 	);
 
+	$form['page_background_animation_speed']=array(
+			'#type'=>'textfield',
+			'#title'=>t('Animation speed'),
+			'#default_value'=>variable_get('page_background_animation_speed',1000),
+	);
+		
+	$form['page_background_delay']=array(
+			'#type'=>'textfield',
+			'#title'=>t('Animation initial delay'),
+			'#default_value'=>variable_get('page_background_delay',0),
+	);
+	
+	$form['page_background_fit']=array(
+			'#type'=>'checkbox',
+			'#title'=>t('Fit slides to container'),
+			'#default_value'=>variable_get('page_background_fit',true),
+	);
+	
+	$form['page_background_sync']=array(
+			'#type'=>'checkbox',
+			'#title'=>t('Sync'),
+			'#default_value'=>variable_get('page_background_sync',true),
+	);
+	
 	$form['#validate'][]='page_background_settings_form_validate';
 
 	return system_settings_form($form);
@@ -404,7 +437,7 @@ function page_background_settings_form_validate($form,&$form_state){
 }
 
 function page_background_preprocess_html(&$variables){
-	$out=_page_background_get_markup_by_path($_GET['q']=='frontpage'?'<front>':$_GET['q']);
+	$out=_page_background_get_markup_by_path(($_GET['q']=='frontpage' || drupal_is_front_page())?'<front>':$_GET['q']);
 
 	foreach(module_implements('alter_page_background') as $module){
 		$out = module_invoke($module, 'alter_page_background',$out);
@@ -462,7 +495,12 @@ function _page_background_get_fids_markup($fids=array()){
 	$ch=variable_get('page_background_container_height','');
 	$fx=variable_get('page_background_animation_effect','scrollHorz');
 	$timeout=variable_get('page_background_animation_timeout',5000);
-
+	$speed=variable_get('page_background_animation_speed',1000);
+	$fit=variable_get('page_background_fit',true);
+	$delay=variable_get('page_background_delay',0);
+	$sync=variable_get('page_background_sync',true);
+	$slide_type=variable_get('page_background_slides_type','styled_divs');
+	
 	if($cw==''){
 		foreach($fids as $fid){
 			$cw = (is_numeric($cw)&&$cw<$fid->file->image_dimensions['width'])? $cw : $fid->file->image_dimensions['width'];
@@ -506,22 +544,61 @@ function _page_background_get_fids_markup($fids=array()){
 						';
 		}
 	}
+	
+	$out['#css'].='
+					.page_background_slide{
+						margin: 0;
+						padding: 0;
+						height: '.$ch.((!preg_match('/%$/i',$ch))?'px':'').';
+						width: '.$cw.((!preg_match('/%$/i',$cw))?'px':'').';
+					}
+					';
+	
+	if($slide_type=='images'){
+		$out['#css'].='
+				.page_background_slide img{
+					display: block;
+					margin: auto;
+				}
+		';
+	}else{
+		$out['#css'].='
+				.page_background_slide .img{
+					display: block;
+					margin: auto;
+				}
+		';
+	}
+	
 	//var_dump($fids);
 	$out['#markup']='<div id="page_background_container">';
 	$slides=array();
 	$pager=array();
 	foreach($fids as $key=>$fid){
-		$slides[]='<div id="page_background_slide_'.$key.'" class="page_background_slide"></div>';
-		$out['#css'].='
-			#page_background_slide_'.$key.'{
-				background: url('.url( file_create_url($fid->file->uri), array('absolute'=>true) ).') no-repeat center top;
-				width: '.$fid->file->image_dimensions['width'].'px;
-				height: '.$fid->file->image_dimensions['height'].'px;
-				position: absolute;top: 50%;left: 50%;
-				margin-left: -'.(round($fid->file->image_dimensions['width']/2)).'px;
-				margin-top: -'.(round($fid->file->image_dimensions['height']/2)).'px;
-			}
-			';
+		switch($slide_type){
+			case 'images':
+				$slides[]='<div class="page_background_slide">'.theme('image',array(
+					'path'=>file_create_url($fid->file->uri),
+					'width'=>$fid->file->image_dimensions['width'],
+					'height'=>$fid->file->image_dimensions['height'],
+					'attributes'=>array('id'=>'page_background_slide_'.$key)
+				)).'</div>';
+				break;
+			case 'styled_divs':
+			default:
+				$slides[]='<div class="page_background_slide"><div id="page_background_slide_'.$key.'" class="img"></div></div>';
+				$out['#css'].='
+				#page_background_slide_'.$key.'{
+					background: url('.url( file_create_url($fid->file->uri), array('absolute'=>true) ).') no-repeat center top;
+					width: '.$fid->file->image_dimensions['width'].'px;
+					height: '.$fid->file->image_dimensions['height'].'px;
+					position: absolute;top: 50%;left: 50%;
+					margin-left: -'.(round($fid->file->image_dimensions['width']/2)).'px;
+					margin-top: -'.(round($fid->file->image_dimensions['height']/2)).'px;
+				}
+				';
+				break;
+		}		
 		$pager[]='<li class="pager_elem'.(($key==0)?' active':'').'" id="pager_element_'.$key.'">'.($key+1).'</li>';
 	}
 	if(is_array($fids) && count($fids)>0){
@@ -530,21 +607,27 @@ function _page_background_get_fids_markup($fids=array()){
 		}else{
 			if ($cycle_path = _page_background_cycle_library_path()) {
 				//slideshow
-				$out['#js'][]=array($cycle_path);
-				$out['#css'].='
+				$out['#js'][]=array($cycle_path);				
+				/*$out['#css'].='
 					.page_background_slide{
 						margin: auto !important;
 						position: relative !important;
 					}
-					';
-				$out['#js'][]=array('jQuery(document).ready(function($){
-						$(\'#page_background_container\').cycle({
-							fx: \''.$fx.'\',
-							timeout: '.$timeout.',
-							pager:	\'#page_background_pager\',
-							pagerAnchorBuilder: function(){}
-						});
-					});','inline');
+					';*/
+				$out['#js'][]=array('(function($){
+						$(document).ready(function(){
+							$(\'#page_background_container\').not(\'.processed\').cycle({
+								fx: \''.$fx.'\',
+								timeout: '.$timeout.',
+								speed: '.$speed.',
+								fit: '.$fit.',
+								delay: '.$delay.',
+								sync: '.$sync.',
+								pager:	\'#page_background_pager\',
+								pagerAnchorBuilder: function(){}
+							}).addClass(\'processed\');
+						})
+					})(jQuery);','inline');
 			}else{
 				//immagine statica. la prima
 				$slides=array_slice($slides, 0,1);
