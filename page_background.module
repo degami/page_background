@@ -335,7 +335,7 @@ function theme_page_background_admin_form($variables){
 			);
 			$row = array(
 				array('data'	=>	render($elem)),
-				array('data'	=>	$infos->path==null?t('Default'):(($infos->path=='<front>')?htmlentities('<front>'):$infos->path)),
+				array('data'	=>	$infos->path==null?t('Default'):check_plain($infos->path)),
 				array('data'	=>	url( file_create_url($file->uri), array('absolute'=>true) )),
 				array('data'	=>	theme('image_style',$themed_image)),
 				array('data'	=> render($form[str_replace("bkg_","weight_",$key)]))
