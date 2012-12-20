@@ -308,7 +308,7 @@ function page_background_admin_form_submit($form,&$form_state){
 	}elseif($form_state['values']['op']==t('Save Changes')){
 		$bids=array();
 		foreach($form_state['values'] as $key=>$elem){
-			if(stripos($key,'weight_')===0 && !empty($elem)){
+			if(stripos($key,'weight_')===0){
 				$bid=preg_replace("/^weight_/i","",$key);
 				$query=db_update('url_background_images')->fields(array(
 					'weight'=>$elem,
