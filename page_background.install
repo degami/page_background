@@ -23,6 +23,11 @@ function page_background_schema() {
 				'default' => 0,
 				'description' => 'File ID',
 			),
+			'weight' => array(
+					'type' => 'int',
+					'not null' => TRUE,
+					'description' => 'weight',
+			),
 			'created' => array(
 				'type' => 'int',
 				'not null' => TRUE,

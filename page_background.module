@@ -199,7 +199,7 @@ function page_background_node_delete($node){
 
 function page_background_admin_form($form,&$form_state){
 	global $user;
-	$query = db_select('url_background_images','bg')->fields('bg')->orderBy('created');
+	$query = db_select('url_background_images','bg')->fields('bg')->orderBy('weight')->orderBy('created');
 	$query->extend('PagerDefault')->limit(50);
 	$result=$query->execute()->fetchAll();
 
@@ -209,8 +209,16 @@ function page_background_admin_form($form,&$form_state){
 			'#type'=>'checkbox',
 			'#infos'=>serialize($bkg),
 		);
+		$form['weight_'.$bkg->bid]=array(
+				'#type'=>'textfield',
+				'#default_value'=>$bkg->weight,
+				'#attributes'=>Array('class'=> Array('my-elements-weight')),
+		);
 	}
-	if($result) $form['delete_selected']=array('#type'=>'submit','#value'=>t('Delete Selected'));
+	if($result) {
+		$form['delete_selected']=array('#type'=>'submit','#value'=>t('Delete Selected'));
+		$form['update_weight']=array('#type'=>'submit','#value'=>t('Save Changes'));
+	}
 
 	$form['addfile'] = array('#type'=>'fieldset','#title'=>t('Upload a new file'));
 
@@ -295,15 +303,28 @@ function page_background_admin_form_submit($form,&$form_state){
 		}
 
 		drupal_set_message(t('!numdeleted files deleted',array('!numdeleted'=>$numdeleted)));
+	}elseif($form_state['values']['op']==t('Save Changes')){
+		$bids=array();
+		foreach($form_state['values'] as $key=>$elem){
+			if(stripos($key,'weight_')===0 && !empty($elem)){
+				$bid=preg_replace("/^weight_/i","",$key);
+				$query=db_update('url_background_images')->fields(array(
+					'weight'=>$elem,
+				))->condition('bid',$bid);
+				$query->execute();
+			}
+		}
+		drupal_set_message(t('Changes saved.'));
 	}
 	drupal_goto('admin/config/page_background');
 }
 
 function theme_page_background_admin_form($variables){
 	$form=$variables['form'];
+	drupal_add_tabledrag('page-background-table', 'order', 'sibling', 'my-elements-weight');
 	$out="";
 	$rows=array();
-	$header=array('',t('Path'),t('Url'),t('Thumb'));
+	$header=array('',t('Path'),t('Url'),t('Thumb'),t('Weight'));
 	foreach($form as $key=>&$elem){
 		if(stripos($key,'bkg_')===0){
 			$infos=unserialize($elem['#infos']);unset($elem['#infos']);
@@ -317,11 +338,15 @@ function theme_page_background_admin_form($variables){
 				array('data'	=>	$infos->path==null?t('Default'):(($infos->path=='<front>')?'frontpage':$infos->path)),
 				array('data'	=>	url( file_create_url($file->uri), array('absolute'=>true) )),
 				array('data'	=>	theme('image_style',$themed_image)),
+				array('data'	=> render($form[str_replace("bkg_","weight_",$key)]))
 			);
-			$rows[]=array('data'=>$row);
+			$rows[]=array(
+					'data'=>$row,
+					'class' => array('draggable'),
+			);
 		}
 	}
-	$out.=theme('table',array('header'=>$header,'rows'=>$rows)).render($form['delete_selected']).'<br />';
+	$out.=theme('table',array('header'=>$header,'rows'=>$rows, 'attributes' => array('id' => 'page-background-table'))).render($form['update_weight']).'&nbsp;'.render($form['delete_selected']).'<br /><br />';
 	return $out.=drupal_render_children($form);
 }
 
@@ -416,6 +441,16 @@ function page_background_settings_form($form,&$form_state){
 			'#title'=>t('Sync'),
 			'#default_value'=>variable_get('page_background_sync',true),
 	);
+
+	$form['page_background_default_behavior']=array(
+			'#type'=>'select',
+			'#title'=>t('Behavior with default images'),
+			'#options'=>array(
+				'singleframe'=>t('Show one random single frame'),
+				'slideshow'=>t('Show slideshow'),
+			),
+			'#default_value'=>variable_get('page_background_default_behavior','singleframe'),
+	);
 	
 	$form['#validate'][]='page_background_settings_form_validate';
 
@@ -464,8 +499,10 @@ function _page_background_get_fids_markup($fids=array()){
 	if(!$fids || count($fids)==0){
 		$fids=_page_background_get_default_fids();
 		if(count($fids)>1){
-			shuffle($fids);
-			$fids=array( array_shift($fids) );
+			if( variable_get('page_background_default_behavior','singleframe')=='singleframe' ){
+				shuffle($fids);
+				$fids=array( array_shift($fids) );
+			}
 		}
 	}else{
 		$internal_fids=array();
@@ -660,11 +697,11 @@ function _page_background_get_markup_by_path($path){
 }
 
 function _page_background_get_fids($path='<front>'){
-	return db_select('url_background_images','bg')->fields('bg')->condition('path',$path,'=')->orderBy('created')->execute()->fetchAll();
+	return db_select('url_background_images','bg')->fields('bg')->condition('path',$path,'=')->orderBy('weight')->orderBy('created')->execute()->fetchAll();
 }
 
 function _page_background_get_default_fids(){
-	return db_select('url_background_images','bg')->fields('bg')->condition('path',null,'IS')->orderBy('created')->execute()->fetchAll();
+	return db_select('url_background_images','bg')->fields('bg')->condition('path',null,'IS')->orderBy('weight')->orderBy('created')->execute()->fetchAll();
 }
 
 /**
