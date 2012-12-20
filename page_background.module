@@ -173,6 +173,7 @@ function page_background_node_submit($node, $form, &$form_state){
 					->fields(array(
 					'path'=>'node/'.$form_state['values']['nid'],
 					'fid'=>$file->fid,
+					'weight'=>0,
 					'created'=>time(),
 					))->execute();
 				}
@@ -284,6 +285,7 @@ function page_background_admin_form_submit($form,&$form_state){
 			->fields(array(
 				'path'=>$form_state['values']['path'],
 				'fid'=>$file->fid,
+				'weight'=>0,
 				'created'=>time(),
 			))->execute();
 
