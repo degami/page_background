@@ -335,7 +335,7 @@ function theme_page_background_admin_form($variables){
 			);
 			$row = array(
 				array('data'	=>	render($elem)),
-				array('data'	=>	$infos->path==null?t('Default'):(($infos->path=='<front>')?'frontpage':$infos->path)),
+				array('data'	=>	$infos->path==null?t('Default'):(($infos->path=='<front>')?htmlentities('<front>'):$infos->path)),
 				array('data'	=>	url( file_create_url($file->uri), array('absolute'=>true) )),
 				array('data'	=>	theme('image_style',$themed_image)),
 				array('data'	=> render($form[str_replace("bkg_","weight_",$key)]))
@@ -472,7 +472,7 @@ function page_background_settings_form_validate($form,&$form_state){
 }
 
 function page_background_preprocess_html(&$variables){
-	$out=_page_background_get_markup_by_path(($_GET['q']=='frontpage' || drupal_is_front_page())?'<front>':$_GET['q']);
+	$out=_page_background_get_markup_by_path(drupal_is_front_page()?'<front>':$_GET['q']);
 
 	foreach(module_implements('alter_page_background') as $module){
 		$out = module_invoke($module, 'alter_page_background',$out);
