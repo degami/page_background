@@ -280,7 +280,10 @@ function page_background_admin_form_submit($form,&$form_state){
 			file_save($file);
 
 			if($form_state['values']['default']==1) $form_state['values']['path']=null;
-
+			else{
+				$form_state['values']['path'] = drupal_get_normal_path($form_state['values']['path']);
+			}
+			
 			db_insert('url_background_images')
 			->fields(array(
 				'path'=>$form_state['values']['path'],
@@ -454,6 +457,13 @@ function page_background_settings_form($form,&$form_state){
 			'#default_value'=>variable_get('page_background_default_behavior','singleframe'),
 	);
 	
+	$form['page_background_block']=array(
+			'#type'=>'checkbox',
+			'#title'=>t('Page background block'),
+			'#default_value'=>variable_get('page_background_block',false),
+			'#description'=>t('If enabled Page background will be available as a block and not automatically added to pages'),
+	);
+
 	$form['#validate'][]='page_background_settings_form_validate';
 
 	return system_settings_form($form);
@@ -474,6 +484,8 @@ function page_background_settings_form_validate($form,&$form_state){
 }
 
 function page_background_preprocess_html(&$variables){
+	if(variable_get('page_background_block',false)==true) return;
+
 	$out=_page_background_get_markup_by_path(drupal_is_front_page()?'<front>':$_GET['q']);
 
 	foreach(module_implements('alter_page_background') as $module){
@@ -554,12 +566,15 @@ function _page_background_get_fids_markup($fids=array()){
 	$cw=trim($cw);
 	$ch=trim($ch);
 
+	$position='absolute';
+	if(variable_get('page_background_block',false)==true) $position='static';
+
 	$out['#css']='
 			#page_background_container{
 				height: '.$ch.((!preg_match('/%$/i',$ch))?'px':'').';
 				width: '.$cw.((!preg_match('/%$/i',$cw))?'px':'').';
 				overflow: hidden;
-				position:absolute;
+				position:'.$position.';
 				z-index: -1;
 				top: 0;
 			}
@@ -733,4 +748,54 @@ function _page_background_cycle_library_path() {
 	}
 
 	return $cycle_path;
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function page_background_block_info() {
+  $blocks=array();
+  if(variable_get('page_background_block',false)==true) {
+	  $blocks['page_background_block'] = array(
+	    'info' => t('Page Backgrounds Block'),
+	    'cache' => DRUPAL_NO_CACHE
+	  );
+  }
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function page_background_block_view($delta = '') {
+  $block = array();
+
+  switch ($delta) {
+    case 'page_background_block':
+		$block['subject'] = '';
+
+		$out=_page_background_get_markup_by_path(drupal_is_front_page()?'<front>':$_GET['q']);
+		foreach(module_implements('alter_page_background') as $module){
+			$out = module_invoke($module, 'alter_page_background',$out);
+		}
+
+		if(!isset($out['#markup']) || trim($out['#markup'])=='') return;
+
+		if(isset($out['#js']) && is_array($out['#js'])){
+			foreach($out['#js'] as $elem){
+				if(count($elem)==0) continue;
+				if(count($elem)>1){
+					drupal_add_js($elem[0],$elem[1]);
+				}else drupal_add_js($elem[0]);
+			}
+		}
+
+		if(isset($out['#css']))	drupal_add_css($out['#css'],'inline');
+
+		$block['content'] = $out;
+      break;
+    
+  }
+  return $block;
 }
