@@ -535,6 +535,15 @@ function _page_background_get_fids_markup($fids=array()){
 			$fids=$internal_fids;
 	}
 	
+	if(count($fids)==0) 
+		return array( 
+			'#css' => '',
+			'#js' => array(),
+			'#fids' => array(),
+			'#numfids'=>0,
+			'#markup' => '',
+		);
+
 	foreach($fids as $fid){
 		$fid->file=file_load($fid->fid);
 		if(!isset($fid->file->image_dimensions)){
@@ -694,6 +703,7 @@ function _page_background_get_fids_markup($fids=array()){
 	$out['#markup'].='<ul id="page_background_pager" class="pager">'.implode('',$pager).'</ul>';
 
 	$out['#fids']=$fids;
+	$out['#numfids']=count($fids);
 	return $out;
 }
 
