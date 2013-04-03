@@ -575,19 +575,27 @@ function _page_background_get_fids_markup($fids=array()){
 	$cw=trim($cw);
 	$ch=trim($ch);
 
-	$position='absolute';
-	if(variable_get('page_background_block',false)==true) $position='static';
-
-	$out['#css']='
+	if( variable_get('page_background_block',false)==true ) {
+		$out['#css']='
 			#page_background_container{
 				height: '.$ch.((!preg_match('/%$/i',$ch))?'px':'').';
 				width: '.$cw.((!preg_match('/%$/i',$cw))?'px':'').';
 				overflow: hidden;
-				position:'.$position.';
+				position: relative;
+			}
+		';
+	}else{
+		$out['#css']='
+			#page_background_container{
+				height: '.$ch.((!preg_match('/%$/i',$ch))?'px':'').';
+				width: '.$cw.((!preg_match('/%$/i',$cw))?'px':'').';
+				overflow: hidden;
+				position:absolute;
 				z-index: -1;
 				top: 0;
 			}
 		';
+	}
 
 	if($cw!='100%'){
 		if(!preg_match('/%$/i',$cw)){
@@ -802,10 +810,34 @@ function page_background_block_view($delta = '') {
 		}
 
 		if(isset($out['#css']))	drupal_add_css($out['#css'],'inline');
+		$add_css=variable_get('page_background_block_additional_css', '');
+		if(trim($add_css)!='') drupal_add_css($add_css,'inline');
 
-		$block['content'] = $out;
+		$block['content'] = $out['#markup'];
       break;
     
   }
   return $block;
+}
+
+/**
+ * Implements hook_block_configure().
+ */
+function page_background_block_configure($delta = '') {
+  $form = array();
+  if ($delta == 'page_background_block') {
+    $form['page_background_block_additional_css'] = array(
+      '#type' => 'textarea',
+      '#title' => t('Additional css'),
+      '#default_value' => variable_get('page_background_block_additional_css', ''),
+    );
+  }
+  return $form;
+}
+
+function page_background_block_save($delta = '', $edit = array()) {
+  if ($delta == 'page_background_block') {
+    variable_set('page_background_block_additional_css', $edit['page_background_block_additional_css']);
+  }
+  return;
 }
