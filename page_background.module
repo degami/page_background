@@ -396,7 +396,7 @@ function page_background_admin_form_validate($form,&$form_state){
 		if( ($file = file_load($form_state['values']['uploadfile'])) === false ){
 			form_set_error('uploadfile',t('A background image is necessary'));
 		}
-		if($form_state['values']['default']!=1 && (trim($form_state['values']['path'])=='' || !drupal_valid_path($form_state['values']['path'],true)) ) {
+		if($form_state['values']['default']!=1 && (trim($form_state['values']['path'])=='' || !drupal_valid_path( drupal_get_normal_path( $form_state['values']['path'] ) ,true)) ) {
 			form_set_error('path',t('Invalid path'));
 		}
 	}elseif($form_state['values']['op']==t('Delete Selected')){
