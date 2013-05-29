@@ -596,6 +596,12 @@ function page_background_settings_form($form,&$form_state){
 			),
 			'#default_value'=>variable_get('page_background_default_behavior','singleframe'),
 	);
+
+	$form['page_background_pager']=array(
+			'#type'=>'checkbox',
+			'#title'=>t('Show pager'),
+			'#default_value'=>variable_get('page_background_pager',true),
+	);
 	
 	$form['page_background_block']=array(
 			'#type'=>'checkbox',
@@ -642,8 +648,17 @@ function page_background_preprocess_html(&$variables){
 			}else drupal_add_js($elem[0]);
 		}
 	}
-
-	if(isset($out['#css']))	drupal_add_css($out['#css'],'inline');
+	if(isset($out['#css']) && is_array($out['#css'])){
+		foreach($out['#css'] as $elem){
+			if(is_string($elem)) {
+				drupal_add_css($elem,'inline');
+			} else if(is_array($elem) && count($elem)>1) {
+				drupal_add_css($elem[0],$elem[1]);
+			}else if(is_array($elem)) {
+				drupal_add_css($elem[0],'inline');
+			}
+		}
+	}
 
 	$variables['page']['page_top']['page_background'] = $out;
 }
@@ -677,7 +692,7 @@ function _page_background_get_fids_markup($fids=array()){
 	
 	if(count($fids)==0) 
 		return array( 
-			'#css' => '',
+			'#css' => array(),
 			'#js' => array(),
 			'#fids' => array(),
 			'#numfids'=>0,
@@ -716,7 +731,7 @@ function _page_background_get_fids_markup($fids=array()){
 	$ch=trim($ch);
 
 	if( variable_get('page_background_block',false)==true ) {
-		$out['#css']='
+		$out['#css'][]='
 			#page_background_container{
 				height: '.$ch.((!preg_match('/%$/i',$ch))?'px':'').';
 				width: '.$cw.((!preg_match('/%$/i',$cw))?'px':'').';
@@ -725,7 +740,7 @@ function _page_background_get_fids_markup($fids=array()){
 			}
 		';
 	}else{
-		$out['#css']='
+		$out['#css'][]='
 			#page_background_container{
 				height: '.$ch.((!preg_match('/%$/i',$ch))?'px':'').';
 				width: '.$cw.((!preg_match('/%$/i',$cw))?'px':'').';
@@ -739,7 +754,7 @@ function _page_background_get_fids_markup($fids=array()){
 
 	if($cw!='100%'){
 		if(!preg_match('/%$/i',$cw)){
-			$out['#css'].='
+			$out['#css'][]='
 						#page_background_container{
 							left: 50%;
 							margin-left: -'.round($cw/2).'px;
@@ -748,7 +763,7 @@ function _page_background_get_fids_markup($fids=array()){
 		}else{
 			$percent=str_replace('%','',$cw);
 			$margin=round(100-$percent)/2;
-			$out['#css'].='
+			$out['#css'][]='
 						#page_background_container{
 							left: '.$margin.'%;
 						}
@@ -756,7 +771,7 @@ function _page_background_get_fids_markup($fids=array()){
 		}
 	}
 	
-	$out['#css'].='
+	$out['#css'][]='
 					.page_background_slide{
 						margin: 0;
 						padding: 0;
@@ -766,14 +781,14 @@ function _page_background_get_fids_markup($fids=array()){
 					';
 	
 	if($slide_type=='images'){
-		$out['#css'].='
+		$out['#css'][]='
 				.page_background_slide img{
 					display: block;
 					margin: auto;
 				}
 		';
 	}else{
-		$out['#css'].='
+		$out['#css'][]='
 				.page_background_slide .img{
 					display: block;
 					margin: auto;
@@ -788,17 +803,17 @@ function _page_background_get_fids_markup($fids=array()){
 	foreach($fids as $key=>$fid){
 		switch($slide_type){
 			case 'images':
-				$slides[]='<div class="page_background_slide">'.theme('image',array(
+				$slides[]=array('#markup'=>'<div class="page_background_slide">'.theme('image',array(
 					'path'=>file_create_url($fid->file->uri),
 					'width'=>$fid->file->image_dimensions['width'],
 					'height'=>$fid->file->image_dimensions['height'],
 					'attributes'=>array('id'=>'page_background_slide_'.$key)
-				)).'</div>';
+				)).'</div>','#fid'=>$fid);
 				break;
 			case 'styled_divs':
 			default:
-				$slides[]='<div class="page_background_slide"><div id="page_background_slide_'.$key.'" class="img"></div></div>';
-				$out['#css'].='
+				$slides[]=array('#markup'=>'<div class="page_background_slide"><div id="page_background_slide_'.$key.'" class="img"></div></div>','#fid'=>$fid);
+				$out['#css'][]='
 				#page_background_slide_'.$key.'{
 					background: url('.url( file_create_url($fid->file->uri), array('absolute'=>true) ).') no-repeat center top;
 					width: '.$fid->file->image_dimensions['width'].'px;
@@ -809,8 +824,13 @@ function _page_background_get_fids_markup($fids=array()){
 				}
 				';
 				break;
-		}		
+		}	
 		$pager[]='<li class="pager_elem'.(($key==0)?' active':'').'" id="pager_element_'.$key.'">'.($key+1).'</li>';
+
+		foreach(module_implements('alter_page_background_slide') as $module){
+			$slides = module_invoke($module, 'alter_page_background_slide',$slides);
+		}
+
 	}
 	if(is_array($fids) && count($fids)>0){
 		if(count($fids)==1){
@@ -844,11 +864,17 @@ function _page_background_get_fids_markup($fids=array()){
 				$slides=array_slice($slides, 0,1);
 			}
 		}
-		$out['#markup'].=implode('',$slides);
+		//$out['#markup'].=implode('',$slides);
+		$markupslides = '';
+		foreach($slides as $slide){
+			$markupslides.=$slide['#markup'];
+		}
+		$out['#markup'].=$markupslides;
 	}
 	$out['#markup'].='</div>';
-	if(count($slides)>1)
-	$out['#markup'].='<ul id="page_background_pager" class="pager">'.implode('',$pager).'</ul>';
+	if( count($slides)>1 && variable_get('page_background_pager',true)==true ){
+		$out['#markup'].='<ul id="page_background_pager" class="pager">'.implode('',$pager).'</ul>';
+	}
 
 	$out['#fids']=$fids;
 	$out['#numfids']=count($fids);
@@ -863,7 +889,7 @@ function _page_background_get_markup_by_path($path){
 
 	$out=array();
 	$out['#markup']='';
-	$out['#css']='';
+	$out['#css']=array();
 
 	$fids=_page_background_get_fids($path);
 	$out=_page_background_get_fids_markup($fids);
@@ -949,7 +975,18 @@ function page_background_block_view($delta = '') {
 			}
 		}
 
-		if(isset($out['#css']))	drupal_add_css($out['#css'],'inline');
+		if(isset($out['#css']) && is_array($out['#css'])){
+			foreach($out['#css'] as $elem){
+				if(is_string($elem)) {
+					drupal_add_css($elem,'inline');
+				} else if(is_array($elem) && count($elem)>1) {
+					drupal_add_css($elem[0],$elem[1]);
+				}else if(is_array($elem)) {
+					drupal_add_css($elem[0],'inline');
+				}
+			}
+		}
+
 		$add_css=variable_get('page_background_block_additional_css', '');
 		if(trim($add_css)!='') drupal_add_css($add_css,'inline');
 
