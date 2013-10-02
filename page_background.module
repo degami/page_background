@@ -21,6 +21,15 @@ function page_background_menu(){
 	  	'access arguments' => array('administer page_background'),
 	);
 	
+	$items['admin/config/page_background/%bid/clone'] = array(
+	    'title' => t('Page Backgrounds Clone'),
+	    'description' => t('Page Backgrounds Clone'),
+	    'page callback' => 'drupal_get_form',
+	    'page arguments' => array('page_background_clone_form',3),
+		'access callback'=>'_page_background_check_access',
+	  	'access arguments' => array('administer page_background'),
+	);
+
 	return $items;
 }
 
@@ -469,7 +478,7 @@ function theme_page_background_admin_form($variables){
 	drupal_add_tabledrag('page-background-table', 'order', 'sibling', 'my-elements-weight');
 	$out="";
 	$rows=array();
-	$header=array('',t('Path'),t('Url'),t('Thumb'),t('Weight'));
+	$header=array('',t('Path'),t('Url'),t('Thumb'),t('Weight'),'');
 	foreach($form as $key=>&$elem){
 		if(stripos($key,'bkg_')===0){
 			$infos=unserialize($elem['#infos']);unset($elem['#infos']);
@@ -483,7 +492,8 @@ function theme_page_background_admin_form($variables){
 				array('data'	=>	$infos->path==null?t('Default'):check_plain($infos->path)),
 				array('data'	=>	url( file_create_url($file->uri), array('absolute'=>true) )),
 				array('data'	=>	theme('image_style',$themed_image)),
-				array('data'	=> render($form[str_replace("bkg_","weight_",$key)]))
+				array('data'	=> render($form[str_replace("bkg_","weight_",$key)])),
+				array('data'	=>	l(t('clone'),'admin/config/page_background/'.$infos->bid.'/clone') ),
 			);
 			$rows[]=array(
 					'data'=>$row,
@@ -495,7 +505,44 @@ function theme_page_background_admin_form($variables){
 	return $out.=drupal_render_children($form);
 }
 
+function page_background_clone_form($form,&$form_state,$background_row){
+	global $user;
 
+	$form['bid']=array('#type'=>'hidden','#value'=>$background_row->bid);
+	$form['uid']=array('#type'=>'hidden','#value'=>$user->uid);
+	$form['default']=array('#type'=>'checkbox','#title'=>t('Add to defaults'));
+	$form['path']=array('#type'=>'textfield','#title'=>t('Path'));
+	$form['submit']=array('#type'=>'submit','#value'=>t('Submit'));
+
+	return $form;
+}
+function page_background_clone_form_validate($form,&$form_state){
+	if(!is_numeric($form_state['values']['bid']) || ($background_row=bid_load($form_state['values']['bid'])) === false ){
+		form_set_error('',t('A background image is necessary'));
+	}
+	if($form_state['values']['default']!=1 && (trim($form_state['values']['path'])=='' || !drupal_valid_path( drupal_get_normal_path( $form_state['values']['path'] ) ,true)) ) {
+			form_set_error('path',t('Invalid path'));
+	}
+}
+function page_background_clone_form_submit($form,&$form_state){
+	$background_row_orig = bid_load($form_state['values']['bid']);
+
+	if($form_state['values']['default']==1) $form_state['values']['path']=null;
+	else{
+		$form_state['values']['path'] = drupal_get_normal_path($form_state['values']['path']);
+	}
+
+	db_insert('url_background_images')
+	->fields(array(
+		'path'=>$form_state['values']['path'],
+		'fid'=>$background_row_orig->fid,
+		'weight'=>0,
+		'created'=>time(),
+	))->execute();
+
+	drupal_set_message(t('Background cloned succesfully'));
+	drupal_goto('admin/config/page_background');
+}
 
 function page_background_settings_form($form,&$form_state){
 
@@ -903,6 +950,22 @@ function _page_background_get_fids($path='<front>'){
 
 function _page_background_get_default_fids(){
 	return db_select('url_background_images','bg')->fields('bg')->condition('path',null,'IS')->orderBy('weight')->orderBy('created')->execute()->fetchAll();
+}
+
+
+/**
+ * Implementation of a %wildcard_load(). http://drupal.org/node/224170
+ *
+ * Handles menu items with %bid in the path.  Seems to get called a lot(!) so we cache.
+ */
+function bid_load($bid) {
+  $cache = &drupal_static(__FUNCTION__);
+  if (!isset($cache))
+    $cache = array();
+  if (!isset($cache[$id])) {
+  	$cache[$bid] = db_select('url_background_images','bg')->fields('bg')->condition('bid',$bid,'=')->range(0,1)->execute()->fetch(PDO::FETCH_OBJ);
+  }
+  return $cache[$bid];
 }
 
 /**
