@@ -29,6 +29,15 @@ function page_background_menu(){
 		'access callback'=>'_page_background_check_access',
 	  	'access arguments' => array('administer page_background'),
 	);
+	
+	$items['admin/config/page_background/%bid/edit'] = array(
+	    'title' => t('Edit Page Backgrounds'),
+	    'description' => t('Edit Page Backgrounds'),
+	    'page callback' => 'drupal_get_form',
+	    'page arguments' => array('page_background_edit_form',3),
+		'access callback'=>'_page_background_check_access',
+	  	'access arguments' => array('administer page_background'),
+	);
 
 	return $items;
 }
@@ -177,13 +186,20 @@ function page_background_form_taxonomy_form_term_submit($form, &$form_state){
 					$file->uid = $user->uid;
 					file_save($file);
 	
-					db_insert('url_background_images')
-					->fields(array(
-					'path'=>'taxonomy/term/'.$form_state['values']['tid'],
-					'fid'=>$file->fid,
-					'weight'=>0,
-					'created'=>time(),
-					))->execute();
+					$background_row = _page_background_save( array(
+						'file' => $file,
+						'path' => 'taxonomy/term/'.$form_state['values']['tid'],
+						'weight' => 0,
+						'bglinkurl' => trim($form_state['values']['bglinkurl']) != '' ? trim($form_state['values']['bglinkurl']) : null,
+					) );
+
+					// db_insert('url_background_images')
+					// ->fields(array(
+					// 'path'=>'taxonomy/term/'.$form_state['values']['tid'],
+					// 'fid'=>$file->fid,
+					// 'weight'=>0,
+					// 'created'=>time(),
+					// ))->execute();
 				}
 			}
 		}
@@ -197,13 +213,22 @@ function page_background_form_taxonomy_form_term_submit($form, &$form_state){
 		}
 		$numdeleted = 0;
 		if(count($bids)>0){
-			$numdeleted = db_delete('url_background_images')->condition('bid',$bids,'IN')->execute();
+			//$numdeleted = db_delete('url_background_images')->condition('bid',$bids,'IN')->execute();
+			$numdeleted = _page_background_delete_multiple($bids);
 		}
 	}
 }
 
 function page_background_taxonomy_term_delete($term){
-	$numdeleted = db_delete('url_background_images')->condition('path','taxonomy/term/'.$term->tid,'=')->execute();
+	//$numdeleted = db_delete('url_background_images')->condition('path','taxonomy/term/'.$term->tid,'=')->execute();
+
+	$bids = array();
+	$query = db_select('url_background_images','bg')->fields('bg',array('bid'))->condition('path','taxonomy/term/'.$term->tid,'=');
+	$result=$query->execute()->fetchAll();
+	foreach($result as $row) $bids[] = $row->bid;
+	if( count($bids) > 0 ){
+		$numdeleted = _page_background_delete_multiple($bids);
+	}
 }
 
 
@@ -318,13 +343,20 @@ function page_background_node_submit($node, $form, &$form_state){
 					$file->uid = $user->uid;
 					file_save($file);
 	
-					db_insert('url_background_images')
-					->fields(array(
-					'path'=>'node/'.$form_state['values']['nid'],
-					'fid'=>$file->fid,
-					'weight'=>0,
-					'created'=>time(),
-					))->execute();
+					$background_row = _page_background_save( array(
+						'file' => $file,
+						'path' => 'node/'.$form_state['values']['nid'],
+						'weight' => 0,
+						'bglinkurl' => trim($form_state['values']['bglinkurl']) != '' ? trim($form_state['values']['bglinkurl']) : null,
+					) );
+
+					// db_insert('url_background_images')
+					// ->fields(array(
+					// 'path'=>'node/'.$form_state['values']['nid'],
+					// 'fid'=>$file->fid,
+					// 'weight'=>0,
+					// 'created'=>time(),
+					// ))->execute();
 				}
 			}
 		}
@@ -338,13 +370,22 @@ function page_background_node_submit($node, $form, &$form_state){
 		}
 		$numdeleted = 0;
 		if(count($bids)>0){
-			$numdeleted = db_delete('url_background_images')->condition('bid',$bids,'IN')->execute();
+			//$numdeleted = db_delete('url_background_images')->condition('bid',$bids,'IN')->execute();
+			$numdeleted = _page_background_delete_multiple($bids);
 		}
 	}
 }
 
 function page_background_node_delete($node){
-	$numdeleted = db_delete('url_background_images')->condition('path','node/'.$node->nid,'=')->execute();
+	//$numdeleted = db_delete('url_background_images')->condition('path','node/'.$node->nid,'=')->execute();
+
+	$bids = array();
+	$query = db_select('url_background_images','bg')->fields('bg',array('bid'))->condition('path','node/'.$node->nid,'=');
+	$result=$query->execute()->fetchAll();
+	foreach($result as $row) $bids[] = $row->bid;
+	if( count($bids) > 0 ){
+		$numdeleted = _page_background_delete_multiple($bids);
+	}
 }
 
 function page_background_admin_form($form,&$form_state){
@@ -382,7 +423,7 @@ function page_background_admin_form($form,&$form_state){
 
 	$form['uid']=array('#type'=>'hidden','#value'=>$user->uid);
 
-	$form['addfile']['path']=array('#type'=>'textfield','#title'=>t('Path'));
+	
 	$form['addfile']['uploadfile']=array(
 		'#type'=>'managed_file',
 		'#title'=>t('Upload New Background'),
@@ -394,6 +435,8 @@ function page_background_admin_form($form,&$form_state){
 		'#upload_location'=>'public://page_backgrounds/',
 		'#description'=>t('extensions allowed: !extension_list , max file size: !maxfilesize MB',Array('!extension_list'=>implode(' ',$extensions),'!maxfilesize'=>$upload_mb)),
 	);
+	$form['addfile']['path']=array('#type'=>'textfield','#title'=>t('Path'));
+	$form['addfile']['bglinkurl']=array('#type'=>'textfield','#title'=>t('Link Url'));
 
 	$form['addfile']['default']=array('#type'=>'checkbox','#title'=>t('Add to defaults'));
 	$form['addfile']['submit']=array('#type'=>'submit','#value'=>t('Submit'));
@@ -407,6 +450,9 @@ function page_background_admin_form_validate($form,&$form_state){
 		}
 		if($form_state['values']['default']!=1 && (trim($form_state['values']['path'])=='' || !drupal_valid_path( drupal_get_normal_path( $form_state['values']['path'] ) ,true)) ) {
 			form_set_error('path',t('Invalid path'));
+		}
+		if( trim($form_state['values']['bglinkurl']) != '' && parse_url( $form_state['values']['bglinkurl'] ) === false ) {
+			form_set_error('bglinkurl',t('Invalid Link Url'));
 		}
 	}elseif($form_state['values']['op']==t('Delete Selected')){
 		$count=0;
@@ -432,14 +478,22 @@ function page_background_admin_form_submit($form,&$form_state){
 			else{
 				$form_state['values']['path'] = drupal_get_normal_path($form_state['values']['path']);
 			}
+
+			$background_row = _page_background_save( array(
+				'file' => $file,
+				'path' => $form_state['values']['path'],
+				'weight' => 0,
+				'bglinkurl' => trim($form_state['values']['bglinkurl']) != '' ? trim($form_state['values']['bglinkurl']) : null,
+			) );
 			
-			db_insert('url_background_images')
-			->fields(array(
-				'path'=>$form_state['values']['path'],
-				'fid'=>$file->fid,
-				'weight'=>0,
-				'created'=>time(),
-			))->execute();
+			// db_insert('url_background_images')
+			// ->fields(array(
+			// 	'path'=>$form_state['values']['path'],
+			// 	'fid'=>$file->fid,
+			// 	'weight'=>0,
+			// 	'bglinkurl'=> trim($form_state['values']['bglinkurl']) != '' ? trim($form_state['values']['bglinkurl']) : null,
+			// 	'created'=>time(),
+			// ))->execute();
 
 			drupal_set_message(t('File uploaded succesfully'));
 		}
@@ -453,7 +507,8 @@ function page_background_admin_form_submit($form,&$form_state){
 		}
 		$numdeleted = 0;
 		if(count($bids)>0){
-			$numdeleted = db_delete('url_background_images')->condition('bid',$bids,'IN')->execute();
+			//$numdeleted = db_delete('url_background_images')->condition('bid',$bids,'IN')->execute();
+			$numdeleted = _page_background_delete_multiple($bids);
 		}
 
 		drupal_set_message(t('!numdeleted files deleted',array('!numdeleted'=>$numdeleted)));
@@ -478,22 +533,35 @@ function theme_page_background_admin_form($variables){
 	drupal_add_tabledrag('page-background-table', 'order', 'sibling', 'my-elements-weight');
 	$out="";
 	$rows=array();
-	$header=array('',t('Path'),t('Url'),t('Thumb'),t('Weight'),'');
+	$header=array('',t('Path'),t('Url'),t('Link Url'),t('Thumb'),t('Weight'),'');
 	foreach($form as $key=>&$elem){
 		if(stripos($key,'bkg_')===0){
 			$infos=unserialize($elem['#infos']);unset($elem['#infos']);
+
+			if( $infos->bglinkurl != null ){
+				if( parse_url($infos->bglinkurl) === false){
+					$infos->bglinkurl = null;
+				}
+			}
+
 			$file=file_load($infos->fid);
 			$themed_image=array(
 				'path'=>$file->uri,
 				'style_name'=>'thumbnail',
 			);
+
+			$links=array();
+			$links[] = l(t('clone'),'admin/config/page_background/'.$infos->bid.'/clone');
+			$links[] = l(t('edit'),'admin/config/page_background/'.$infos->bid.'/edit');
+
 			$row = array(
 				array('data'	=>	render($elem)),
 				array('data'	=>	$infos->path==null?t('Default'):check_plain($infos->path)),
 				array('data'	=>	url( file_create_url($file->uri), array('absolute'=>true) )),
+				array('data'	=>	($infos->bglinkurl == null) ? ' - ' : url( $infos->bglinkurl, array('absolute'=>true) )),
 				array('data'	=>	theme('image_style',$themed_image)),
 				array('data'	=> render($form[str_replace("bkg_","weight_",$key)])),
-				array('data'	=>	l(t('clone'),'admin/config/page_background/'.$infos->bid.'/clone') ),
+				array('data'	=>	implode(' | ',$links) ),
 			);
 			$rows[]=array(
 					'data'=>$row,
@@ -512,6 +580,7 @@ function page_background_clone_form($form,&$form_state,$background_row){
 	$form['uid']=array('#type'=>'hidden','#value'=>$user->uid);
 	$form['default']=array('#type'=>'checkbox','#title'=>t('Add to defaults'));
 	$form['path']=array('#type'=>'textfield','#title'=>t('Path'));
+	$form['bglinkurl']=array('#type'=>'textfield','#title'=>t('Link Url'));
 	$form['submit']=array('#type'=>'submit','#value'=>t('Submit'));
 
 	return $form;
@@ -532,17 +601,119 @@ function page_background_clone_form_submit($form,&$form_state){
 		$form_state['values']['path'] = drupal_get_normal_path($form_state['values']['path']);
 	}
 
-	db_insert('url_background_images')
-	->fields(array(
-		'path'=>$form_state['values']['path'],
-		'fid'=>$background_row_orig->fid,
-		'weight'=>0,
-		'created'=>time(),
-	))->execute();
+	$background_row = _page_background_save( array(
+		'fid' => $background_row_orig->fid,
+		'path' => $form_state['values']['path'],
+		'weight' => 0,
+		'bglinkurl' => trim($form_state['values']['bglinkurl']) != '' ? trim($form_state['values']['bglinkurl']) : null,
+	) );
+
+	// db_insert('url_background_images')
+	// ->fields(array(
+	// 	'path'=>$form_state['values']['path'],
+	// 	'fid'=>$background_row_orig->fid,
+	// 	'weight'=>0,
+	// 	'created'=>time(),
+	// ))->execute();
 
 	drupal_set_message(t('Background cloned succesfully'));
 	drupal_goto('admin/config/page_background');
 }
+
+
+
+function page_background_edit_form($form,&$form_state,$background_row){
+	global $user;
+	$form['addfile'] = array('#type'=>'fieldset','#title'=>t('Modify a page background'));
+
+	$max_upload = (int)(ini_get('upload_max_filesize'));
+	$max_post = (int)(ini_get('post_max_size'));
+	$memory_limit = (int)(ini_get('memory_limit'));
+	$upload_mb = min($max_upload, $max_post, $memory_limit);
+
+	$extensions=explode(' ','jpg jpeg png');
+	foreach($extensions as &$ext) $ext='.'.trim($ext);
+
+	$form['background_row']=array('#type'=>'value','#value'=> isset($form_state['values']['background_row']) ? $form_state['values']['background_row'] : $background_row );
+
+	if( ($file = file_load( $form['background_row']['#value']->fid )) !== false ){
+		$fileusage = file_usage_list($file);
+		if( !isset( $fileusage['page_background']['background_image'][ $form['background_row']['#value']->bid ] ) || 
+			$fileusage['page_background']['background_image'][ $form['background_row']['#value']->bid ] == 0 ){
+				//se mancava file usage lo aggiungo
+				file_usage_add( $file, 'page_background', 'background_image', $form['background_row']['#value']->bid );
+		}
+	} 
+
+	$form['uid']=array('#type'=>'hidden','#value'=>$user->uid);
+	
+	$form['addfile']['uploadfile']=array(
+		'#type'=>'managed_file',
+		'#title'=>t('Upload New Background'),
+		'#upload_validators' => array(
+		'file_validate_extensions' => array('jpg jpeg png'),
+		// Pass the maximum file size in bytes
+		    'file_validate_size' => array($upload_mb * 1024 * 1024),
+		),
+		'#upload_location'=>'public://page_backgrounds/',
+		'#description'=>t('extensions allowed: !extension_list , max file size: !maxfilesize MB',array('!extension_list'=>implode(' ',$extensions),'!maxfilesize'=>$upload_mb)),
+		'#default_value' => $form['background_row']['#value']->fid,
+	);
+	$form['addfile']['path']=array('#type'=>'textfield','#title'=>t('Path'),'#default_value'=> $form['background_row']['#value']->path );
+	$form['addfile']['bglinkurl']=array('#type'=>'textfield','#title'=>t('Link Url'),'#default_value'=> $form['background_row']['#value']->bglinkurl );
+
+	$form['addfile']['default']=array('#type'=>'checkbox','#title'=>t('Add to defaults'),'#default_value'=> ($form['background_row']['#value']->path == null) );
+	$form['addfile']['submit']=array('#type'=>'submit','#value'=>t('Save'));
+
+	return $form;
+}
+function page_background_edit_form_validate($form,&$form_state){
+	if( ($file = file_load($form_state['values']['uploadfile'])) === false ){
+		form_set_error('uploadfile',t('A background image is necessary'));
+	}
+	if($form_state['values']['default']!=1 && (trim($form_state['values']['path'])=='' || !drupal_valid_path( drupal_get_normal_path( $form_state['values']['path'] ) ,true)) ) {
+		form_set_error('path',t('Invalid path'));
+	}
+	if( trim($form_state['values']['bglinkurl']) != '' && parse_url( $form_state['values']['bglinkurl'] ) === false ) {
+		form_set_error('bglinkurl',t('Invalid Link Url'));
+	}
+}
+function page_background_edit_form_submit($form,&$form_state){
+
+	if( ($file = file_load($form_state['values']['uploadfile'])) !== false ){
+		$file->status = FILE_STATUS_PERMANENT;
+		$file->uid = $form_state['values']['uid'];
+		file_save($file);
+
+		if($form_state['values']['default']==1) $form_state['values']['path']=null;
+		else{
+			$form_state['values']['path'] = drupal_get_normal_path($form_state['values']['path']);
+		}
+		
+		$background_row = _page_background_save( array(
+			'bid' => $form_state['values']['background_row']->bid,
+			'file' => $file,
+			'path' => $form_state['values']['path'],
+			'weight' => 0,
+			'bglinkurl' => trim($form_state['values']['bglinkurl']) != '' ? trim($form_state['values']['bglinkurl']) : null,
+		) );
+
+		// db_insert('url_background_images')
+		// ->fields(array(
+		// 	'path'=>$form_state['values']['path'],
+		// 	'fid'=>$file->fid,
+		// 	'weight'=>0,
+		// 	'bglinkurl'=> trim($form_state['values']['bglinkurl']) != '' ? trim($form_state['values']['bglinkurl']) : null,
+		// 	'created'=>time(),
+		// ))->execute();
+
+		drupal_set_message(t('File uploaded succesfully'));
+	}
+
+	drupal_set_message(t('Background modified succesfully'));
+	drupal_goto('admin/config/page_background');
+}
+
 
 function page_background_settings_form($form,&$form_state){
 
@@ -848,18 +1019,37 @@ function _page_background_get_fids_markup($fids=array()){
 	$slides=array();
 	$pager=array();
 	foreach($fids as $key=>$fid){
+		
+		if( $fid->bglinkurl != null && parse_url($fid->bglinkurl) === false ) $fid->bglinkurl = null;
 		switch($slide_type){
 			case 'images':
-				$slides[]=array('#markup'=>'<div class="page_background_slide">'.theme('image',array(
-					'path'=>file_create_url($fid->file->uri),
-					'width'=>$fid->file->image_dimensions['width'],
-					'height'=>$fid->file->image_dimensions['height'],
-					'attributes'=>array('id'=>'page_background_slide_'.$key)
-				)).'</div>','#fid'=>$fid);
+
+				if( $fid->bglinkurl != null ){
+					$slides[]=array('#markup'=>'<div class="page_background_slide">'.l( theme('image',array(
+						'path'=>file_create_url($fid->file->uri),
+						'width'=>$fid->file->image_dimensions['width'],
+						'height'=>$fid->file->image_dimensions['height'],
+						'attributes'=>array('id'=>'page_background_slide_'.$key)
+					)) , $fid->bglinkurl , array('html'=>true) ) .'</div>','#fid'=>$fid);
+				} else {
+					$slides[]=array('#markup'=>'<div class="page_background_slide">'.theme('image',array(
+						'path'=>file_create_url($fid->file->uri),
+						'width'=>$fid->file->image_dimensions['width'],
+						'height'=>$fid->file->image_dimensions['height'],
+						'attributes'=>array('id'=>'page_background_slide_'.$key)
+					)).'</div>','#fid'=>$fid);
+				}
+
 				break;
 			case 'styled_divs':
 			default:
-				$slides[]=array('#markup'=>'<div class="page_background_slide"><div id="page_background_slide_'.$key.'" class="img"></div></div>','#fid'=>$fid);
+
+				if( $fid->bglinkurl != null ){
+					$slides[]=array('#markup'=>'<div class="page_background_slide">'.l('<div id="page_background_slide_'.$key.'" class="img"></div>', $fid->bglinkurl , array('html'=>true) ).'</div>','#fid'=>$fid);
+				} else {
+					$slides[]=array('#markup'=>'<div class="page_background_slide"><div id="page_background_slide_'.$key.'" class="img"></div></div>','#fid'=>$fid);
+				}
+
 				$out['#css'][]='
 				#page_background_slide_'.$key.'{
 					background: url('.url( file_create_url($fid->file->uri), array('absolute'=>true) ).') no-repeat center top;
@@ -958,14 +1148,88 @@ function _page_background_get_default_fids(){
  *
  * Handles menu items with %bid in the path.  Seems to get called a lot(!) so we cache.
  */
-function bid_load($bid) {
+function bid_load( $bid, $reset = true ) {
   $cache = &drupal_static(__FUNCTION__);
   if (!isset($cache))
     $cache = array();
-  if (!isset($cache[$id])) {
+  if (!isset($cache[$id]) || $reset == true) {
   	$cache[$bid] = db_select('url_background_images','bg')->fields('bg')->condition('bid',$bid,'=')->range(0,1)->execute()->fetch(PDO::FETCH_OBJ);
   }
   return $cache[$bid];
+}
+
+
+
+/**
+ * Save a background
+ *
+ */
+function _page_background_save($values = array()) {
+	$orig_bkg_row = null;
+
+	$return_background_row = null;
+
+	$file = isset($values['file']) ? $values['file'] : ( isset($values['fid']) ? file_load($values['fid']) : null ) ;
+	$path = isset($values['path']) ? $values['path'] : null;
+	$weight = isset($values['weight']) ? $values['weight'] : 0;
+	$bglinkurl = isset($values['bglinkurl']) ? $values['bglinkurl'] : null;
+
+	$fields = array(
+		'path'=>$path,
+		'fid'=>$file->fid,
+		'weight'=>$weight,
+		'bglinkurl'=>$bglinkurl,
+	);
+
+	if(isset($values['bid'])){
+		$orig_bkg_row = bid_load($values['bid']);
+		$query = db_update('url_background_images');
+		$query->condition('bid',$values['bid'],'=');
+	}else{
+		$query = db_insert('url_background_images');
+		$fields['created']=time();
+	}
+
+	$res = $query->fields($fields)->execute();
+
+	if(isset($values['bid'])){
+		$return_background_row = bid_load($values['bid'], true);
+		if( $orig_bkg_row->fid != $return_background_row->fid ){
+			// elimino vecchio file usage
+			if( ($oldfile = file_load($orig_bkg_row->fid)) !== false ){
+				file_usage_delete( $oldfile, 'page_background', 'background_image', $return_background_row->bid );
+			}
+
+			//aggiungo il nuovo
+			file_usage_add( $file, 'page_background', 'background_image', $return_background_row->bid );
+		}
+	}else{
+		$return_background_row = bid_load($res, true);
+		file_usage_add( $file, 'page_background', 'background_image', $return_background_row->bid );
+	}
+	return $return_background_row;
+}
+
+function _page_background_delete( $background_row ){
+	if( is_numeric($background_row) ) $background_row = bid_load($background_row , true);
+	if(!isset($background_row->file) && is_numeric($background_row->fid) ) $background_row->file = file_load($background_row->fid);
+
+	if( is_object($background_row->file) )
+		file_usage_delete( $file, 'page_background', 'background_image', $background_row->bid );
+
+	$numdeleted = db_delete('url_background_images')->condition('bid',$background_row->bid)->execute();
+	return $numdeleted;
+}
+
+function _page_background_delete_multiple( $bgs = array() ){
+	if( !is_array($bgs) ) $bgs = array($bgs);
+
+	$out = 0;
+	foreach($bgs as $bg){
+		$out += _page_background_delete($bg);
+	}
+
+	return $out;
 }
 
 /**

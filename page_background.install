@@ -28,11 +28,17 @@ function page_background_schema() {
 					'not null' => TRUE,
 					'description' => 'weight',
 			),
+			'bglinkurl' => array(
+				'type' => 'varchar',
+				'length' => 255,
+				'not null' => FALSE,
+				'description' => 'Background Link url',
+			),			
 			'created' => array(
 				'type' => 'int',
 				'not null' => TRUE,
 				'description' => 'unix time',
-			),			
+			),
 		),
 		'description' => 'Store Paths Background Images',
 		'primary key' => array('bid'),
@@ -42,4 +48,27 @@ function page_background_schema() {
 	);
 	
 	return $schema;
+}
+
+/**
+ * Implements hook_update_N().
+ */
+function page_background_update_7000(&$sandbox) {
+	db_add_field('url_background_images', 'weight', array(
+		'type' => 'int',
+		'not null' => TRUE,
+		'description' => 'weight',
+	));
+}
+
+/**
+ * Implements hook_update_N().
+ */
+function page_background_update_7100(&$sandbox) {
+	db_add_field('url_background_images', 'bglinkurl', array(
+		'type' => 'varchar',
+		'length' => 255,
+		'not null' => FALSE,
+		'description' => 'Background Link url',
+	));
 }
