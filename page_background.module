@@ -145,8 +145,10 @@ function page_background_form_taxonomy_form_term_alter(&$form, &$form_state, $fo
 					'#upload_location'=>'public://page_backgrounds/',
 					'#description'=>t('extensions allowed: !extension_list , max file size: !maxfilesize MB',Array('!extension_list'=>implode(' ',$extensions),'!maxfilesize'=>$upload_mb)),
 			);
+			$form['page_backgrounds']['uploads_fieldset']["page_backgrounds_bglinkurl$i"]=array('#type'=>'textfield','#title'=>t('Link Url') );
 		}
 		
+
 		$form['page_backgrounds']['add-new-file']=array(
 				'#type'=>'button',
 				'#value'=>t('Add more'),
@@ -180,7 +182,7 @@ function page_background_form_taxonomy_form_term_submit($form, &$form_state){
 		( isset($form_state['values']['save_translate']) && $form_state['values']['save_translate']==t('Save and translate') ) 
 	){
 		foreach($form_state['values'] as $key=>$value){
-			if( preg_match('/^page_backgrounds_uploadfile[0-9]+$/i',$key) ){
+			if( preg_match('/^page_backgrounds_uploadfile([0-9]+)$/i',$key,$matches) ){
 				if( ($file = file_load($form_state['values'][$key])) !== false ){
 					$file->status = FILE_STATUS_PERMANENT;
 					$file->uid = $user->uid;
@@ -190,7 +192,7 @@ function page_background_form_taxonomy_form_term_submit($form, &$form_state){
 						'file' => $file,
 						'path' => 'taxonomy/term/'.$form_state['values']['tid'],
 						'weight' => 0,
-						'bglinkurl' => trim($form_state['values']['bglinkurl']) != '' ? trim($form_state['values']['bglinkurl']) : null,
+						'bglinkurl' => trim($form_state['values']['page_backgrounds_bglinkurl'.$matches[1]]) != '' ? trim($form_state['values']['page_backgrounds_bglinkurl'.$matches[1]]) : null,
 					) );
 
 					// db_insert('url_background_images')
@@ -298,8 +300,10 @@ function page_background_form_node_form_alter(&$form, &$form_state, $form_id) {
 					'#upload_location'=>'public://page_backgrounds/',
 					'#description'=>t('extensions allowed: !extension_list , max file size: !maxfilesize MB',Array('!extension_list'=>implode(' ',$extensions),'!maxfilesize'=>$upload_mb)),
 			);
+			$form['page_backgrounds']['uploads_fieldset']["page_backgrounds_bglinkurl$i"]=array('#type'=>'textfield','#title'=>t('Link Url') );
 		}
 		
+
 		$form['page_backgrounds']['add-new-file']=array(
 				'#type'=>'button',
 				'#value'=>t('Add more'),
@@ -319,7 +323,8 @@ function page_background_form_node_form_alter(&$form, &$form_state, $form_id) {
 						'progress' => array('type' => 'none'),
 				),
 		);
-		
+
+
 	}else{
 		$form['page_backgrounds']['alert']=array('#markup'=>t('Page backgrounds can be added only to existing nodes.'));
 	}
@@ -337,7 +342,7 @@ function page_background_node_submit($node, $form, &$form_state){
 	global $user;
 	if($form_state['values']['op']==t('Save')){
 		foreach($form_state['values'] as $key=>$value){
-			if( preg_match('/^page_backgrounds_uploadfile[0-9]+$/i',$key) ){
+			if( preg_match('/^page_backgrounds_uploadfile([0-9]+)$/i',$key,$matches) ){
 				if( ($file = file_load($form_state['values'][$key])) !== false ){
 					$file->status = FILE_STATUS_PERMANENT;
 					$file->uid = $user->uid;
@@ -347,7 +352,7 @@ function page_background_node_submit($node, $form, &$form_state){
 						'file' => $file,
 						'path' => 'node/'.$form_state['values']['nid'],
 						'weight' => 0,
-						'bglinkurl' => trim($form_state['values']['bglinkurl']) != '' ? trim($form_state['values']['bglinkurl']) : null,
+						'bglinkurl' => trim($form_state['values']['page_backgrounds_bglinkurl'.$matches[1]]) != '' ? trim($form_state['values']['page_backgrounds_bglinkurl'.$matches[1]]) : null,
 					) );
 
 					// db_insert('url_background_images')
@@ -1152,7 +1157,7 @@ function bid_load( $bid, $reset = true ) {
   $cache = &drupal_static(__FUNCTION__);
   if (!isset($cache))
     $cache = array();
-  if (!isset($cache[$id]) || $reset == true) {
+  if (!isset($cache[$bid]) || $reset == true) {
   	$cache[$bid] = db_select('url_background_images','bg')->fields('bg')->condition('bid',$bid,'=')->range(0,1)->execute()->fetch(PDO::FETCH_OBJ);
   }
   return $cache[$bid];
@@ -1215,7 +1220,7 @@ function _page_background_delete( $background_row ){
 	if(!isset($background_row->file) && is_numeric($background_row->fid) ) $background_row->file = file_load($background_row->fid);
 
 	if( is_object($background_row->file) )
-		file_usage_delete( $file, 'page_background', 'background_image', $background_row->bid );
+		file_usage_delete( $background_row->file, 'page_background', 'background_image', $background_row->bid );
 
 	$numdeleted = db_delete('url_background_images')->condition('bid',$background_row->bid)->execute();
 	return $numdeleted;
