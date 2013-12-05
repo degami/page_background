@@ -24,16 +24,33 @@ function page_background_schema() {
 				'description' => 'File ID',
 			),
 			'weight' => array(
-					'type' => 'int',
-					'not null' => TRUE,
-					'description' => 'weight',
+				'type' => 'int',
+				'not null' => TRUE,
+				'description' => 'weight',
 			),
 			'bglinkurl' => array(
 				'type' => 'varchar',
 				'length' => 255,
 				'not null' => FALSE,
 				'description' => 'Background Link url',
-			),			
+			),
+			'bgtext' => array(
+				'type' => 'text',
+				'not null' => FALSE,
+				'description' => 'Background Slogan Text',
+			),
+			'bgtextformat' => array(
+				'type' => 'varchar',
+				'length' => 255,
+				'not null' => FALSE,
+				'description' => 'Background Slogan Text Format',
+			),	
+			'bgtextlang' => array(
+				'type' => 'varchar',
+				'length' => 2,
+				'not null' => FALSE,
+				'description' => 'Background Slogan Text Language',
+			),
 			'created' => array(
 				'type' => 'int',
 				'not null' => TRUE,
@@ -44,6 +61,7 @@ function page_background_schema() {
 		'primary key' => array('bid'),
 		'indexes' => array(
 			'path' => array('path'),
+			'bgtextlang' => array('bgtextlang'),
 		),	
 	);
 	
@@ -71,4 +89,29 @@ function page_background_update_7100(&$sandbox) {
 		'not null' => FALSE,
 		'description' => 'Background Link url',
 	));
+}
+
+/**
+ * Implements hook_update_N().
+ */
+function page_background_update_7101(&$sandbox) {
+	db_add_field('url_background_images', 'bgtext', array(
+		'type' => 'text',
+		'not null' => FALSE,
+		'description' => 'Background Slogan Text',
+	));
+	db_add_field('url_background_images', 'bgtextformat', array(
+		'type' => 'varchar',
+		'length' => 255,
+		'not null' => FALSE,
+		'description' => 'Background Slogan Text Format',
+	));	
+	db_add_field('url_background_images', 'bgtextlang', array(
+		'type' => 'varchar',
+		'length' => 2,
+		'not null' => FALSE,
+		'description' => 'Background Slogan Text Language',
+	));
+
+	db_add_index('url_background_images', 'bgtextlang',array('bgtextlang'));
 }
