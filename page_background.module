@@ -1179,7 +1179,7 @@ function _page_background_get_fids_markup($fids=array()){
 
 
 function _page_background_get_markup_by_path($path){
-	global $theme_key,$language;
+	global $theme_key, $language;
 	$admintheme=variable_get('admin_theme','');
 	if(trim(strtolower($theme_key)) == trim(strtolower($admintheme))) return "";
 
@@ -1187,13 +1187,10 @@ function _page_background_get_markup_by_path($path){
 	$out['#markup']='';
 	$out['#css']=array();
 
-	$fids = _page_background_get_fids($path,$language);
+	// $fids = _page_background_get_fids($path, $language);
+	// $out = _page_background_get_fids_markup($fids);
 
-	foreach(module_implements('alter_page_background_fids') as $module){
-		$fids = module_invoke($module, 'alter_page_background_fids',$fids);
-	}
-
-	$out = _page_background_get_fids_markup($fids);
+	$out = _page_background_get_fids_markup(_page_background_get_fids($path, $language));
 
 	return $out;
 }
@@ -1216,9 +1213,13 @@ function _page_background_get_fids($path='<front>',$language = null){
 		$and->condition('bgtext',null,'IS');
 
 		$or->condition($and);
+		$query->condition($or);
 	}
-
-	return $query->execute()->fetchAll();
+	$fids = $query->execute()->fetchAll();
+	foreach(module_implements('alter_page_background_fids') as $module){
+		$fids = module_invoke($module, 'alter_page_background_fids',$fids);
+	}
+	return $fids;
 }
 
 function _page_background_get_default_fids($language = null){
@@ -1237,12 +1238,17 @@ function _page_background_get_default_fids($language = null){
 		$and->condition('bgtext',null,'IS');
 
 		$or->condition($and);
+		$query->condition($or);
 	}
 
 	$query->orderBy('weight');
 	$query->orderBy('created');
 
-	return $query->execute()->fetchAll();
+ 	$fids = $query->execute()->fetchAll();
+	foreach(module_implements('alter_page_background_fids') as $module){
+		$fids = module_invoke($module, 'alter_page_background_fids',$fids);
+	}
+	return $fids;
 }
 
 
