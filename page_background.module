@@ -422,6 +422,8 @@ function page_background_admin_form($form,&$form_state){
 	$query->extend('PagerDefault')->limit(50);
 	$result=$query->execute()->fetchAll();
 
+	$form['#attached']['js'][] = '/'.drupal_get_path('module', 'page_background').'/js/page_background_admin.js';
+
 	$form['#validate'][]='page_background_admin_form_validate';
 	foreach($result as $bkg){
 		$form['bkg_'.$bkg->bid]=array(
@@ -464,11 +466,12 @@ function page_background_admin_form($form,&$form_state){
 		'#description'=>t('extensions allowed: !extension_list , max file size: !maxfilesize MB',Array('!extension_list'=>implode(' ',$extensions),'!maxfilesize'=>$upload_mb)),
 	);
 	$form['addfile']['path']=array('#type'=>'textfield','#title'=>t('Path'));
+	$form['addfile']['default']=array('#type'=>'checkbox','#title'=>t('Add to defaults'));
+
 	$form['addfile']['bglinkurl']=array('#type'=>'textfield','#title'=>t('Link Url'));
 	$form['addfile']['bgtext']=array('#type'=>'text_format','#title'=>t('Background Slogan') );
 	$form['addfile']['bgtextlang']=array('#type'=>'select','#options'=>_page_background_get_languages_selectoptions(),'#title'=>t('Background Slogan Language') );
 
-	$form['addfile']['default']=array('#type'=>'checkbox','#title'=>t('Add to defaults'));
 	$form['addfile']['submit']=array('#type'=>'submit','#value'=>t('Submit'));
 	return $form;
 }
@@ -611,10 +614,13 @@ function theme_page_background_admin_form($variables){
 function page_background_clone_form($form,&$form_state,$background_row){
 	global $user;
 
+	$form['#attached']['js'][] = '/'.drupal_get_path('module', 'page_background').'/js/page_background_admin.js';
+
 	$form['bid']=array('#type'=>'hidden','#value'=>$background_row->bid);
 	$form['uid']=array('#type'=>'hidden','#value'=>$user->uid);
-	$form['default']=array('#type'=>'checkbox','#title'=>t('Add to defaults'));
 	$form['path']=array('#type'=>'textfield','#title'=>t('Path'));
+	$form['default']=array('#type'=>'checkbox','#title'=>t('Add to defaults'));
+	
 	$form['bglinkurl']=array('#type'=>'textfield','#title'=>t('Link Url'));
 	$form['bgtext']=array('#type'=>'text_format','#title'=>t('Background Slogan') );
 	$form['bgtextlang']=array('#type'=>'select','#options'=>_page_background_get_languages_selectoptions(),'#title'=>t('Background Slogan Language') );	
@@ -663,6 +669,8 @@ function page_background_clone_form_submit($form,&$form_state){
 
 function page_background_edit_form($form,&$form_state,$background_row){
 	global $user;
+
+	$form['#attached']['js'][] = '/'.drupal_get_path('module', 'page_background').'/js/page_background_admin.js';
 	$form['addfile'] = array('#type'=>'fieldset','#title'=>t('Modify a page background'));
 
 	$max_upload = (int)(ini_get('upload_max_filesize'));
@@ -699,11 +707,12 @@ function page_background_edit_form($form,&$form_state,$background_row){
 		'#default_value' => $form['background_row']['#value']->fid,
 	);
 	$form['addfile']['path']=array('#type'=>'textfield','#title'=>t('Path'),'#default_value'=> $form['background_row']['#value']->path );
+	$form['addfile']['default']=array('#type'=>'checkbox','#title'=>t('Add to defaults'),'#default_value'=> ($form['background_row']['#value']->path == null) );
+
 	$form['addfile']['bglinkurl']=array('#type'=>'textfield','#title'=>t('Link Url'),'#default_value'=> $form['background_row']['#value']->bglinkurl );
 	$form['addfile']['bgtext']=array('#type'=>'text_format','#title'=>t('Background Slogan'),'#default_value'=> $form['background_row']['#value']->bgtext );
 	$form['addfile']['bgtextlang']=array('#type'=>'select','#options'=>_page_background_get_languages_selectoptions(),'#title'=>t('Background Slogan Language'),'#default_value'=> $form['background_row']['#value']->bgtextlang );
 
-	$form['addfile']['default']=array('#type'=>'checkbox','#title'=>t('Add to defaults'),'#default_value'=> ($form['background_row']['#value']->path == null) );
 	$form['addfile']['submit']=array('#type'=>'submit','#value'=>t('Save'));
 
 	return $form;
