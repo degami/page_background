@@ -211,7 +211,7 @@ function page_background_form_taxonomy_form_term_submit($form, &$form_state){
 						// 'bglinkurl' => trim($form_state['values']['page_backgrounds_bglinkurl'.$matches[1]]) != '' ? trim($form_state['values']['page_backgrounds_bglinkurl'.$matches[1]]) : null,
 						// 'bgtext' => isset($form_state['values']['page_backgrounds_bgtext'.$matches[1]]) ? $form_state['values']['page_backgrounds_bgtext'.$matches[1]] : null,
 						// 'bgtextlang' => trim($form_state['values']['page_backgrounds_bgtextlang'.$matches[1]]) != '' ? trim($form_state['values']['page_backgrounds_bgtextlang'.$matches[1]]) : null,
-					) );
+					) , $form_state );
 
 					// db_insert('url_background_images')
 					// ->fields(array(
@@ -376,7 +376,7 @@ function page_background_node_submit($node, $form, &$form_state){
 						// 'bglinkurl' => trim($form_state['values']['page_backgrounds_bglinkurl'.$matches[1]]) != '' ? trim($form_state['values']['page_backgrounds_bglinkurl'.$matches[1]]) : null,
 						// 'bgtext' => isset($form_state['values']['page_backgrounds_bgtext'.$matches[1]]) ? $form_state['values']['page_backgrounds_bgtext'.$matches[1]] : null,
 						// 'bgtextlang' => trim($form_state['values']['page_backgrounds_bgtextlang'.$matches[1]]) != '' ? trim($form_state['values']['page_backgrounds_bgtextlang'.$matches[1]]) : null,
-					) );
+					) , $form_state );
 
 					// db_insert('url_background_images')
 					// ->fields(array(
@@ -517,9 +517,9 @@ function page_background_admin_form_submit($form,&$form_state){
 				'path' => $form_state['values']['path'],
 				'weight' => 0,
 				'bglinkurl' => trim($form_state['values']['bglinkurl']) != '' ? trim($form_state['values']['bglinkurl']) : null,
-				'bgtext' => isset($form_state['values']['bgtext']) != '' ? $form_state['values']['bgtext'] : null,
+				'bgtext' => trim($form_state['values']['bgtext']) != '' ? $form_state['values']['bgtext'] : null,
 				'bgtextlang' => trim($form_state['values']['bgtextlang']) != '' ? trim($form_state['values']['bgtextlang']) : null,
-			) );
+			) , $form_state );
 			
 			// db_insert('url_background_images')
 			// ->fields(array(
@@ -649,9 +649,9 @@ function page_background_clone_form_submit($form,&$form_state){
 		'path' => $form_state['values']['path'],
 		'weight' => 0,
 		'bglinkurl' => trim($form_state['values']['bglinkurl']) != '' ? trim($form_state['values']['bglinkurl']) : null,
-		'bgtext' => isset($form_state['values']['bgtext']) != '' ? $form_state['values']['bgtext'] : null,
+		'bgtext' => trim($form_state['values']['bgtext']) != '' ? $form_state['values']['bgtext'] : null,
 		'bgtextlang' => trim($form_state['values']['bgtextlang']) != '' ? trim($form_state['values']['bgtextlang']) : null,		
-	) );
+	) , $form_state );
 
 	// db_insert('url_background_images')
 	// ->fields(array(
@@ -746,9 +746,9 @@ function page_background_edit_form_submit($form,&$form_state){
 			'path' => $form_state['values']['path'],
 			'weight' => 0,
 			'bglinkurl' => trim($form_state['values']['bglinkurl']) != '' ? trim($form_state['values']['bglinkurl']) : null,
-			'bgtext' => isset($form_state['values']['bgtext']) != '' ? $form_state['values']['bgtext'] : null,
+			'bgtext' => trim($form_state['values']['bgtext']) != '' ? $form_state['values']['bgtext'] : null,
 			'bgtextlang' => trim($form_state['values']['bgtextlang']) != '' ? trim($form_state['values']['bgtextlang']) : null,					
-		) );
+		) , $form_state );
 
 		// db_insert('url_background_images')
 		// ->fields(array(
@@ -1282,7 +1282,7 @@ function bid_load( $bid, $reset = true ) {
  * Save a background
  *
  */
-function _page_background_save($values = array()) {
+function _page_background_save($values = array() , $form_state = null ) {
 	$orig_bkg_row = null;
 
 	$return_background_row = null;
@@ -1331,6 +1331,11 @@ function _page_background_save($values = array()) {
 		$return_background_row = bid_load($res, true);
 		file_usage_add( $file, 'page_background', 'background_image', $return_background_row->bid );
 	}
+
+	foreach(module_implements('page_background_save') as $module){
+		$return_background_row = module_invoke($module, 'page_background_save',$return_background_row, $form_state);
+	}
+
 	return $return_background_row;
 }
 
@@ -1338,10 +1343,15 @@ function _page_background_delete( $background_row ){
 	if( is_numeric($background_row) ) $background_row = bid_load($background_row , true);
 	if(!isset($background_row->file) && is_numeric($background_row->fid) ) $background_row->file = file_load($background_row->fid);
 
+	foreach(module_implements('page_background_delete') as $module){
+		$background_row = module_invoke($module, 'page_background_delete',$background_row);
+	}
+
 	if( is_object($background_row->file) )
 		file_usage_delete( $background_row->file, 'page_background', 'background_image', $background_row->bid );
 
 	$numdeleted = db_delete('url_background_images')->condition('bid',$background_row->bid)->execute();
+
 	return $numdeleted;
 }
 

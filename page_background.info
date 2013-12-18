@@ -1,5 +1,6 @@
 name = Page Background
 description = Page Background
+package = Page Background
 core = 7.x
 
 dependencies[] = libraries
