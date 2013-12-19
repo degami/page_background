@@ -31,7 +31,7 @@ if($form_id == 'page_background_admin_form' || $form_id == 'page_background_edit
 			'#tree' => TRUE,
 			'#options' => $options,
 		);
-
+		$form['addfile']['submit']['#weight'] = 10001;
 		// $form['#submit'][] = '_page_background_domain_access_write_domain_info';
 
  	}else if( $form_id == 'page_background_clone_form'){
@@ -60,7 +60,7 @@ if($form_id == 'page_background_admin_form' || $form_id == 'page_background_edit
 			'#tree' => TRUE,
 			'#options' => $options,
 		);
-
+		$form['submit']['#weight'] = 10001;
 		// $form['#submit'][] = '_page_background_domain_access_write_domain_info';
 
  	}
