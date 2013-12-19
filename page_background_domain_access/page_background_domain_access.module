@@ -1,0 +1,119 @@
+<?php
+
+/**
+ * Implements hook_form_alter().
+ */
+function page_background_domain_access_form_alter(&$form, &$form_state, $form_id) {
+if($form_id == 'page_background_admin_form' || $form_id == 'page_background_edit_form'){
+		$weight = 0;
+ 		foreach( $form['addfile'] as $key => &$elem){
+ 			if( stripos($key, '#') !== 0 ){
+ 				$elem['#weight'] = ++$weight;
+ 			}
+ 		}
+
+		//$options = array(DOMAIN_ALL => t('All domains'), DOMAIN_ACTIVE => t('Author\'s currently active domain'));
+		$options = array( DOMAIN_ALL => t('All domains') );
+		foreach (domain_domains() as $key => $value) {
+			$options[$value['domain_id']] = $value['sitename'];
+		}
+		$form['addfile']['domain'] = array(
+			'#type' => 'fieldset',
+			'#title' => t('Domain access settings'),
+			'#collapsible' => TRUE,
+			'#collapsed' => TRUE,
+			'#group' => 'additional_settings',
+			'#weight' => 1000,
+		);
+		$form['addfile']['domain']['domain_id'] = array(
+			'#title' => t('Publish to'),
+			'#type' => 'checkboxes',
+			'#tree' => TRUE,
+			'#options' => $options,
+		);
+
+		// $form['#submit'][] = '_page_background_domain_access_write_domain_info';
+
+ 	}else if( $form_id == 'page_background_clone_form'){
+		$weight = 0;
+ 		foreach( $form as $key => &$elem){
+ 			if( stripos($key, '#') !== 0 ){
+ 				$elem['#weight'] = ++$weight;
+ 			}
+ 		}
+
+		$options = array( DOMAIN_ALL => t('All domains') );
+		foreach (domain_domains() as $key => $value) {
+			$options[$value['domain_id']] = $value['sitename'];
+		}
+		$form['domain'] = array(
+			'#type' => 'fieldset',
+			'#title' => t('Domain access settings'),
+			'#collapsible' => TRUE,
+			'#collapsed' => TRUE,
+			'#group' => 'additional_settings',
+			'#weight' => 1000,
+		);
+		$form['domain']['domain_id'] = array(
+			'#title' => t('Publish to'),
+			'#type' => 'checkboxes',
+			'#tree' => TRUE,
+			'#options' => $options,
+		);
+
+		// $form['#submit'][] = '_page_background_domain_access_write_domain_info';
+
+ 	}
+}
+
+
+function page_background_domain_access_alter_page_background_fids( $fids ){
+	$currdomain = domain_get_domain();
+	foreach( $fids as $key => $fid){
+		if( !(empty($fid->domains) || in_array( $currdomain['domain_id'], $background_row->domains ) || in_array( -1, $background_row->domains )) ){
+			unset($fids[$key]);
+		}
+	}
+	return $fids;
+}
+
+
+// function _page_background_domain_access_write_domain_info($form,&$form_state){}
+
+function page_background_domain_access_page_background_load($background_row){ 
+	$background_row->domains = db_select('url_background_images_domain_access', 'da')->fields('da',array('domain_id','domain_id'))->execute()->fetchAllKeyed();
+	return $background_row; 
+}
+function page_background_domain_access_page_background_save($background_row , $form_state){
+	if($form_state!=null){
+		if(isset($form_state['values']['domain_id'])){
+			// $res = db_update('url_background_images')->fields(array(
+			// 	'domain_id' => is_numeric(trim($form_state['values']['domain_id'])) ? trim($form_state['values']['domain_id']) : null,
+			// ))->condition('bid',$background_row->bid)->execute();
+
+
+			$res = db_delete('url_background_images_domain_access')->condition('bid',$background_row->bid)->execute();
+
+			if(!empty( $form_state['values']['domain_id'][DOMAIN_ALL] )){
+				$res = db_insert('url_background_images_domain_access')->fields(array(
+			      'bid' => $background_row->bid,
+			      'domain_id' => -1,
+				))->execute();
+			}else{
+				foreach($form_state['values']['domain_id'] as $key => $value ){
+					if(!empty($value)){
+						$res = db_insert('url_background_images_domain_access')->fields(array(
+					      'bid' => $background_row->bid,
+					      'domain_id' => $value,
+						))->execute();
+					}
+				}
+			}
+
+
+		}
+	}
+
+	return $background_row;
+}
+function page_background_domain_access_page_background_delete($background_row){}

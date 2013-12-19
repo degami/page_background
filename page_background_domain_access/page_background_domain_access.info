@@ -1,0 +1,7 @@
+name = Page Background Domain Integration
+description = Page Background Domain Integration
+package = Page Background
+core = 7.x
+
+dependencies[] = page_background
+dependencies[] = domain
