@@ -1225,6 +1225,12 @@ function _page_background_get_fids($path='<front>',$language = null){
 		$query->condition($or);
 	}
 	$fids = $query->execute()->fetchAll();
+	foreach($fids as &$fid){
+		foreach(module_implements('page_background_load') as $module){
+			$fid = module_invoke($module, 'page_background_load',$fid);
+		}	
+	}
+	
 	foreach(module_implements('alter_page_background_fids') as $module){
 		$fids = module_invoke($module, 'alter_page_background_fids',$fids);
 	}
@@ -1254,6 +1260,12 @@ function _page_background_get_default_fids($language = null){
 	$query->orderBy('created');
 
  	$fids = $query->execute()->fetchAll();
+	foreach($fids as &$fid){
+		foreach(module_implements('page_background_load') as $module){
+			$fid = module_invoke($module, 'page_background_load',$fid);
+		}	
+	}
+
 	foreach(module_implements('alter_page_background_fids') as $module){
 		$fids = module_invoke($module, 'alter_page_background_fids',$fids);
 	}
@@ -1272,6 +1284,7 @@ function bid_load( $bid, $reset = true ) {
     $cache = array();
   if (!isset($cache[$bid]) || $reset == true) {
   	$return_background_row = db_select('url_background_images','bg')->fields('bg')->condition('bid',$bid,'=')->range(0,1)->execute()->fetch(PDO::FETCH_OBJ);
+
 	foreach(module_implements('page_background_load') as $module){
 		$return_background_row = module_invoke($module, 'page_background_load',$return_background_row);
 	}

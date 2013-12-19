@@ -70,7 +70,7 @@ if($form_id == 'page_background_admin_form' || $form_id == 'page_background_edit
 function page_background_domain_access_alter_page_background_fids( $fids ){
 	$currdomain = domain_get_domain();
 	foreach( $fids as $key => $fid){
-		if( !(empty($fid->domains) || in_array( $currdomain['domain_id'], $background_row->domains ) || in_array( -1, $background_row->domains )) ){
+		if( !(empty($fid->domains) || in_array( $currdomain['domain_id'], $fid->domains ) || in_array( -1, $fid->domains )) ){
 			unset($fids[$key]);
 		}
 	}
