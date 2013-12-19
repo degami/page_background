@@ -1271,7 +1271,12 @@ function bid_load( $bid, $reset = true ) {
   if (!isset($cache))
     $cache = array();
   if (!isset($cache[$bid]) || $reset == true) {
-  	$cache[$bid] = db_select('url_background_images','bg')->fields('bg')->condition('bid',$bid,'=')->range(0,1)->execute()->fetch(PDO::FETCH_OBJ);
+  	$return_background_row = db_select('url_background_images','bg')->fields('bg')->condition('bid',$bid,'=')->range(0,1)->execute()->fetch(PDO::FETCH_OBJ);
+	foreach(module_implements('page_background_load') as $module){
+		$return_background_row = module_invoke($module, 'page_background_load',$return_background_row);
+	}
+
+  	$cache[$bid] = $return_background_row;
   }
   return $cache[$bid];
 }
