@@ -17,6 +17,12 @@ if($form_id == 'page_background_admin_form' || $form_id == 'page_background_edit
 		foreach (domain_domains() as $key => $value) {
 			$options[$value['domain_id']] = $value['sitename'];
 		}
+
+		$defaults = array();
+		if($form_id == 'page_background_edit_form'){
+			$defaults = db_select('url_background_images_domain_access', 'da')->fields('da',array('domain_id','domain_id'))->condition('bid',$form['background_row']['#value']->bid)->execute()->fetchAllKeyed();
+		}
+
 		$form['addfile']['domain'] = array(
 			'#type' => 'fieldset',
 			'#title' => t('Domain access settings'),
@@ -30,6 +36,7 @@ if($form_id == 'page_background_admin_form' || $form_id == 'page_background_edit
 			'#type' => 'checkboxes',
 			'#tree' => TRUE,
 			'#options' => $options,
+			'#default_value' => $defaults,
 		);
 		$form['addfile']['submit']['#weight'] = 10001;
 		// $form['#submit'][] = '_page_background_domain_access_write_domain_info';
@@ -81,7 +88,7 @@ function page_background_domain_access_alter_page_background_fids( $fids ){
 // function _page_background_domain_access_write_domain_info($form,&$form_state){}
 
 function page_background_domain_access_page_background_load($background_row){ 
-	$background_row->domains = db_select('url_background_images_domain_access', 'da')->fields('da',array('domain_id','domain_id'))->execute()->fetchAllKeyed();
+	$background_row->domains = db_select('url_background_images_domain_access', 'da')->fields('da',array('domain_id','domain_id'))->condition('bid',$background_row->bid)->execute()->fetchAllKeyed();
 	return $background_row; 
 }
 function page_background_domain_access_page_background_save($background_row , $form_state){

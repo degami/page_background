@@ -517,7 +517,8 @@ function page_background_admin_form_submit($form,&$form_state){
 				'path' => $form_state['values']['path'],
 				'weight' => 0,
 				'bglinkurl' => trim($form_state['values']['bglinkurl']) != '' ? trim($form_state['values']['bglinkurl']) : null,
-				'bgtext' => trim($form_state['values']['bgtext']) != '' ? $form_state['values']['bgtext'] : null,
+				'bgtext' => trim($form_state['values']['bgtext']['value']) != '' ? $form_state['values']['bgtext']['value'] : null,
+				'bgtextformat' => trim($form_state['values']['bgtext']['format']) != '' ? $form_state['values']['bgtext']['format'] : null,
 				'bgtextlang' => trim($form_state['values']['bgtextlang']) != '' ? trim($form_state['values']['bgtextlang']) : null,
 			) , $form_state );
 			
@@ -649,7 +650,8 @@ function page_background_clone_form_submit($form,&$form_state){
 		'path' => $form_state['values']['path'],
 		'weight' => 0,
 		'bglinkurl' => trim($form_state['values']['bglinkurl']) != '' ? trim($form_state['values']['bglinkurl']) : null,
-		'bgtext' => trim($form_state['values']['bgtext']) != '' ? $form_state['values']['bgtext'] : null,
+		'bgtext' => trim($form_state['values']['bgtext']['value']) != '' ? $form_state['values']['bgtext']['value'] : null,
+		'bgtextformat' => trim($form_state['values']['bgtext']['format']) != '' ? $form_state['values']['bgtext']['format'] : null,
 		'bgtextlang' => trim($form_state['values']['bgtextlang']) != '' ? trim($form_state['values']['bgtextlang']) : null,		
 	) , $form_state );
 
@@ -710,7 +712,7 @@ function page_background_edit_form($form,&$form_state,$background_row){
 	$form['addfile']['default']=array('#type'=>'checkbox','#title'=>t('Add to defaults'),'#default_value'=> ($form['background_row']['#value']->path == null) );
 
 	$form['addfile']['bglinkurl']=array('#type'=>'textfield','#title'=>t('Link Url'),'#default_value'=> $form['background_row']['#value']->bglinkurl );
-	$form['addfile']['bgtext']=array('#type'=>'text_format','#title'=>t('Background Slogan'),'#default_value'=> $form['background_row']['#value']->bgtext );
+	$form['addfile']['bgtext']=array('#type'=>'text_format','#title'=>t('Background Slogan'),'#default_value'=> $form['background_row']['#value']->bgtext, '#format' => $form['background_row']['#value']->bgtextformat );
 	$form['addfile']['bgtextlang']=array('#type'=>'select','#options'=>_page_background_get_languages_selectoptions(),'#title'=>t('Background Slogan Language'),'#default_value'=> $form['background_row']['#value']->bgtextlang );
 
 	$form['addfile']['submit']=array('#type'=>'submit','#value'=>t('Save'));
@@ -747,6 +749,7 @@ function page_background_edit_form_submit($form,&$form_state){
 			'weight' => 0,
 			'bglinkurl' => trim($form_state['values']['bglinkurl']) != '' ? trim($form_state['values']['bglinkurl']) : null,
 			'bgtext' => trim($form_state['values']['bgtext']) != '' ? $form_state['values']['bgtext'] : null,
+			'bgtextformat' => trim($form_state['values']['bgtext']['format']) != '' ? $form_state['values']['bgtext']['format'] : null,
 			'bgtextlang' => trim($form_state['values']['bgtextlang']) != '' ? trim($form_state['values']['bgtextlang']) : null,					
 		) , $form_state );
 
