@@ -517,8 +517,7 @@ function page_background_admin_form_submit($form,&$form_state){
 				'path' => $form_state['values']['path'],
 				'weight' => 0,
 				'bglinkurl' => trim($form_state['values']['bglinkurl']) != '' ? trim($form_state['values']['bglinkurl']) : null,
-				'bgtext' => trim($form_state['values']['bgtext']['value']) != '' ? $form_state['values']['bgtext']['value'] : null,
-				'bgtextformat' => trim($form_state['values']['bgtext']['format']) != '' ? $form_state['values']['bgtext']['format'] : null,
+				'bgtext' => isset($form_state['values']['bgtext']) != '' ? $form_state['values']['bgtext'] : null,
 				'bgtextlang' => trim($form_state['values']['bgtextlang']) != '' ? trim($form_state['values']['bgtextlang']) : null,
 			) , $form_state );
 			
@@ -650,8 +649,7 @@ function page_background_clone_form_submit($form,&$form_state){
 		'path' => $form_state['values']['path'],
 		'weight' => 0,
 		'bglinkurl' => trim($form_state['values']['bglinkurl']) != '' ? trim($form_state['values']['bglinkurl']) : null,
-		'bgtext' => trim($form_state['values']['bgtext']['value']) != '' ? $form_state['values']['bgtext']['value'] : null,
-		'bgtextformat' => trim($form_state['values']['bgtext']['format']) != '' ? $form_state['values']['bgtext']['format'] : null,
+		'bgtext' => isset($form_state['values']['bgtext']) != '' ? $form_state['values']['bgtext'] : null,
 		'bgtextlang' => trim($form_state['values']['bgtextlang']) != '' ? trim($form_state['values']['bgtextlang']) : null,		
 	) , $form_state );
 
@@ -748,8 +746,7 @@ function page_background_edit_form_submit($form,&$form_state){
 			'path' => $form_state['values']['path'],
 			'weight' => 0,
 			'bglinkurl' => trim($form_state['values']['bglinkurl']) != '' ? trim($form_state['values']['bglinkurl']) : null,
-			'bgtext' => trim($form_state['values']['bgtext']) != '' ? $form_state['values']['bgtext'] : null,
-			'bgtextformat' => trim($form_state['values']['bgtext']['format']) != '' ? $form_state['values']['bgtext']['format'] : null,
+			'bgtext' => isset($form_state['values']['bgtext']) != '' ? $form_state['values']['bgtext'] : null,
 			'bgtextlang' => trim($form_state['values']['bgtextlang']) != '' ? trim($form_state['values']['bgtextlang']) : null,					
 		) , $form_state );
 
