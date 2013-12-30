@@ -1187,9 +1187,11 @@ function _page_background_get_fids_markup($fids=array()){
 				break;
 		}
 
-		$image .= (trim($fid->bgtext) != '') ? '<div class="slogan">'.check_markup($fid->bgtext, $fid->bgtextformat, $fid->bgtextlang).'</div>' : '';
+		if( variable_get('page_background_slogan',false) == true ){
+			$image .= (trim($fid->bgtext) != '') ? '<div class="slogan">'.check_markup($fid->bgtext, $fid->bgtextformat, $fid->bgtextlang).'</div>' : '';
+		}		
 
-		if( $fid->bglinkurl != null ){
+		if( variable_get('page_background_linkurl',false) == true && $fid->bglinkurl != null ){
 			$slides[]=array('#markup'=>'<div class="page_background_slide">'.l($image, $fid->bglinkurl , array('html'=>true) ).'</div>','#fid'=>$fid);
 		} else {
 			$slides[]=array('#markup'=>'<div class="page_background_slide">'.$image.'</div>','#fid'=>$fid);
