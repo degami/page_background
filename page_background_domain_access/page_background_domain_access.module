@@ -123,4 +123,4 @@ function page_background_domain_access_page_background_save($background_row , $f
 
 	return $background_row;
 }
-function page_background_domain_access_page_background_delete($background_row){}
+function page_background_domain_access_page_background_delete($background_row){return $background_row;}
