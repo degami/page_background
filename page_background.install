@@ -47,7 +47,7 @@ function page_background_schema() {
 			),	
 			'bgtextlang' => array(
 				'type' => 'varchar',
-				'length' => 2,
+				'length' => 10,
 				'not null' => FALSE,
 				'description' => 'Background Slogan Text Language',
 			),
