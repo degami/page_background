@@ -1160,7 +1160,6 @@ function _page_background_get_fids_markup($fids=array()){
 		';
 	}
 	
-	//var_dump($fids);
 	$out['#markup']='<div id="page_background_container">';
 	$slides=array();
 	$pager=array();
@@ -1301,6 +1300,7 @@ function _page_background_get_fids($path='<front>',$language = null){
 	foreach(module_implements('alter_page_background_fids') as $module){
 		$fids = module_invoke($module, 'alter_page_background_fids',$fids);
 	}
+	
 	return $fids;
 }
 
@@ -1376,18 +1376,18 @@ function _page_background_save($values = array() , $form_state = null ) {
 	$path = isset($values['path']) ? $values['path'] : null;
 	$weight = isset($values['weight']) ? $values['weight'] : 0;
 	$bglinkurl = isset($values['bglinkurl']) ? $values['bglinkurl'] : null;
-	$bgtext = isset($values['bgtext']) ? $values['bgtext']['value'] : null;
-	$bgtextformat = isset($values['bgtext']) ? $values['bgtext']['format'] : null;
-	$bgtextlang = isset($values['bgtextlang']) ? $values['bgtextlang'] : null;
+	$bgtext = (isset($values['bgtext']) && !empty($values['bgtext']['value'])) ? $values['bgtext']['value'] : null;
+	$bgtextformat = (isset($values['bgtext']) && !empty($values['bgtext']['value'])) ? $values['bgtext']['format'] : null;
+	$bgtextlang = (isset($values['bgtextlang']) && !empty($values['bgtextlang'])) ? $values['bgtextlang'] : null;
 
 	$fields = array(
-		'path'=>$path,
-		'fid'=>$file->fid,
-		'weight'=>$weight,
-		'bglinkurl'=>$bglinkurl,
-		'bgtext' => $bgtext,
-		'bgtextformat' => $bgtextformat,
-		'bgtextlang' => $bgtextlang,
+		'path' 			=> $path,
+		'fid' 			=> $file->fid,
+		'weight' 		=> $weight,
+		'bglinkurl' 	=> $bglinkurl,
+		'bgtext' 		=> $bgtext,
+		'bgtextformat' 	=> $bgtextformat,
+		'bgtextlang' 	=> $bgtextlang,
 	);
 
 	if(isset($values['bid'])){
@@ -1500,7 +1500,6 @@ function page_background_block_info() {
  */
 function page_background_block_view($delta = '') {
   $block = array();
-
   switch ($delta) {
     case 'page_background_block':
 		$block['subject'] = '';
@@ -1577,4 +1576,26 @@ function page_background_delete_form_submit($form,&$form_state){
 	$numdeleted = _page_background_delete($form_state['values']['background_row']);
 	drupal_set_title(t(':numelements elements deleted',array(':numelements'=>$numdeleted)));
 	drupal_goto('admin/config/page_background');
+}
+
+
+function _page_background_get_query_string(SelectQueryInterface $query) {
+  $string = (string) $query;
+  $arguments = $query->arguments();
+
+  if (!empty($arguments) && is_array($arguments)) {
+    foreach ($arguments as $placeholder => &$value) {
+      if (is_string($value)) {
+        $value = "'$value'";
+      }elseif($value == null){
+      	$value = 'NULL';
+      }
+    }
+
+    $string = strtr($string, $arguments);
+  }
+
+  $string = preg_replace('/\{(.*?)\}/','$1',$string);
+
+  return $string;
 }
