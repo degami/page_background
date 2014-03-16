@@ -115,3 +115,21 @@ function page_background_update_7101(&$sandbox) {
 
 	db_add_index('url_background_images', 'bgtextlang',array('bgtextlang'));
 }
+
+/**
+ * Implements hook_update_N().
+ */
+function page_background_update_7102(&$sandbox) {
+	db_add_field('url_background_images', 'image_alt', array(
+		'type' => 'varchar',
+		'length' => 255,
+		'not null' => FALSE,
+		'description' => 'Background Image Alt Text',
+	));
+	db_add_field('url_background_images', 'image_title', array(
+		'type' => 'varchar',
+		'length' => 255,
+		'not null' => FALSE,
+		'description' => 'Background Image Title Text',
+	));	
+}
