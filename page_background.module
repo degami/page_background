@@ -425,7 +425,11 @@ function page_background_admin_form($form,&$form_state){
 	$query->extend('PagerDefault')->limit(50);
 	$result=$query->execute()->fetchAll();
 
-	$form['#attached']['js'][] = '/'.drupal_get_path('module', 'page_background').'/js/page_background_admin.js';
+	//$form['#attached']['js'][] = '/'.drupal_get_path('module', 'page_background').'/js/page_background_admin.js';
+	$form['#attached']['js'][] = array(
+	  'data' => drupal_get_path('module', 'page_background').'/js/page_background_admin.js',
+	  'type' => 'file'
+	);
 
 	$form['#validate'][]='page_background_admin_form_validate';
 	foreach($result as $bkg){
@@ -659,7 +663,12 @@ function theme_page_background_admin_form($variables){
 function page_background_clone_form($form,&$form_state,$background_row){
 	global $user;
 
-	$form['#attached']['js'][] = '/'.drupal_get_path('module', 'page_background').'/js/page_background_admin.js';
+//	$form['#attached']['js'][] = '/'.drupal_get_path('module', 'page_background').'/js/page_background_admin.js';
+
+	$form['#attached']['js'][] = array(
+	  'data' => drupal_get_path('module', 'page_background').'/js/page_background_admin.js',
+	  'type' => 'file'
+	);
 
 	$form['bid']=array('#type'=>'hidden','#value'=>$background_row->bid);
 	$form['uid']=array('#type'=>'hidden','#value'=>$user->uid);
@@ -728,7 +737,12 @@ function page_background_clone_form_submit($form,&$form_state){
 function page_background_edit_form($form,&$form_state,$background_row){
 	global $user;
 
-	$form['#attached']['js'][] = '/'.drupal_get_path('module', 'page_background').'/js/page_background_admin.js';
+	//$form['#attached']['js'][] = '/'.drupal_get_path('module', 'page_background').'/js/page_background_admin.js';
+	$form['#attached']['js'][] = array(
+	  'data' => drupal_get_path('module', 'page_background').'/js/page_background_admin.js',
+	  'type' => 'file'
+	);
+
 	$form['addfile'] = array('#type'=>'fieldset','#title'=>t('Modify a page background'));
 
 	$max_upload = (int)(ini_get('upload_max_filesize'));
