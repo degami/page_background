@@ -82,6 +82,9 @@ function page_background_theme($existing, $type, $theme, $path) {
 		'page_background_admin_form' => array(
 			'render element' => 'form',
 		),
+		'page_background_slide' => array(
+			'variables' => array( 'image' => null, 'background_row' => null ),
+		),
 	);
 }
 
@@ -526,11 +529,11 @@ function page_background_admin_form_submit($form,&$form_state){
 				'file' => $file,
 				'path' => $form_state['values']['path'],
 				'weight' => 0,
-				'bglinkurl' => trim($form_state['values']['bglinkurl']) != '' ? trim($form_state['values']['bglinkurl']) : null,
-				'bgtext' => isset($form_state['values']['bgtext']) != '' ? $form_state['values']['bgtext'] : null,
-				'bgtextlang' => trim($form_state['values']['bgtextlang']) != '' ? trim($form_state['values']['bgtextlang']) : null,
-				'image_alt' => trim($form_state['values']['image_alt']) != '' ? trim($form_state['values']['image_alt']) : null,
-				'image_title' => trim($form_state['values']['image_title']) != '' ? trim($form_state['values']['image_title']) : null,
+				'bglinkurl' => (isset($form_state['values']['bglinkurl']) && trim($form_state['values']['bglinkurl']) != '') ? trim($form_state['values']['bglinkurl']) : null,
+				'bgtext' => (isset($form_state['values']['bgtext']) && trim($form_state['values']['bgtext']) != '') ? $form_state['values']['bgtext'] : null,
+				'bgtextlang' => (isset($form_state['values']['bgtextlang']) && trim($form_state['values']['bgtextlang']) != '') ? trim($form_state['values']['bgtextlang']) : null,
+				'image_alt' => (isset($form_state['values']['image_alt']) && trim($form_state['values']['image_alt']) != '') ? trim($form_state['values']['image_alt']) : null,
+				'image_title' => (isset($form_state['values']['image_title']) && trim($form_state['values']['image_title']) != '') ? trim($form_state['values']['image_title']) : null,
 			) , $form_state );
 			
 			// db_insert('url_background_images')
@@ -701,11 +704,11 @@ function page_background_clone_form_submit($form,&$form_state){
 		'fid' => $background_row_orig->fid,
 		'path' => $form_state['values']['path'],
 		'weight' => 0,
-		'bglinkurl' => trim($form_state['values']['bglinkurl']) != '' ? trim($form_state['values']['bglinkurl']) : null,
-		'bgtext' => isset($form_state['values']['bgtext']) != '' ? $form_state['values']['bgtext'] : null,
-		'bgtextlang' => trim($form_state['values']['bgtextlang']) != '' ? trim($form_state['values']['bgtextlang']) : null,
-		'image_alt' => trim($form_state['values']['image_alt']) != '' ? trim($form_state['values']['image_alt']) : null,
-		'image_title' => trim($form_state['values']['image_title']) != '' ? trim($form_state['values']['image_title']) : null,		
+		'bglinkurl' => (isset($form_state['values']['bglinkurl']) && trim($form_state['values']['bglinkurl']) != '') ? trim($form_state['values']['bglinkurl']) : null,
+		'bgtext' => (isset($form_state['values']['bgtext']) && trim($form_state['values']['bgtext']) != '') ? $form_state['values']['bgtext'] : null,
+		'bgtextlang' => (isset($form_state['values']['bgtextlang']) && trim($form_state['values']['bgtextlang']) != '') ? trim($form_state['values']['bgtextlang']) : null,
+		'image_alt' => (isset($form_state['values']['image_alt']) && trim($form_state['values']['image_alt']) != '') ? trim($form_state['values']['image_alt']) : null,
+		'image_title' => (isset($form_state['values']['image_title']) && trim($form_state['values']['image_title']) != '') ? trim($form_state['values']['image_title']) : null,
 	) , $form_state );
 
 	// db_insert('url_background_images')
@@ -817,11 +820,11 @@ function page_background_edit_form_submit($form,&$form_state){
 			'file' => $file,
 			'path' => $form_state['values']['path'],
 			'weight' => 0,
-			'bglinkurl' => trim($form_state['values']['bglinkurl']) != '' ? trim($form_state['values']['bglinkurl']) : null,
-			'bgtext' => isset($form_state['values']['bgtext']) != '' ? $form_state['values']['bgtext'] : null,
-			'bgtextlang' => trim($form_state['values']['bgtextlang']) != '' ? trim($form_state['values']['bgtextlang']) : null,					
-			'image_alt' => trim($form_state['values']['image_alt']) != '' ? trim($form_state['values']['image_alt']) : null,
-			'image_title' => trim($form_state['values']['image_title']) != '' ? trim($form_state['values']['image_title']) : null,
+			'bglinkurl' => (isset($form_state['values']['bglinkurl']) && trim($form_state['values']['bglinkurl']) != '') ? trim($form_state['values']['bglinkurl']) : null,
+			'bgtext' => (isset($form_state['values']['bgtext']) && trim($form_state['values']['bgtext']) != '') ? $form_state['values']['bgtext'] : null,
+			'bgtextlang' => (isset($form_state['values']['bgtextlang']) && trim($form_state['values']['bgtextlang']) != '') ? trim($form_state['values']['bgtextlang']) : null,
+			'image_alt' => (isset($form_state['values']['image_alt']) && trim($form_state['values']['image_alt']) != '') ? trim($form_state['values']['image_alt']) : null,
+			'image_title' => (isset($form_state['values']['image_title']) && trim($form_state['values']['image_title']) != '') ? trim($form_state['values']['image_title']) : null,
 		) , $form_state );
 
 		// db_insert('url_background_images')
@@ -1217,15 +1220,17 @@ function _page_background_get_fids_markup($fids=array()){
 				break;
 		}
 
-		if( variable_get('page_background_slogan',false) == true ){
-			$image .= (trim($fid->bgtext) != '') ? '<div class="slogan">'.check_markup($fid->bgtext, $fid->bgtextformat, $fid->bgtextlang).'</div>' : '';
-		}		
+		// if( variable_get('page_background_slogan',false) == true ){
+		// 	$image .= (trim($fid->bgtext) != '') ? '<div class="slogan">'.check_markup($fid->bgtext, $fid->bgtextformat, $fid->bgtextlang).'</div>' : '';
+		// }		
 
-		if( variable_get('page_background_linkurl',false) == true && $fid->bglinkurl != null ){
-			$slides[]=array('#markup'=>'<div class="page_background_slide">'.l($image, $fid->bglinkurl , array('html'=>true) ).'</div>','#fid'=>$fid);
-		} else {
-			$slides[]=array('#markup'=>'<div class="page_background_slide">'.$image.'</div>','#fid'=>$fid);
-		}
+		// if( variable_get('page_background_linkurl',false) == true && $fid->bglinkurl != null ){
+		// 	$slides[]=array('#markup'=>'<div class="page_background_slide">'.l($image, $fid->bglinkurl , array('html'=>true) ).'</div>','#fid'=>$fid);
+		// } else {
+		// 	$slides[]=array('#markup'=>'<div class="page_background_slide">'.$image.'</div>','#fid'=>$fid);
+		// }
+
+		$slides[]=array('#markup'=> theme('page_background_slide' , array( 'image' => $image, 'background_row' => $fid )) ,'#fid'=>$fid);
 
 		$pager[]='<li class="pager_elem'.(($key==0)?' active':'').'" id="pager_element_'.$key.'">'.($key+1).'</li>';
 
@@ -1283,6 +1288,24 @@ function _page_background_get_fids_markup($fids=array()){
 	return $out;
 }
 
+function theme_page_background_slide( $variables ){
+
+	$image = $variables['image'];
+	$background_row = $variables['background_row'];
+
+	$out = '';
+
+	if( variable_get('page_background_slogan',false) == true ){
+		$image .= (trim($background_row->bgtext) != '') ? '<div class="slogan">'.check_markup($background_row->bgtext, $background_row->bgtextformat, $background_row->bgtextlang).'</div>' : '';
+	}
+
+	if( variable_get('page_background_linkurl',false) == true && $background_row->bglinkurl != null ){
+		$out = '<div class="page_background_slide">'.l($image, $background_row->bglinkurl , array('html'=>true) ).'</div>';
+	} else {
+		 $out = '<div class="page_background_slide">'.$image.'</div>';
+	}
+	return $out;
+}
 
 function _page_background_get_markup_by_path($path){
 	global $theme_key, $language;
