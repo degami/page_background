@@ -530,14 +530,14 @@ function page_background_admin_form_submit($form,&$form_state){
 			}
 
 			$background_row = _page_background_save( array(
-				'file' => $file,
-				'path' => $form_state['values']['path'],
-				'weight' => 0,
-				'bglinkurl' => (isset($form_state['values']['bglinkurl']) && trim($form_state['values']['bglinkurl']) != '') ? trim($form_state['values']['bglinkurl']) : null,
-				'bgtext' => (isset($form_state['values']['bgtext']) && trim($form_state['values']['bgtext']) != '') ? $form_state['values']['bgtext'] : null,
-				'bgtextlang' => (isset($form_state['values']['bgtextlang']) && trim($form_state['values']['bgtextlang']) != '') ? trim($form_state['values']['bgtextlang']) : null,
-				'image_alt' => (isset($form_state['values']['image_alt']) && trim($form_state['values']['image_alt']) != '') ? trim($form_state['values']['image_alt']) : null,
-				'image_title' => (isset($form_state['values']['image_title']) && trim($form_state['values']['image_title']) != '') ? trim($form_state['values']['image_title']) : null,
+				'file' 			=> $file,
+				'path' 			=> $form_state['values']['path'],
+				'weight' 		=> 0,
+				'bglinkurl' 	=> (isset($form_state['values']['bglinkurl']) && trim($form_state['values']['bglinkurl']) != '') ? trim($form_state['values']['bglinkurl']) : null,
+				'bgtextlang' 	=> (isset($form_state['values']['bgtextlang']) && trim($form_state['values']['bgtextlang']) != '') ? trim($form_state['values']['bgtextlang']) : null,
+				'bgtext' 		=> (isset($form_state['values']['bgtext'])) ? $form_state['values']['bgtext'] : null,
+				'image_alt' 	=> (isset($form_state['values']['image_alt']) && trim($form_state['values']['image_alt']) != '') ? trim($form_state['values']['image_alt']) : null,
+				'image_title' 	=> (isset($form_state['values']['image_title']) && trim($form_state['values']['image_title']) != '') ? trim($form_state['values']['image_title']) : null,
 			) , $form_state );
 			
 			// db_insert('url_background_images')
@@ -710,14 +710,14 @@ function page_background_clone_form_submit($form,&$form_state){
 	}
 
 	$background_row = _page_background_save( array(
-		'fid' => $background_row_orig->fid,
-		'path' => $form_state['values']['path'],
-		'weight' => 0,
-		'bglinkurl' => (isset($form_state['values']['bglinkurl']) && trim($form_state['values']['bglinkurl']) != '') ? trim($form_state['values']['bglinkurl']) : null,
-		'bgtext' => (isset($form_state['values']['bgtext']) && trim($form_state['values']['bgtext']) != '') ? $form_state['values']['bgtext'] : null,
-		'bgtextlang' => (isset($form_state['values']['bgtextlang']) && trim($form_state['values']['bgtextlang']) != '') ? trim($form_state['values']['bgtextlang']) : null,
-		'image_alt' => (isset($form_state['values']['image_alt']) && trim($form_state['values']['image_alt']) != '') ? trim($form_state['values']['image_alt']) : null,
-		'image_title' => (isset($form_state['values']['image_title']) && trim($form_state['values']['image_title']) != '') ? trim($form_state['values']['image_title']) : null,
+		'fid' 			=> $background_row_orig->fid,
+		'path' 			=> $form_state['values']['path'],
+		'weight' 		=> 0,
+		'bglinkurl' 	=> (isset($form_state['values']['bglinkurl']) && trim($form_state['values']['bglinkurl']) != '') ? trim($form_state['values']['bglinkurl']) : null,
+		'bgtextlang' 	=> (isset($form_state['values']['bgtextlang']) && trim($form_state['values']['bgtextlang']) != '') ? trim($form_state['values']['bgtextlang']) : null,
+		'bgtext' 		=> (isset($form_state['values']['bgtext'])) ? $form_state['values']['bgtext'] : null,
+		'image_alt' 	=> (isset($form_state['values']['image_alt']) && trim($form_state['values']['image_alt']) != '') ? trim($form_state['values']['image_alt']) : null,
+		'image_title' 	=> (isset($form_state['values']['image_title']) && trim($form_state['values']['image_title']) != '') ? trim($form_state['values']['image_title']) : null,
 	) , $form_state );
 
 	// db_insert('url_background_images')
@@ -830,15 +830,15 @@ function page_background_edit_form_submit($form,&$form_state){
 		}
 		
 		$background_row = _page_background_save( array(
-			'bid' => $form_state['values']['background_row']->bid,
-			'file' => $file,
-			'path' => $form_state['values']['path'],
-			'weight' => 0,
-			'bglinkurl' => (isset($form_state['values']['bglinkurl']) && trim($form_state['values']['bglinkurl']) != '') ? trim($form_state['values']['bglinkurl']) : null,
-			'bgtext' => (isset($form_state['values']['bgtext']) && trim($form_state['values']['bgtext']) != '') ? $form_state['values']['bgtext'] : null,
-			'bgtextlang' => (isset($form_state['values']['bgtextlang']) && trim($form_state['values']['bgtextlang']) != '') ? trim($form_state['values']['bgtextlang']) : null,
-			'image_alt' => (isset($form_state['values']['image_alt']) && trim($form_state['values']['image_alt']) != '') ? trim($form_state['values']['image_alt']) : null,
-			'image_title' => (isset($form_state['values']['image_title']) && trim($form_state['values']['image_title']) != '') ? trim($form_state['values']['image_title']) : null,
+			'bid' 			=> $form_state['values']['background_row']->bid,
+			'file' 			=> $file,
+			'path' 			=> $form_state['values']['path'],
+			'weight' 		=> 0,
+			'bglinkurl' 	=> (isset($form_state['values']['bglinkurl']) && trim($form_state['values']['bglinkurl']) != '') ? trim($form_state['values']['bglinkurl']) : null,
+			'bgtextlang' 	=> (isset($form_state['values']['bgtextlang']) && trim($form_state['values']['bgtextlang']) != '') ? trim($form_state['values']['bgtextlang']) : null,
+			'bgtext' 		=> (isset($form_state['values']['bgtext'])) ? $form_state['values']['bgtext'] : null,
+			'image_alt' 	=> (isset($form_state['values']['image_alt']) && trim($form_state['values']['image_alt']) != '') ? trim($form_state['values']['image_alt']) : null,
+			'image_title' 	=> (isset($form_state['values']['image_title']) && trim($form_state['values']['image_title']) != '') ? trim($form_state['values']['image_title']) : null,
 		) , $form_state );
 
 		// db_insert('url_background_images')
