@@ -10,6 +10,16 @@ function page_background_menu(){
 	    'page arguments' => array('page_background_admin_form'),
 		'access callback'=>'_page_background_check_access',
 	  	'access arguments' => array('administer page_background'),
+	  	'type' => MENU_NORMAL_ITEM,
+	);
+	$items['admin/config/page_background/list'] = array(
+	    'title' => t('Page Backgrounds'),
+	    'description' => t('Page Backgrounds'),
+	    'page callback' => 'drupal_get_form',
+	    'page arguments' => array('page_background_admin_form'),
+		'access callback'=>'_page_background_check_access',
+	  	'access arguments' => array('administer page_background'),
+	  	'type' => MENU_DEFAULT_LOCAL_TASK,
 	);
 
 	$items['admin/config/page_background/settings'] = array(
@@ -19,6 +29,7 @@ function page_background_menu(){
 	    'page arguments' => array('page_background_settings_form'),
 		'access callback'=>'_page_background_check_access',
 	  	'access arguments' => array('administer page_background'),
+	  	'type' => MENU_LOCAL_TASK,
 	);
 	
 	$items['admin/config/page_background/%bid/clone'] = array(
@@ -1208,6 +1219,10 @@ function _page_background_get_fids_markup($fids=array()){
 		if( $fid->bglinkurl != null && parse_url($fid->bglinkurl) === false ) $fid->bglinkurl = null;
 		switch($slide_type){
 			case 'images':
+
+				if( empty($fid->image_alt) ) $fid->image_alt = trim( check_plain(strip_tags($fid->bgtext)) );
+				if( empty($fid->image_title) ) $fid->image_title = trim( check_plain(strip_tags($fid->bgtext)) );
+
 				$image = theme('image',array( 
 								'path'=>file_create_url($fid->file->uri), 
 								'width'=>$fid->file->image_dimensions['width'], 
