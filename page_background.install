@@ -26,6 +26,7 @@ function page_background_schema() {
 			'weight' => array(
 				'type' => 'int',
 				'not null' => TRUE,
+				'default' => 0,
 				'description' => 'weight',
 			),
 			'bglinkurl' => array(
@@ -87,6 +88,7 @@ function page_background_update_7000(&$sandbox) {
 	db_add_field('url_background_images', 'weight', array(
 		'type' => 'int',
 		'not null' => TRUE,
+		'default' => 0,
 		'description' => 'weight',
 	));
 }
