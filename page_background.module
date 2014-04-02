@@ -1381,7 +1381,7 @@ function _page_background_get_fids($path='<front>',$language = null){
 	}
 	
 	foreach(module_implements('alter_page_background_fids') as $module){
-		$fids = module_invoke($module, 'alter_page_background_fids',$fids);
+		$fids = module_invoke($module, 'alter_page_background_fids',$fids,$path,$language );
 	}
 	
 	return $fids;
@@ -1417,7 +1417,7 @@ function _page_background_get_default_fids($language = null){
 	}
 
 	foreach(module_implements('alter_page_background_fids') as $module){
-		$fids = module_invoke($module, 'alter_page_background_fids',$fids);
+		$fids = module_invoke($module, 'alter_page_background_fids',$fids,null,$language);
 	}
 	return $fids;
 }
