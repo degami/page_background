@@ -430,9 +430,32 @@ function page_background_node_delete($node){
 	}
 }
 
+function page_background_admin_filter_form($form,&$form_state){
+	$form['#method']='GET';
+
+	drupal_add_css('#page-background-admin-filter-form .form-item,#page-background-admin-filter-form .form-submit{display: inline-block;}', 'inline');
+
+	$form['filter-container']=array('#type'=>'fieldset','#title'=>'filter','#collapsible'=>true,'#collapsed'=>empty(trim($_REQUEST['filter'])));
+	$form['filter-container']['filter']=array(
+		'#type'=>'textfield',
+		'#title'=>t('Path'),
+		'#required'=>true,
+		'#default_value'=>(!empty(trim($_REQUEST['filter'])) ? trim($_REQUEST['filter']) : ''),
+	);
+	$form['filter-container']['submit']=array('#type'=>'submit','#value'=>t('Submit'));
+	return $form;
+}
+
 function page_background_admin_form($form,&$form_state){
 	global $user;
-	$query = db_select('url_background_images','bg')->fields('bg')->orderBy('weight')->orderBy('created');
+	$query = db_select('url_background_images','bg');
+	$query->fields('bg');
+	if( !empty(trim($_REQUEST['filter'])) ){
+		$query->condition('path',trim($_REQUEST['filter']));
+		drupal_set_message( t('The page is displaying ":path" path associated backgrounds only. !showall',array(':path'=>trim($_REQUEST['filter']), '!showall'=>l(t('Show all'),'admin/config/page_background'))) );
+	}
+	$query->orderBy('weight');
+	$query->orderBy('created');
 	$query->extend('PagerDefault')->limit(50);
 	$result=$query->execute()->fetchAll();
 
@@ -443,6 +466,10 @@ function page_background_admin_form($form,&$form_state){
 	);
 
 	$form['#validate'][]='page_background_admin_form_validate';
+
+	$form_filter = drupal_get_form('page_background_admin_filter_form');
+	$form['#prefix'] = render($form_filter);
+
 	foreach($result as $bkg){
 		$form['bkg_'.$bkg->bid]=array(
 			'#type'=>'checkbox',
@@ -667,7 +694,7 @@ function theme_page_background_admin_form($variables){
 			);
 		}
 	}
-	$out.=theme('table',array('header'=>$header,'rows'=>$rows, 'attributes' => array('id' => 'page-background-table'))).render($form['update_weight']).'&nbsp;'.render($form['delete_selected']).'<br /><br />';
+	$out.=theme('table',array('header'=>$header,'rows'=>$rows,'empty'=>t('No elements found'), 'attributes' => array('id' => 'page-background-table'))).render($form['update_weight']).'&nbsp;'.render($form['delete_selected']).'<br /><br />';
 	return $out.=drupal_render_children($form);
 }
 
@@ -1715,6 +1742,7 @@ function page_background_contextual_links_view_alter(&$element, &$items) {
     $element['#links']['page_background'] = array(
       'title' => 'Edit page backgrounds',
       'href' => url('admin/config/page_background', array('absolute' => TRUE)),
+      'query' => array('filter'=>$_GET['q']),
     );
   }
 }
