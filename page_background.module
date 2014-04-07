@@ -1711,12 +1711,6 @@ function _page_background_get_query_string(SelectQueryInterface $query) {
 }
 
 function page_background_contextual_links_view_alter(&$element, &$items) {
-  // This hook is called for EVERY set of contextual links
-  // on a page.  We first want to check the $element to make
-  // sure we are adding a link to the correct list of contextual
-  // links. In this case we only want to add a link to blocks
-  // created by the "search" module. We just add links using the
-  // same array structure as is used by theme_links.
   if (isset($element['#element']['#block']) && $element['#element']['#block']->delta == "page_background_block") {
     $element['#links']['page_background'] = array(
       'title' => 'Edit page backgrounds',
