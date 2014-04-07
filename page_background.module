@@ -435,12 +435,12 @@ function page_background_admin_filter_form($form,&$form_state){
 
 	drupal_add_css('#page-background-admin-filter-form .form-item,#page-background-admin-filter-form .form-submit{display: inline-block;}', 'inline');
 
-	$form['filter-container']=array('#type'=>'fieldset','#title'=>'filter','#collapsible'=>true,'#collapsed'=>empty(trim($_REQUEST['filter'])));
+	$form['filter-container']=array('#type'=>'fieldset','#title'=>'filter','#collapsible'=>true,'#collapsed'=>empty($_REQUEST['filter']));
 	$form['filter-container']['filter']=array(
 		'#type'=>'textfield',
 		'#title'=>t('Path'),
 		'#required'=>true,
-		'#default_value'=>(!empty(trim($_REQUEST['filter'])) ? trim($_REQUEST['filter']) : ''),
+		'#default_value'=>(!empty($_REQUEST['filter']) ? trim($_REQUEST['filter']) : ''),
 	);
 	$form['filter-container']['submit']=array('#type'=>'submit','#value'=>t('Submit'));
 	return $form;
@@ -450,7 +450,7 @@ function page_background_admin_form($form,&$form_state){
 	global $user;
 	$query = db_select('url_background_images','bg');
 	$query->fields('bg');
-	if( !empty(trim($_REQUEST['filter'])) ){
+	if( !empty($_REQUEST['filter']) ){
 		$query->condition('path',trim($_REQUEST['filter']));
 		drupal_set_message( t('The page is displaying ":path" path associated backgrounds only. !showall',array(':path'=>trim($_REQUEST['filter']), '!showall'=>l(t('Show all'),'admin/config/page_background'))) );
 	}
