@@ -1,4 +1,9 @@
-<?php 
+<?php
+
+/**
+ * @file
+ * Page Background Domain Integration Install
+ */
 
 /**
  * Implements hook_schema().
@@ -11,34 +16,15 @@ function page_background_domain_access_schema() {
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
-       ),
+      ),
       'domain_id' => array(
         'description' => 'Domain ID',
         'type' => 'int',
         'unsigned' => FALSE,
         'not null' => TRUE,
-       ),
       ),
-    'primary key' => array('bid','domain_id'),
+    ),
+    'primary key' => array('bid', 'domain_id'),
   );
   return $schema;
 }
-
-/**
- * Implements hook_install().
- */
-function page_background_domain_access_install() {
-	// db_add_field('url_background_images', 'domain_id', array(
-	// 	'type' => 'int',
-	// 	'not null' => FALSE,
-	// 	'description' => 'Background Domain - Reference to {domain}.domain_id',
-	// ));
-}
-
-/**
- * Implements hook_uninstall().
- */
-function page_background_domain_access_uninstall() {
-	// db_drop_field('url_background_images', 'domain_id');
-}
-

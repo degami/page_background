@@ -1,64 +1,72 @@
 <?php
 
-function page_background_menu(){
-	$items=array();
+/**
+ * @file
+ * Page Background
+ */
 
-	$items['admin/config/page_background'] = array(
-	    'title' => t('Page Backgrounds'),
-	    'description' => t('Page Backgrounds'),
-	    'page callback' => 'drupal_get_form',
-	    'page arguments' => array('page_background_admin_form'),
-		'access callback'=>'_page_background_check_access',
-	  	'access arguments' => array('administer page_background'),
-	  	'type' => MENU_NORMAL_ITEM,
-	);
-	$items['admin/config/page_background/list'] = array(
-	    'title' => t('Page Backgrounds'),
-	    'description' => t('Page Backgrounds'),
-	    'page callback' => 'drupal_get_form',
-	    'page arguments' => array('page_background_admin_form'),
-		'access callback'=>'_page_background_check_access',
-	  	'access arguments' => array('administer page_background'),
-	  	'type' => MENU_DEFAULT_LOCAL_TASK,
-	);
+/**
+ * Implements hook_menu().
+ */
+function page_background_menu() {
+  $items = array();
 
-	$items['admin/config/page_background/settings'] = array(
-	    'title' => t('Page Backgrounds Settings'),
-	    'description' => t('Page Backgrounds Settings'),
-	    'page callback' => 'drupal_get_form',
-	    'page arguments' => array('page_background_settings_form'),
-		'access callback'=>'_page_background_check_access',
-	  	'access arguments' => array('administer page_background'),
-	  	'type' => MENU_LOCAL_TASK,
-	);
-	
-	$items['admin/config/page_background/%bid/clone'] = array(
-	    'title' => t('Page Backgrounds Clone'),
-	    'description' => t('Page Backgrounds Clone'),
-	    'page callback' => 'drupal_get_form',
-	    'page arguments' => array('page_background_clone_form',3),
-		'access callback'=>'_page_background_check_access',
-	  	'access arguments' => array('administer page_background'),
-	);
-	
-	$items['admin/config/page_background/%bid/edit'] = array(
-	    'title' => t('Edit Page Backgrounds'),
-	    'description' => t('Edit Page Backgrounds'),
-	    'page callback' => 'drupal_get_form',
-	    'page arguments' => array('page_background_edit_form',3),
-		'access callback'=>'_page_background_check_access',
-	  	'access arguments' => array('administer page_background'),
-	);
+  $items['admin/config/page_background'] = array(
+    'title' => 'Page Backgrounds',
+    'description' => 'Page Backgrounds',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('page_background_admin_form'),
+    'access callback' => '_page_background_check_access',
+    'access arguments' => array('administer page_background'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['admin/config/page_background/list'] = array(
+    'title' => 'Page Backgrounds',
+    'description' => 'Page Backgrounds',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('page_background_admin_form'),
+    'access callback' => '_page_background_check_access',
+    'access arguments' => array('administer page_background'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
 
-	$items['admin/config/page_background/%bid/delete'] = array(
-	    'title' => t('Delete Page Backgrounds'),
-	    'description' => t('Delete Page Backgrounds'),
-	    'page callback' => 'drupal_get_form',
-	    'page arguments' => array('page_background_delete_form',3),
-		'access callback'=>'_page_background_check_access',
-	  	'access arguments' => array('administer page_background'),
-	);
-	return $items;
+  $items['admin/config/page_background/settings'] = array(
+    'title' => 'Page Backgrounds Settings',
+    'description' => 'Page Backgrounds Settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('page_background_settings_form'),
+    'access callback' => '_page_background_check_access',
+    'access arguments' => array('administer page_background'),
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  $items['admin/config/page_background/%bid/clone'] = array(
+    'title' => 'Page Backgrounds Clone',
+    'description' => 'Page Backgrounds Clone',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('page_background_clone_form', 3),
+    'access callback' => '_page_background_check_access',
+    'access arguments' => array('administer page_background'),
+  );
+
+  $items['admin/config/page_background/%bid/edit'] = array(
+    'title' => 'Edit Page Backgrounds',
+    'description' => 'Edit Page Backgrounds',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('page_background_edit_form', 3),
+    'access callback' => '_page_background_check_access',
+    'access arguments' => array('administer page_background'),
+  );
+
+  $items['admin/config/page_background/%bid/delete'] = array(
+    'title' => 'Delete Page Backgrounds',
+    'description' => 'Delete Page Backgrounds',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('page_background_delete_form', 3),
+    'access callback' => '_page_background_check_access',
+    'access arguments' => array('administer page_background'),
+  );
+  return $items;
 }
 
 
@@ -66,22 +74,32 @@ function page_background_menu(){
  * Implements hook_permission().
  */
 function page_background_permission() {
-	return array(
-	    'administer page_background' =>  array(
-			'title' => t('Administer Page Background'),
-			'description' => t('Perform administration tasks for Page Background.'),
-		),
-	);
+  return array(
+    'administer page_background' => array(
+      'title' => t('Administer Page Background'),
+      'description' => t('Perform administration tasks for Page Background.'),
+    ),
+  );
 }
 
-function _page_background_check_access($access){
-	global $user;
-	if($user->uid==1) return true;
-	if(!is_array($access)) $access=array($access);
-	foreach($access as $string)
-	if( user_access($string,$user) ) return true;
+/**
+ * Page_background_check_access().
+ */
+function _page_background_check_access($access) {
+  global $user;
+  if ($user->uid == 1) {
+    return TRUE;
+  }
+  if (!is_array($access)) {
+    $access = array($access);
+  }
+  foreach ($access as $string) {
+    if (user_access($string, $user)) {
+      return TRUE;
+    }
+  }
 
-	return false;
+  return FALSE;
 }
 
 
@@ -89,1547 +107,1574 @@ function _page_background_check_access($access){
  * Implements hook_theme().
  */
 function page_background_theme($existing, $type, $theme, $path) {
-	return array(
-		'page_background_admin_form' => array(
-			'render element' => 'form',
-		),
-		'page_background_slide' => array(
-			'variables' => array( 'image' => null, 'background_row' => null ),
-		),
-	);
+  return array(
+    'page_background_admin_form' => array(
+      'render element' => 'form',
+    ),
+    'page_background_slide' => array(
+      'variables' => array('image' => NULL, 'background_row' => NULL),
+    ),
+  );
 }
 
-
+/**
+ * Page_background_addmore_uploads_callback().
+ */
 function page_background_addmore_uploads_callback($form, $form_state) {
-  return $form['page_backgrounds']['uploads_fieldset']['page_backgrounds_uploadfile'.$form['page_backgrounds']['page_backgrounds_num_uploads']['#value']];
+  return $form['page_backgrounds']['uploads_fieldset']['page_backgrounds_uploadfile' . $form['page_backgrounds']['page_backgrounds_num_uploads']['#value']];
 }
 
-
-function _page_background_get_languages_selectoptions(){
-	$out = array(''=>t('Any'));
-	foreach( language_list() as $language ){
-		$out[$language->language] = $language->name;
-	}
-	return $out;
+/**
+ * Page_background_addmore_uploads_callback().
+ */
+function _page_background_get_languages_selectoptions() {
+  $out = array('' => t('Any'));
+  foreach (language_list() as $language) {
+    $out[$language->language] = $language->name;
+  }
+  return $out;
 }
-
 
 /**
  * Implements hook_form_BASE_FORM_ID_alter().
- * Alter the taxonomy term forms.
  */
 function page_background_form_taxonomy_form_term_alter(&$form, &$form_state, $form_id) {
-	$term = (object)$form['#term'];
-	$form['page_backgrounds'] = array('#type'=>'fieldset','#title'=>t('Page Backgrounds'),'#collapsible'=>true,'#collapsed'=>true);
-	$form['page_backgrounds']['#group'] = 'additional_settings';
-	$form['page_backgrounds']['#weight'] = 9999;
+  $term = (object) $form['#term'];
+  $form['page_backgrounds'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Page Backgrounds'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+  $form['page_backgrounds']['#group'] = 'additional_settings';
+  $form['page_backgrounds']['#weight'] = 9999;
 
-	if(isset($term->tid)){
-		$query = db_select('url_background_images','bg')->fields('bg')->condition('path','taxonomy/term/'.$term->tid,'=')->orderBy('created');
-		$result=$query->execute()->fetchAll();
-		if(count($result)>0){
-			$form['page_backgrounds']['existing']=array('#markup'=>'<strong>'.t('Mark for deletion of an existing background.').'</strong>');
-		}
-		foreach($result as $bkg){
-		
-			$file=file_load($bkg->fid);
-			$themed_image=array(
-					'path'=>$file->uri,
-					'style_name'=>'thumbnail',
-			);
-		
-			$form['page_backgrounds']['page_background_bkg_'.$bkg->bid]=array(
-					'#type'=>'checkbox',
-					'#title'=>theme('image_style',$themed_image),
-			);
-		
-		}
-		
-		$max_upload = (int)(ini_get('upload_max_filesize'));
-		$max_post = (int)(ini_get('post_max_size'));
-		$memory_limit = (int)(ini_get('memory_limit'));
-		$upload_mb = min($max_upload, $max_post, $memory_limit);
-		
-		$extensions=explode(' ','jpg jpeg png');
-		foreach($extensions as &$ext) $ext='.'.trim($ext);
-		
-		$num_uploads = !empty($form_state['values']['page_backgrounds_num_uploads']) ? $form_state['values']['page_backgrounds_num_uploads']+1 : 1;
-		
-		$form['page_backgrounds']['page_backgrounds_num_uploads']=array('#type'=>'value','#value'=>$num_uploads);
-		$form['page_backgrounds']['uploads_fieldset'] = array(
-				'#title' => t('Upload New Background'),
-				'#type' => 'container',
-				'#id'=>'page_background-uploads-div',
-		);
-		$form['page_backgrounds']['uploads_fieldset']['new-title']=array('#markup'=>'<strong>'.t('Add new backgrounds.').'</strong>');
-		for ($i = 1; $i <= $num_uploads; $i++) {
-			$form['page_backgrounds']['uploads_fieldset']["page_backgrounds_uploadfile$i"] = array(
-					'#type'=>'managed_file',
-					'#upload_validators' => array(
-							'file_validate_extensions' => array('jpg jpeg png'),
-							// Pass the maximum file size in bytes
-							'file_validate_size' => array($upload_mb * 1024 * 1024),
-					),
-					'#upload_location'=>'public://page_backgrounds/',
-					'#description'=>t('extensions allowed: !extension_list , max file size: !maxfilesize MB',array('!extension_list'=>implode(' ',$extensions),'!maxfilesize'=>$upload_mb)),
-			);
-			// $form['page_backgrounds']['uploads_fieldset']["page_backgrounds_bglinkurl$i"]=array('#type'=>'textfield','#title'=>t('Link Url') );
-			// $form['page_backgrounds']['uploads_fieldset']["page_backgrounds_bgtext$i"]=array('#type'=>'text_format','#title'=>t('Background Slogan') );
-			// $form['page_backgrounds']['uploads_fieldset']["page_backgrounds_bgtextlang$i"]=array('#type'=>'select','#options'=>_page_background_get_languages_selectoptions(),'#title'=>t('Background Slogan Language') );
-		}
-		
+  if (isset($term->tid)) {
+    $query = db_select('url_background_images', 'bg')
+    ->fields('bg')->condition('path', 'taxonomy/term/' . $term->tid, '=')
+    ->orderBy('created');
+    $result = $query->execute()->fetchAll();
+    if (count($result) > 0) {
+      $form['page_backgrounds']['existing'] = array('#markup' => '<strong>' . t('Mark for deletion of an existing background.') . '</strong>');
+    }
+    foreach ($result as $bkg) {
 
-		$form['page_backgrounds']['add-new-file']=array(
-				'#type'=>'button',
-				'#value'=>t('Add more'),
-				'#ajax' => array(
-						'callback' => 'page_background_addmore_uploads_callback',
-						'wrapper' => 'page_background-uploads-div',
-						'method' => 'append',
-						'effect' => 'fade',
-						'progress' => array('type' => 'none'),
-				),
-		);
-		
-	}else{
-		$form['page_backgrounds']['alert']=array('#markup'=>t('Page backgrounds can be added only to existing terms.'));
-	}
-	$form['#validate'][]='page_background_form_taxonomy_form_term_validate';
-	$form['#submit'][]='page_background_form_taxonomy_form_term_submit';
+      $file = file_load($bkg->fid);
+      $themed_image = array(
+        'path' => $file->uri,
+        'style_name' => 'thumbnail',
+      );
+
+      $form['page_backgrounds']['page_background_bkg_' . $bkg->bid] = array(
+        '#type' => 'checkbox',
+        '#title' => theme('image_style', $themed_image),
+      );
+
+    }
+
+    $max_upload = (int) (ini_get('upload_max_filesize'));
+    $max_post = (int) (ini_get('post_max_size'));
+    $memory_limit = (int) (ini_get('memory_limit'));
+    $upload_mb = min($max_upload, $max_post, $memory_limit);
+
+    $extensions = explode(' ', 'jpg jpeg png');
+    foreach ($extensions as &$ext) {
+      $ext = '.' . trim($ext);
+    }
+
+    $num_uploads = !empty($form_state['values']['page_backgrounds_num_uploads']) ? $form_state['values']['page_backgrounds_num_uploads'] + 1 : 1;
+
+    $form['page_backgrounds']['page_backgrounds_num_uploads'] = array('#type' => 'value', '#value' => $num_uploads);
+    $form['page_backgrounds']['uploads_fieldset'] = array(
+      '#title' => t('Upload New Background'),
+      '#type' => 'container',
+      '#id' => 'page_background-uploads-div',
+    );
+    $form['page_backgrounds']['uploads_fieldset']['new-title'] = array('#markup' => '<strong>' . t('Add new backgrounds.') . '</strong>');
+    for ($i = 1; $i <= $num_uploads; $i++) {
+      $form['page_backgrounds']['uploads_fieldset']["page_backgrounds_uploadfile$i"] = array(
+        '#type' => 'managed_file',
+        '#upload_validators' => array(
+          'file_validate_extensions' => array('jpg jpeg png'),
+          'file_validate_size' => array($upload_mb * 1024 * 1024),
+        ),
+        '#upload_location' => 'public://page_backgrounds/',
+        '#description' => t('extensions allowed: !extension_list , max file size: !maxfilesize MB', array('!extension_list' => implode(' ', $extensions), '!maxfilesize' => $upload_mb)),
+      );
+    }
+
+    $form['page_backgrounds']['add-new-file'] = array(
+      '#type' => 'button',
+      '#value' => t('Add more'),
+      '#ajax' => array(
+        'callback' => 'page_background_addmore_uploads_callback',
+        'wrapper' => 'page_background-uploads-div',
+        'method' => 'append',
+        'effect' => 'fade',
+        'progress' => array('type' => 'none'),
+      ),
+    );
+
+  }
+  else {
+    $form['page_backgrounds']['alert'] = array('#markup' => t('Page backgrounds can be added only to existing terms.'));
+  }
+  $form['#validate'][] = 'page_background_form_taxonomy_form_term_validate';
+  $form['#submit'][] = 'page_background_form_taxonomy_form_term_submit';
 }
 
-function page_background_form_taxonomy_form_term_validate($form, &$form_state){
-	foreach($form_state['values'] as $key=>$value){
-		if( preg_match('/^page_backgrounds_uploadfile[0-9]+$/i',$key) ){
-		}
-	}
+/**
+ * Page_background_form_taxonomy_form_term_validate().
+ */
+function page_background_form_taxonomy_form_term_validate($form, &$form_state) {
+  foreach ($form_state['values'] as $key => $value) {
+    if (preg_match('/^page_backgrounds_uploadfile[0-9]+$/i', $key)) {
+    }
+  }
 }
 
-function page_background_form_taxonomy_form_term_submit($form, &$form_state){
-	global $user;
-	if(
-		( isset($form_state['values']['op']) && $form_state['values']['op']==t('Save') ) || 
-		( isset($form_state['values']['save_translate']) && $form_state['values']['save_translate']==t('Save and translate') ) 
-	){
-		foreach($form_state['values'] as $key=>$value){
-			if( preg_match('/^page_backgrounds_uploadfile([0-9]+)$/i',$key,$matches) ){
-				if( ($file = file_load($form_state['values'][$key])) !== false ){
-					$file->status = FILE_STATUS_PERMANENT;
-					$file->uid = $user->uid;
-					file_save($file);
-	
-					$background_row = _page_background_save( array(
-						'file' => $file,
-						'path' => 'taxonomy/term/'.$form_state['values']['tid'],
-						'weight' => 0,
-						// 'bglinkurl' => trim($form_state['values']['page_backgrounds_bglinkurl'.$matches[1]]) != '' ? trim($form_state['values']['page_backgrounds_bglinkurl'.$matches[1]]) : null,
-						// 'bgtext' => isset($form_state['values']['page_backgrounds_bgtext'.$matches[1]]) ? $form_state['values']['page_backgrounds_bgtext'.$matches[1]] : null,
-						// 'bgtextlang' => trim($form_state['values']['page_backgrounds_bgtextlang'.$matches[1]]) != '' ? trim($form_state['values']['page_backgrounds_bgtextlang'.$matches[1]]) : null,
-					) , $form_state );
+/**
+ * Page_background_form_taxonomy_form_term_submit().
+ */
+function page_background_form_taxonomy_form_term_submit($form, &$form_state) {
+  global $user;
+  if (
+    (isset($form_state['values']['op']) && $form_state['values']['op'] == t('Save')) ||
+    (isset($form_state['values']['save_translate']) && $form_state['values']['save_translate'] == t('Save and translate'))
+    ) {
+    foreach ($form_state['values'] as $key => $value) {
+      if (preg_match('/^page_backgrounds_uploadfile([0-9]+)$/i', $key, $matches)) {
+        if (($file = file_load($form_state['values'][$key])) !== FALSE) {
+          $file->status = FILE_STATUS_PERMANENT;
+          $file->uid = $user->uid;
+          file_save($file);
 
-					// db_insert('url_background_images')
-					// ->fields(array(
-					// 'path'=>'taxonomy/term/'.$form_state['values']['tid'],
-					// 'fid'=>$file->fid,
-					// 'weight'=>0,
-					// 'created'=>time(),
-					// ))->execute();
-				}
-			}
-		}
+          $background_row = _page_background_save(array(
+            'file' => $file,
+            'path' => 'taxonomy/term/' . $form_state['values']['tid'],
+            'weight' => 0,
+          ) , $form_state);
+        }
+      }
+    }
 
-		//trovo checkbox selezionati per eliminazione
-		$bids=array();
-		foreach($form_state['values'] as $key=>$elem){
-			if(stripos($key,'page_background_bkg_')===0 && !empty($elem)){
-				$bids[]=preg_replace("/^page_background_bkg_/i","",$key);
-			}
-		}
-		$numdeleted = 0;
-		if(count($bids)>0){
-			//$numdeleted = db_delete('url_background_images')->condition('bid',$bids,'IN')->execute();
-			$numdeleted = _page_background_delete_multiple($bids);
-		}
-	}
+    $bids = array();
+    foreach ($form_state['values'] as $key => $elem) {
+      if (stripos($key, 'page_background_bkg_') === 0 && !empty($elem)) {
+        $bids[] = preg_replace("/^page_background_bkg_/i", "", $key);
+      }
+    }
+    $numdeleted = 0;
+    if (count($bids) > 0) {
+      $numdeleted = _page_background_delete_multiple($bids);
+    }
+  }
 }
 
-function page_background_taxonomy_term_delete($term){
-	//$numdeleted = db_delete('url_background_images')->condition('path','taxonomy/term/'.$term->tid,'=')->execute();
-
-	$bids = array();
-	$query = db_select('url_background_images','bg')->fields('bg',array('bid'))->condition('path','taxonomy/term/'.$term->tid,'=');
-	$result=$query->execute()->fetchAll();
-	foreach($result as $row) $bids[] = $row->bid;
-	if( count($bids) > 0 ){
-		$numdeleted = _page_background_delete_multiple($bids);
-	}
+/**
+ * Page_background_taxonomy_term_delete().
+ */
+function page_background_taxonomy_term_delete($term) {
+  $bids = array();
+  $query = db_select('url_background_images', 'bg')->fields('bg', array('bid'))->condition('path', 'taxonomy/term/' . $term->tid, '=');
+  $result = $query->execute()->fetchAll();
+  foreach ($result as $row) {
+    $bids[] = $row->bid;
+  }
+  if (count($bids) > 0) {
+    $numdeleted = _page_background_delete_multiple($bids);
+  }
 }
-
-
-
-
-
-
 
 /**
  * Implements hook_form_BASE_FORM_ID_alter().
- * Alter the node forms.
  */
 function page_background_form_node_form_alter(&$form, &$form_state, $form_id) {
-	// Add the Location fields on the node edit form.
-	$node = $form['#node'];
-	$form['page_backgrounds'] = array('#type'=>'fieldset','#title'=>t('Page Backgrounds'));
-	$form['page_backgrounds']['#group'] = 'additional_settings';
-		
-	if(isset($node->nid)){
-		$query = db_select('url_background_images','bg')->fields('bg')->condition('path','node/'.$node->nid,'=')->orderBy('created');
-		$result=$query->execute()->fetchAll();
-		if(count($result)>0){
-			$form['page_backgrounds']['existing']=array('#markup'=>'<strong>'.t('Mark for deletion of an existing background.').'</strong>');
-		}
-		foreach($result as $bkg){
-		
-			$file=file_load($bkg->fid);
-			$themed_image=array(
-					'path'=>$file->uri,
-					'style_name'=>'thumbnail',
-			);
-		
-			$form['page_backgrounds']['page_background_bkg_'.$bkg->bid]=array(
-					'#type'=>'checkbox',
-					'#title'=>theme('image_style',$themed_image),
-			);
-		
-		}
-		
-		$max_upload = (int)(ini_get('upload_max_filesize'));
-		$max_post = (int)(ini_get('post_max_size'));
-		$memory_limit = (int)(ini_get('memory_limit'));
-		$upload_mb = min($max_upload, $max_post, $memory_limit);
-		
-		$extensions=explode(' ','jpg jpeg png');
-		foreach($extensions as &$ext) $ext='.'.trim($ext);
-		
-		$num_uploads = !empty($form_state['values']['page_backgrounds_num_uploads']) ? $form_state['values']['page_backgrounds_num_uploads']+1 : 1;
-		
-		$form['page_backgrounds']['page_backgrounds_num_uploads']=array('#type'=>'value','#value'=>$num_uploads);
-		$form['page_backgrounds']['uploads_fieldset'] = array(
-				'#title' => t('Upload New Background'),
-				// The prefix/suffix provide the div that we're replacing, named by
-				// #ajax['wrapper'] below.
-				'#type' => 'container',
-				'#id'=>'page_background-uploads-div',
-		);
-		$form['page_backgrounds']['uploads_fieldset']['new-title']=array('#markup'=>'<strong>'.t('Add new backgrounds.').'</strong>');
-		for ($i = 1; $i <= $num_uploads; $i++) {
-			$form['page_backgrounds']['uploads_fieldset']["page_backgrounds_uploadfile$i"] = array(
-					'#type'=>'managed_file',
-					'#upload_validators' => array(
-							'file_validate_extensions' => array('jpg jpeg png'),
-							// Pass the maximum file size in bytes
-							'file_validate_size' => array($upload_mb * 1024 * 1024),
-					),
-					'#upload_location'=>'public://page_backgrounds/',
-					'#description'=>t('extensions allowed: !extension_list , max file size: !maxfilesize MB',array('!extension_list'=>implode(' ',$extensions),'!maxfilesize'=>$upload_mb)),
-			);
+  $node = $form['#node'];
+  $form['page_backgrounds'] = array('#type' => 'fieldset', '#title' => t('Page Backgrounds'));
+  $form['page_backgrounds']['#group'] = 'additional_settings';
 
-			// $form['page_backgrounds']['uploads_fieldset']["page_backgrounds_bglinkurl$i"]=array('#type'=>'textfield','#title'=>t('Link Url') );
-			// $form['page_backgrounds']['uploads_fieldset']["page_backgrounds_bgtext$i"]=array('#type'=>'text_format','#title'=>t('Background Slogan') );
-			// $form['page_backgrounds']['uploads_fieldset']["page_backgrounds_bgtextlang$i"]=array('#type'=>'select','#options'=>_page_background_get_languages_selectoptions(),'#title'=>t('Background Slogan Language') );			
-		}
-		
+  if (isset($node->nid)) {
+    $query = db_select('url_background_images', 'bg')->fields('bg')->condition('path', 'node/' . $node->nid, '=')->orderBy('created');
+    $result = $query->execute()->fetchAll();
+    if (count($result) > 0) {
+      $form['page_backgrounds']['existing'] = array('#markup' => '<strong>' . t('Mark for deletion of an existing background.') . '</strong>');
+    }
+    foreach ($result as $bkg) {
 
-		$form['page_backgrounds']['add-new-file']=array(
-				'#type'=>'button',
-				'#value'=>t('Add more'),
-				'#ajax' => array(
-						'callback' => 'page_background_addmore_uploads_callback',
-						'wrapper' => 'page_background-uploads-div',
-						//'method' defaults to replaceWith, but valid values also include
-						// append, prepend, before and after.
-						// 'method' => 'replaceWith',
-						'method' => 'append',
-						// 'effect' defaults to none. Other valid values are 'fade' and 'slide'.
-						'effect' => 'fade',
-						// 'speed' defaults to 'slow'. You can also use 'fast'
-						// or a number of milliseconds for the animation to last.
-						// 'speed' => 'slow',
-						// Don't show any throbber...
-						'progress' => array('type' => 'none'),
-				),
-		);
+      $file = file_load($bkg->fid);
+      $themed_image = array(
+        'path' => $file->uri,
+        'style_name' => 'thumbnail',
+      );
 
+      $form['page_backgrounds']['page_background_bkg_' . $bkg->bid] = array(
+        '#type' => 'checkbox',
+        '#title' => theme('image_style', $themed_image),
+      );
 
-	}else{
-		$form['page_backgrounds']['alert']=array('#markup'=>t('Page backgrounds can be added only to existing nodes.'));
-	}
-	$form['#validate'][]='page_background_form_node_form_validate';
+    }
+
+    $max_upload = (int) (ini_get('upload_max_filesize'));
+    $max_post = (int) (ini_get('post_max_size'));
+    $memory_limit = (int) (ini_get('memory_limit'));
+    $upload_mb = min($max_upload, $max_post, $memory_limit);
+
+    $extensions = explode(' ', 'jpg jpeg png');
+    foreach ($extensions as &$ext) {
+      $ext = '.' . trim($ext);
+    }
+
+    $num_uploads = !empty($form_state['values']['page_backgrounds_num_uploads']) ? $form_state['values']['page_backgrounds_num_uploads'] + 1 : 1;
+
+    $form['page_backgrounds']['page_backgrounds_num_uploads'] = array('#type' => 'value', '#value' => $num_uploads);
+    $form['page_backgrounds']['uploads_fieldset'] = array(
+      '#title' => t('Upload New Background'),
+      '#type' => 'container',
+      '#id' => 'page_background-uploads-div',
+    );
+    $form['page_backgrounds']['uploads_fieldset']['new-title'] = array('#markup' => '<strong>' . t('Add new backgrounds.') . '</strong>');
+    for ($i = 1; $i <= $num_uploads; $i++) {
+      $form['page_backgrounds']['uploads_fieldset']["page_backgrounds_uploadfile$i"] = array(
+        '#type' => 'managed_file',
+        '#upload_validators' => array(
+          'file_validate_extensions' => array('jpg jpeg png'),
+          'file_validate_size' => array($upload_mb * 1024 * 1024),
+        ),
+        '#upload_location' => 'public://page_backgrounds/',
+        '#description' => t('extensions allowed: !extension_list , max file size: !maxfilesize MB', array('!extension_list' => implode(' ', $extensions), '!maxfilesize' => $upload_mb)),
+      );
+    }
+
+    $form['page_backgrounds']['add-new-file'] = array(
+      '#type' => 'button',
+      '#value' => t('Add more'),
+      '#ajax' => array(
+        'callback' => 'page_background_addmore_uploads_callback',
+        'wrapper' => 'page_background-uploads-div',
+        'method' => 'append',
+        'effect' => 'fade',
+        'progress' => array('type' => 'none'),
+      ),
+    );
+
+  }
+  else {
+    $form['page_backgrounds']['alert'] = array('#markup' => t('Page backgrounds can be added only to existing nodes.'));
+  }
+  $form['#validate'][] = 'page_background_form_node_form_validate';
 }
-
-function page_background_form_node_form_validate($form, &$form_state){
-	foreach($form_state['values'] as $key=>$value){
-		if( preg_match('/^page_backgrounds_uploadfile[0-9]+$/i',$key) ){
-		}
-	}
-}
-
-function page_background_node_submit($node, $form, &$form_state){
-	global $user;
-	if( isset($form_state['values']['op']) && $form_state['values']['op']==t('Save') ){
-		foreach($form_state['values'] as $key=>$value){
-			if( preg_match('/^page_backgrounds_uploadfile([0-9]+)$/i',$key,$matches) ){
-				if( ($file = file_load($form_state['values'][$key])) !== false ){
-					$file->status = FILE_STATUS_PERMANENT;
-					$file->uid = $user->uid;
-					file_save($file);
-	
-					$background_row = _page_background_save( array(
-						'file' => $file,
-						'path' => 'node/'.$form_state['values']['nid'],
-						'weight' => 0,
-						// 'bglinkurl' => trim($form_state['values']['page_backgrounds_bglinkurl'.$matches[1]]) != '' ? trim($form_state['values']['page_backgrounds_bglinkurl'.$matches[1]]) : null,
-						// 'bgtext' => isset($form_state['values']['page_backgrounds_bgtext'.$matches[1]]) ? $form_state['values']['page_backgrounds_bgtext'.$matches[1]] : null,
-						// 'bgtextlang' => trim($form_state['values']['page_backgrounds_bgtextlang'.$matches[1]]) != '' ? trim($form_state['values']['page_backgrounds_bgtextlang'.$matches[1]]) : null,
-					) , $form_state );
-
-					// db_insert('url_background_images')
-					// ->fields(array(
-					// 'path'=>'node/'.$form_state['values']['nid'],
-					// 'fid'=>$file->fid,
-					// 'weight'=>0,
-					// 'created'=>time(),
-					// ))->execute();
-				}
-			}
-		}
-	
-		//trovo checkbox selezionati per eliminazione
-		$bids=array();
-		foreach($form_state['values'] as $key=>$elem){
-			if(stripos($key,'page_background_bkg_')===0 && !empty($elem)){
-				$bids[]=preg_replace("/^page_background_bkg_/i","",$key);
-			}
-		}
-		$numdeleted = 0;
-		if(count($bids)>0){
-			//$numdeleted = db_delete('url_background_images')->condition('bid',$bids,'IN')->execute();
-			$numdeleted = _page_background_delete_multiple($bids);
-		}
-	}
-}
-
-function page_background_node_delete($node){
-	//$numdeleted = db_delete('url_background_images')->condition('path','node/'.$node->nid,'=')->execute();
-
-	$bids = array();
-	$query = db_select('url_background_images','bg')->fields('bg',array('bid'))->condition('path','node/'.$node->nid,'=');
-	$result=$query->execute()->fetchAll();
-	foreach($result as $row) $bids[] = $row->bid;
-	if( count($bids) > 0 ){
-		$numdeleted = _page_background_delete_multiple($bids);
-	}
-}
-
-function page_background_admin_filter_form($form,&$form_state){
-	$form['#method']='GET';
-
-	drupal_add_css('#page-background-admin-filter-form .form-item,#page-background-admin-filter-form .form-submit{display: inline-block;}', 'inline');
-
-	$form['filter-container']=array('#type'=>'fieldset','#title'=>'filter','#collapsible'=>true,'#collapsed'=>empty($_REQUEST['filter']));
-	$form['filter-container']['filter']=array(
-		'#type'=>'textfield',
-		'#title'=>t('Path'),
-		'#required'=>true,
-		'#default_value'=>(!empty($_REQUEST['filter']) ? trim($_REQUEST['filter']) : ''),
-	);
-	$form['filter-container']['submit']=array('#type'=>'submit','#value'=>t('Submit'));
-	return $form;
-}
-
-function page_background_admin_form($form,&$form_state){
-	global $user;
-	$query = db_select('url_background_images','bg');
-	$query->fields('bg');
-	if( !empty($_REQUEST['filter']) ){
-		$or = db_or();
-		$or->condition('path',trim($_REQUEST['filter']));
-		$or->condition('path',null,'IS');
-		$query->condition($or);
-		drupal_set_message( t('The page is displaying ":path" path associated backgrounds only. !showall',array(':path'=>trim($_REQUEST['filter']), '!showall'=>l(t('Show all'),'admin/config/page_background'))) );
-	}
-	$query->orderBy('weight');
-	$query->orderBy('created');
-	$query->extend('PagerDefault')->limit(50);
-	$result=$query->execute()->fetchAll();
-
-	//$form['#attached']['js'][] = '/'.drupal_get_path('module', 'page_background').'/js/page_background_admin.js';
-	$form['#attached']['js'][] = array(
-	  'data' => drupal_get_path('module', 'page_background').'/js/page_background_admin.js',
-	  'type' => 'file'
-	);
-
-	$form['#validate'][]='page_background_admin_form_validate';
-
-	$form_filter = drupal_get_form('page_background_admin_filter_form');
-	$form['#prefix'] = render($form_filter);
-
-	foreach($result as $bkg){
-		$form['bkg_'.$bkg->bid]=array(
-			'#type'=>'checkbox',
-			'#infos'=>serialize($bkg),
-		);
-		$form['weight_'.$bkg->bid]=array(
-				'#type'=>'textfield',
-				'#default_value'=>$bkg->weight,
-				'#attributes'=>array('class'=> array('my-elements-weight')),
-		);
-	}
-	if($result) {
-		$form['delete_selected']=array('#type'=>'submit','#value'=>t('Delete Selected'));
-		$form['update_weight']=array('#type'=>'submit','#value'=>t('Save Changes'));
-	}
-
-	$form['addfile'] = array('#type'=>'fieldset','#title'=>t('Upload a new file'));
-
-	$max_upload = (int)(ini_get('upload_max_filesize'));
-	$max_post = (int)(ini_get('post_max_size'));
-	$memory_limit = (int)(ini_get('memory_limit'));
-	$upload_mb = min($max_upload, $max_post, $memory_limit);
-
-	$extensions=explode(' ','jpg jpeg png');
-	foreach($extensions as &$ext) $ext='.'.trim($ext);
-
-	$form['uid']=array('#type'=>'hidden','#value'=>$user->uid);
-
-	
-	$form['addfile']['uploadfile']=array(
-		'#type'=>'managed_file',
-		'#title'=>t('Upload New Background'),
-		'#upload_validators' => array(
-		'file_validate_extensions' => array('jpg jpeg png'),
-		// Pass the maximum file size in bytes
-		    'file_validate_size' => array($upload_mb * 1024 * 1024),
-		),
-		'#upload_location'=>'public://page_backgrounds/',
-		'#description'=>t('extensions allowed: !extension_list , max file size: !maxfilesize MB',array('!extension_list'=>implode(' ',$extensions),'!maxfilesize'=>$upload_mb)),
-	);
-	$form['addfile']['path']=array('#type'=>'textfield','#title'=>t('Path'));
-	$form['addfile']['default']=array('#type'=>'checkbox','#title'=>t('Add to defaults'));
-
-	if (variable_get('page_background_linkurl',false) == true){
-		$form['addfile']['bglinkurl']=array('#type'=>'textfield','#title'=>t('Link Url'));
-	}
-
-	if (variable_get('page_background_slogan',false) == true){
-		$form['addfile']['bgtext']=array('#type'=>'text_format','#title'=>t('Background Slogan') );
-		$form['addfile']['bgtextlang']=array('#type'=>'select','#options'=>_page_background_get_languages_selectoptions(),'#title'=>t('Background Slogan Language') );		
-	}
-
-	$form['addfile']['image_alt']=array('#type'=>'textfield','#title'=>t('Image Alt (only if background set as Image tag)'));
-	$form['addfile']['image_title']=array('#type'=>'textfield','#title'=>t('Image Title (only if background set as Image tag)'));
-
-	$form['addfile']['submit']=array('#type'=>'submit','#value'=>t('Submit'));
-	return $form;
-}
-
-function page_background_admin_form_validate($form,&$form_state){
-	if($form_state['values']['op']==t('Submit')){
-		if( ($file = file_load($form_state['values']['uploadfile'])) === false ){
-			form_set_error('uploadfile',t('A background image is necessary'));
-		}
-		if($form_state['values']['default']!=1 && (trim($form_state['values']['path'])=='' || !drupal_valid_path( drupal_get_normal_path( $form_state['values']['path'] ) ,true)) ) {
-			form_set_error('path',t('Invalid path'));
-		}
-		if (variable_get('page_background_linkurl',false) == true){
-			if( trim($form_state['values']['bglinkurl']) != '' && parse_url( $form_state['values']['bglinkurl'] ) === false ) {
-				form_set_error('bglinkurl',t('Invalid Link Url'));
-			}
-		}
-	}elseif($form_state['values']['op']==t('Delete Selected')){
-		$count=0;
-		foreach($form_state['values'] as $key=>$elem){
-			if(stripos($key,'bkg_')===0 && !empty($elem)){
-				$count++;
-			}
-		}
-		if($count==0){
-			form_set_error('',t('No image selected for deletion.'));
-		}
-	}
-}
-
-function page_background_admin_form_submit($form,&$form_state){
-	if($form_state['values']['op']==t('Submit')){
-		if( ($file = file_load($form_state['values']['uploadfile'])) !== false ){
-			$file->status = FILE_STATUS_PERMANENT;
-			$file->uid = $form_state['values']['uid'];
-			file_save($file);
-
-			if($form_state['values']['default']==1) $form_state['values']['path']=null;
-			else{
-				$form_state['values']['path'] = drupal_get_normal_path($form_state['values']['path']);
-			}
-
-			$background_row = _page_background_save( array(
-				'file' 			=> $file,
-				'path' 			=> $form_state['values']['path'],
-				'weight' 		=> 0,
-				'bglinkurl' 	=> (isset($form_state['values']['bglinkurl']) && trim($form_state['values']['bglinkurl']) != '') ? trim($form_state['values']['bglinkurl']) : null,
-				'bgtextlang' 	=> (isset($form_state['values']['bgtextlang']) && trim($form_state['values']['bgtextlang']) != '') ? trim($form_state['values']['bgtextlang']) : null,
-				'bgtext' 		=> (isset($form_state['values']['bgtext'])) ? $form_state['values']['bgtext'] : null,
-				'image_alt' 	=> (isset($form_state['values']['image_alt']) && trim($form_state['values']['image_alt']) != '') ? trim($form_state['values']['image_alt']) : null,
-				'image_title' 	=> (isset($form_state['values']['image_title']) && trim($form_state['values']['image_title']) != '') ? trim($form_state['values']['image_title']) : null,
-			) , $form_state );
-			
-			// db_insert('url_background_images')
-			// ->fields(array(
-			// 	'path'=>$form_state['values']['path'],
-			// 	'fid'=>$file->fid,
-			// 	'weight'=>0,
-			// 	'bglinkurl'=> trim($form_state['values']['bglinkurl']) != '' ? trim($form_state['values']['bglinkurl']) : null,
-			// 	'created'=>time(),
-			// ))->execute();
-
-			drupal_set_message(t('File uploaded succesfully'));
-		}
-
-	}elseif($form_state['values']['op']==t('Delete Selected')){
-		$bids=array();
-		foreach($form_state['values'] as $key=>$elem){
-			if(stripos($key,'bkg_')===0 && !empty($elem)){
-				$bids[]=preg_replace("/^bkg_/i","",$key);
-			}
-		}
-		$numdeleted = 0;
-		if(count($bids)>0){
-			//$numdeleted = db_delete('url_background_images')->condition('bid',$bids,'IN')->execute();
-			$numdeleted = _page_background_delete_multiple($bids);
-		}
-
-		drupal_set_message(t('!numdeleted files deleted',array('!numdeleted'=>$numdeleted)));
-	}elseif($form_state['values']['op']==t('Save Changes')){
-		$bids=array();
-		foreach($form_state['values'] as $key=>$elem){
-			if(stripos($key,'weight_')===0){
-				$bid=preg_replace("/^weight_/i","",$key);
-				$query=db_update('url_background_images')->fields(array(
-					'weight'=>$elem,
-				))->condition('bid',$bid);
-				$query->execute();
-			}
-		}
-		drupal_set_message(t('Changes saved.'));
-	}
-	drupal_goto('admin/config/page_background');
-}
-
-function theme_page_background_admin_form($variables){
-	$form=$variables['form'];
-	drupal_add_tabledrag('page-background-table', 'order', 'sibling', 'my-elements-weight');
-	$out="";
-	$rows=array();
-
-	// $header=array('',t('Path'),t('Url'),t('Link Url'),t('Slogan'),t('Language'),t('Thumb'),t('Weight'),'');
-	$header = array( '',t('Path'),t('Url') );
-	if (variable_get('page_background_linkurl',false) == true){
-		$header[] = t('Link Url');
-	}
-	if (variable_get('page_background_slogan',false) == true){
-		$header[] = t('Slogan');
-		$header[] = t('Language');
-	}
-	$header[] = t('Thumb');
-	$header[] = t('Weight');
-	$header[] = '';
-
-	foreach($form as $key=>&$elem){
-		if(stripos($key,'bkg_')===0){
-			$infos=unserialize($elem['#infos']);unset($elem['#infos']);
-
-			if( $infos->bglinkurl != null ){
-				if( parse_url($infos->bglinkurl) === false){
-					$infos->bglinkurl = null;
-				}
-			}
-
-			$file=file_load($infos->fid);
-			$themed_image=array(
-				'path'=>$file->uri,
-				'style_name'=>'thumbnail',
-			);
-
-			$links=array();
-			$links[] = l(t('clone'),'admin/config/page_background/'.$infos->bid.'/clone');
-			$links[] = l(t('edit'),'admin/config/page_background/'.$infos->bid.'/edit');
-			$links[] = l(t('delete'),'admin/config/page_background/'.$infos->bid.'/delete');
-
-			// $row = array(
-			// 	array('data'	=>	render($elem)),
-			// 	array('data'	=>	$infos->path==null?t('Default'):check_plain($infos->path)),
-			// 	array('data'	=>	url( file_create_url($file->uri), array('absolute'=>true) )),
-			// 	array('data'	=>	($infos->bglinkurl == null) ? ' - ' : url( $infos->bglinkurl, array('absolute'=>true) )),
-			// 	array('data'	=>	($infos->bgtext == null) ? ' - ' : check_plain($infos->bgtext) ),
-			// 	array('data'	=>	($infos->bgtext == null || $infos->bgtextlang == null) ? ' - ' : $infos->bgtextlang ),
-			// 	array('data'	=>	theme('image_style',$themed_image)),
-			// 	array('data'	=> render($form[str_replace("bkg_","weight_",$key)])),
-			// 	array('data'	=>	implode(' | ',$links) ),
-			// );
-
-			$row = array();
-			$row[] = array('data'	=>	render($elem));
-			$row[] = array('data'	=>	$infos->path==null?t('Default'):check_plain($infos->path));
-			$row[] = array('data'	=>	url( file_create_url($file->uri), array('absolute'=>true) ));
-			if (variable_get('page_background_linkurl',false) == true){
-				$row[] = array('data'	=>	($infos->bglinkurl == null) ? ' - ' : url( $infos->bglinkurl, array('absolute'=>true) ));
-			}
-			if (variable_get('page_background_slogan',false) == true){
-				$row[] = array('data'	=>	($infos->bgtext == null) ? ' - ' : check_plain($infos->bgtext) );
-				$row[] = array('data'	=>	($infos->bgtext == null || $infos->bgtextlang == null) ? ' - ' : $infos->bgtextlang );
-			}
-			$row[] = array('data'	=>	theme('image_style',$themed_image));
-			$row[] = array('data'	=> render($form[str_replace("bkg_","weight_",$key)]));
-			$row[] = array('data'	=>	implode(' | ',$links) );
-			
-
-			$rows[]=array(
-					'data'=>$row,
-					'class' => array('draggable'),
-			);
-		}
-	}
-	$out.=theme('table',array('header'=>$header,'rows'=>$rows,'empty'=>t('No elements found'), 'attributes' => array('id' => 'page-background-table'))).render($form['update_weight']).'&nbsp;'.render($form['delete_selected']).'<br /><br />';
-	return $out.=drupal_render_children($form);
-}
-
-function page_background_clone_form($form,&$form_state,$background_row){
-	global $user;
-
-//	$form['#attached']['js'][] = '/'.drupal_get_path('module', 'page_background').'/js/page_background_admin.js';
-
-	$form['#attached']['js'][] = array(
-	  'data' => drupal_get_path('module', 'page_background').'/js/page_background_admin.js',
-	  'type' => 'file'
-	);
-
-	$form['bid']=array('#type'=>'hidden','#value'=>$background_row->bid);
-	$form['uid']=array('#type'=>'hidden','#value'=>$user->uid);
-	$form['path']=array('#type'=>'textfield','#title'=>t('Path'));
-	$form['default']=array('#type'=>'checkbox','#title'=>t('Add to defaults'));
-	if (variable_get('page_background_linkurl',false) == true){
-		$form['bglinkurl']=array('#type'=>'textfield','#title'=>t('Link Url'));
-	}
-	if (variable_get('page_background_slogan',false) == true){
-		$form['bgtext']=array('#type'=>'text_format','#title'=>t('Background Slogan') );
-		$form['bgtextlang']=array('#type'=>'select','#options'=>_page_background_get_languages_selectoptions(),'#title'=>t('Background Slogan Language') );	
-	}
-	$form['image_alt']=array('#type'=>'hidden','#value'=>$background_row->image_alt);
-	$form['image_title']=array('#type'=>'hidden','#value'=>$background_row->image_title);
-
-	$form['submit']=array('#type'=>'submit','#value'=>t('Submit'));
-
-	return $form;
-}
-function page_background_clone_form_validate($form,&$form_state){
-	if(!is_numeric($form_state['values']['bid']) || ($background_row=bid_load($form_state['values']['bid'])) === false ){
-		form_set_error('',t('A background image is necessary'));
-	}
-	if($form_state['values']['default']!=1 && (trim($form_state['values']['path'])=='' || !drupal_valid_path( drupal_get_normal_path( $form_state['values']['path'] ) ,true)) ) {
-			form_set_error('path',t('Invalid path'));
-	}
-	if (variable_get('page_background_linkurl',false) == true){
-		if( trim($form_state['values']['bglinkurl']) != '' && parse_url( $form_state['values']['bglinkurl'] ) === false ) {
-			form_set_error('bglinkurl',t('Invalid Link Url'));
-		}
-	}	
-}
-function page_background_clone_form_submit($form,&$form_state){
-	$background_row_orig = bid_load($form_state['values']['bid']);
-
-	if($form_state['values']['default']==1) $form_state['values']['path']=null;
-	else{
-		$form_state['values']['path'] = drupal_get_normal_path($form_state['values']['path']);
-	}
-
-	$background_row = _page_background_save( array(
-		'fid' 			=> $background_row_orig->fid,
-		'path' 			=> $form_state['values']['path'],
-		'weight' 		=> 0,
-		'bglinkurl' 	=> (isset($form_state['values']['bglinkurl']) && trim($form_state['values']['bglinkurl']) != '') ? trim($form_state['values']['bglinkurl']) : null,
-		'bgtextlang' 	=> (isset($form_state['values']['bgtextlang']) && trim($form_state['values']['bgtextlang']) != '') ? trim($form_state['values']['bgtextlang']) : null,
-		'bgtext' 		=> (isset($form_state['values']['bgtext'])) ? $form_state['values']['bgtext'] : null,
-		'image_alt' 	=> (isset($form_state['values']['image_alt']) && trim($form_state['values']['image_alt']) != '') ? trim($form_state['values']['image_alt']) : null,
-		'image_title' 	=> (isset($form_state['values']['image_title']) && trim($form_state['values']['image_title']) != '') ? trim($form_state['values']['image_title']) : null,
-	) , $form_state );
-
-	// db_insert('url_background_images')
-	// ->fields(array(
-	// 	'path'=>$form_state['values']['path'],
-	// 	'fid'=>$background_row_orig->fid,
-	// 	'weight'=>0,
-	// 	'created'=>time(),
-	// ))->execute();
-
-	drupal_set_message(t('Background cloned succesfully'));
-	drupal_goto('admin/config/page_background');
-}
-
-
-
-function page_background_edit_form($form,&$form_state,$background_row){
-	global $user;
-
-	//$form['#attached']['js'][] = '/'.drupal_get_path('module', 'page_background').'/js/page_background_admin.js';
-	$form['#attached']['js'][] = array(
-	  'data' => drupal_get_path('module', 'page_background').'/js/page_background_admin.js',
-	  'type' => 'file'
-	);
-
-	$form['addfile'] = array('#type'=>'fieldset','#title'=>t('Modify a page background'));
-
-	$max_upload = (int)(ini_get('upload_max_filesize'));
-	$max_post = (int)(ini_get('post_max_size'));
-	$memory_limit = (int)(ini_get('memory_limit'));
-	$upload_mb = min($max_upload, $max_post, $memory_limit);
-
-	$extensions=explode(' ','jpg jpeg png');
-	foreach($extensions as &$ext) $ext='.'.trim($ext);
-
-	$form['background_row']=array('#type'=>'value','#value'=> isset($form_state['values']['background_row']) ? $form_state['values']['background_row'] : $background_row );
-
-	if( ($file = file_load( $form['background_row']['#value']->fid )) !== false ){
-		$fileusage = file_usage_list($file);
-		if( !isset( $fileusage['page_background']['background_image'][ $form['background_row']['#value']->bid ] ) || 
-			$fileusage['page_background']['background_image'][ $form['background_row']['#value']->bid ] == 0 ){
-				//se mancava file usage lo aggiungo
-				file_usage_add( $file, 'page_background', 'background_image', $form['background_row']['#value']->bid );
-		}
-	} 
-
-	$form['uid']=array('#type'=>'hidden','#value'=>$user->uid);
-	
-	$form['addfile']['uploadfile']=array(
-		'#type'=>'managed_file',
-		'#title'=>t('Upload New Background'),
-		'#upload_validators' => array(
-		'file_validate_extensions' => array('jpg jpeg png'),
-		// Pass the maximum file size in bytes
-		    'file_validate_size' => array($upload_mb * 1024 * 1024),
-		),
-		'#upload_location'=>'public://page_backgrounds/',
-		'#description'=>t('extensions allowed: !extension_list , max file size: !maxfilesize MB',array('!extension_list'=>implode(' ',$extensions),'!maxfilesize'=>$upload_mb)),
-		'#default_value' => $form['background_row']['#value']->fid,
-	);
-	$form['addfile']['path']=array('#type'=>'textfield','#title'=>t('Path'),'#default_value'=> $form['background_row']['#value']->path );
-	$form['addfile']['default']=array('#type'=>'checkbox','#title'=>t('Add to defaults'),'#default_value'=> ($form['background_row']['#value']->path == null) );
-
-	if (variable_get('page_background_linkurl',false) == true){
-		$form['addfile']['bglinkurl']=array('#type'=>'textfield','#title'=>t('Link Url'),'#default_value'=> $form['background_row']['#value']->bglinkurl );
-	}
-	if (variable_get('page_background_slogan',false) == true){
-		$form['addfile']['bgtext']=array('#type'=>'text_format','#title'=>t('Background Slogan'),'#default_value'=> $form['background_row']['#value']->bgtext, '#format' => $form['background_row']['#value']->bgtextformat );
-		$form['addfile']['bgtextlang']=array('#type'=>'select','#options'=>_page_background_get_languages_selectoptions(),'#title'=>t('Background Slogan Language'),'#default_value'=> $form['background_row']['#value']->bgtextlang );
-	}
-
-	$form['addfile']['image_alt']=array(
-		'#type'=>'textfield',
-		'#title'=>t('Image Alt (only if background set as Image tag)'), 
-		'#default_value' => $form['background_row']['#value']->image_alt,
-	);
-	$form['addfile']['image_title']=array(
-		'#type'=>'textfield',
-		'#title'=>t('Image Title (only if background set as Image tag)'),
-		'#default_value' => $form['background_row']['#value']->image_title,
-	);
-
-	$form['addfile']['submit']=array('#type'=>'submit','#value'=>t('Save'));
-
-	return $form;
-}
-function page_background_edit_form_validate($form,&$form_state){
-	if( ($file = file_load($form_state['values']['uploadfile'])) === false ){
-		form_set_error('uploadfile',t('A background image is necessary'));
-	}
-	if($form_state['values']['default']!=1 && (trim($form_state['values']['path'])=='' || !drupal_valid_path( drupal_get_normal_path( $form_state['values']['path'] ) ,true)) ) {
-		form_set_error('path',t('Invalid path'));
-	}
-	if (variable_get('page_background_linkurl',false) == true){
-		if( trim($form_state['values']['bglinkurl']) != '' && parse_url( $form_state['values']['bglinkurl'] ) === false ) {
-			form_set_error('bglinkurl',t('Invalid Link Url'));
-		}
-	}
-}
-function page_background_edit_form_submit($form,&$form_state){
-
-	if( ($file = file_load($form_state['values']['uploadfile'])) !== false ){
-		$file->status = FILE_STATUS_PERMANENT;
-		$file->uid = $form_state['values']['uid'];
-		file_save($file);
-
-		if($form_state['values']['default']==1) $form_state['values']['path']=null;
-		else{
-			$form_state['values']['path'] = drupal_get_normal_path($form_state['values']['path']);
-		}
-		
-		$background_row = _page_background_save( array(
-			'bid' 			=> $form_state['values']['background_row']->bid,
-			'file' 			=> $file,
-			'path' 			=> $form_state['values']['path'],
-			'weight' 		=> 0,
-			'bglinkurl' 	=> (isset($form_state['values']['bglinkurl']) && trim($form_state['values']['bglinkurl']) != '') ? trim($form_state['values']['bglinkurl']) : null,
-			'bgtextlang' 	=> (isset($form_state['values']['bgtextlang']) && trim($form_state['values']['bgtextlang']) != '') ? trim($form_state['values']['bgtextlang']) : null,
-			'bgtext' 		=> (isset($form_state['values']['bgtext'])) ? $form_state['values']['bgtext'] : null,
-			'image_alt' 	=> (isset($form_state['values']['image_alt']) && trim($form_state['values']['image_alt']) != '') ? trim($form_state['values']['image_alt']) : null,
-			'image_title' 	=> (isset($form_state['values']['image_title']) && trim($form_state['values']['image_title']) != '') ? trim($form_state['values']['image_title']) : null,
-		) , $form_state );
-
-		// db_insert('url_background_images')
-		// ->fields(array(
-		// 	'path'=>$form_state['values']['path'],
-		// 	'fid'=>$file->fid,
-		// 	'weight'=>0,
-		// 	'bglinkurl'=> trim($form_state['values']['bglinkurl']) != '' ? trim($form_state['values']['bglinkurl']) : null,
-		// 	'created'=>time(),
-		// ))->execute();
-
-		drupal_set_message(t('File uploaded succesfully'));
-	}
-
-	drupal_set_message(t('Background modified succesfully'));
-	drupal_goto('admin/config/page_background');
-}
-
-
-function page_background_settings_form($form,&$form_state){
-
-	$form['container']=array('#title'=>t('Container'),'#type'=>'fieldset');
-
-	$form['container']['page_background_container_width']=array(
-		'#type'=>'textfield',
-		'#title'=>t('Container width'),
-		'#default_value'=>variable_get('page_background_container_width',''),
-	);
-
-	$form['container']['page_background_container_height']=array(
-		'#type'=>'textfield',
-		'#title'=>t('Container height'),
-		'#default_value'=>variable_get('page_background_container_height',''),
-	);
-
-	$form['slides']=array('#title'=>t('Slides'),'#type'=>'fieldset');
-
-	$form['slides']['page_background_slides_type']=array(
-		'#type'=>'select',
-		'#options'=>array(
-				'styled_divs'	=>	t('as divs'),
-				'images'			=> t('as images'),
-		),
-		'#title'=>t('Slides rendered'),
-		'#default_value'=>variable_get('page_background_slides_type','styled_divs'),
-	);
-
-	$stylenames = array('original'=>t('Original image'));
-	foreach(image_styles() as $style) $stylenames[ $style['name'] ] = $style['name'];
-
-	$form['slides']['page_background_image_style_name'] = array(
-		'#title' => t('Image style applied to the images'),
-		'#type' => 'select',
-		'#options'=>$stylenames,
-		'#default_value' => variable_get('page_background_image_style_name','original'),
-	);
-
-	$form['slides']['page_background_linkurl']=array(
-		'#type'=>'checkbox',
-		'#title'=>t('Page background linkurl'),
-		'#default_value'=>variable_get('page_background_linkurl',false),
-		'#description'=>t('If enabled Page background slides will be linked to an url'),
-	);
-
-	$form['slides']['page_background_slogan']=array(
-		'#type'=>'checkbox',
-		'#title'=>t('Page background Slogan on background'),
-		'#default_value'=>variable_get('page_background_slogan',false),
-		'#description'=>t('If enabled Page background slides will have a slogan text'),
-	);
-
-	$form['slides']['page_background_default_behavior']=array(
-		'#type'=>'select',
-		'#title'=>t('Behavior with default images'),
-		'#options'=>array(
-			'singleframe'=>t('Show one random single frame'),
-			'slideshow'=>t('Show slideshow'),
-		),
-		'#default_value'=>variable_get('page_background_default_behavior','singleframe'),
-	);
-
-
-	$form['cycle']=array('#title'=>t('Cycle'),'#type'=>'fieldset');	
-
-	$form['cycle']['page_background_animation_effect']=array(
-		'#type'=>'select',
-		'#options'=>array(
-			'none'			=>	'none',
-			'blindX'		=>	'blindX',
-			'blindY'		=>	'blindY',
-			'blindZ'		=>	'blindZ',
-			'cover'			=>	'cover',
-			'curtainX'		=>	'curtainX',
-			'curtainY'		=>	'curtainY',
-			'fade'			=>	'fade',
-			'fadeZoom'		=>	'fadeZoom',
-			'growX'			=>	'growX',
-			'growY'			=>	'growY',
-			'scrollUp'		=>	'scrollUp',
-			'scrollDown'	=>	'scrollDown',
-			'scrollLeft'	=>	'scrollLeft',
-			'scrollRight'	=>	'scrollRight',
-			'scrollHorz'	=>	'scrollHorz',
-			'scrollVert'	=>	'scrollVert',
-			'shuffle'		=>	'shuffle',
-			'slideX'		=>	'slideX',
-			'slideY'		=>	'slideY',
-			'toss'			=>	'toss',
-			'turnUp'		=>	'turnUp',
-			'turnDown'		=>	'turnDown',
-			'turnLeft'		=>	'turnLeft',
-			'turnRight'		=>	'turnRight',
-			'uncover'		=>	'uncover',
-			'wipe'			=>	'wipe',
-			'zoom'			=>	'zoom',
-		),
-		'#title'=>t('Animation effect'),
-		'#default_value'=>variable_get('page_background_animation_effect','scrollHorz'),
-	);
-
-	$form['cycle']['page_background_animation_timeout']=array(
-		'#type'=>'textfield',
-		'#title'=>t('Animation timeout'),
-		'#default_value'=>variable_get('page_background_animation_timeout',5000),
-	);
-
-	$form['cycle']['page_background_animation_speed']=array(
-		'#type'=>'textfield',
-		'#title'=>t('Animation speed'),
-		'#default_value'=>variable_get('page_background_animation_speed',1000),
-	);
-		
-	$form['cycle']['page_background_delay']=array(
-		'#type'=>'textfield',
-		'#title'=>t('Animation initial delay'),
-		'#default_value'=>variable_get('page_background_delay',0),
-	);
-	
-	$form['cycle']['page_background_fit']=array(
-		'#type'=>'checkbox',
-		'#title'=>t('Fit slides to container'),
-		'#default_value'=>variable_get('page_background_fit',true),
-	);
-	
-	$form['cycle']['page_background_sync']=array(
-		'#type'=>'checkbox',
-		'#title'=>t('Sync'),
-		'#default_value'=>variable_get('page_background_sync',true),
-	);
-
-	$form['pager']=array('#title'=>t('Pager'),'#type'=>'fieldset');	
-
-	$form['pager']['page_background_pager']=array(
-		'#type'=>'checkbox',
-		'#title'=>t('Show pager'),
-		'#default_value'=>variable_get('page_background_pager',true),
-	);
-	
-	$form['pager']['page_background_pager_generator']=array(
-		'#type'=>'select',
-		'#title'=>t('Pager generated by'),
-		'#options' => array('module' => t('Page Background'),'js' => t('Cycle plugin') ),
-		'#default_value'=>variable_get('page_background_pager_generator','module'),
-	);
-
-	$form['other']=array('#title'=>t('Other'),'#type'=>'fieldset');
-
-	$form['other']['page_background_block']=array(
-		'#type'=>'checkbox',
-		'#title'=>t('Page background block'),
-		'#default_value'=>variable_get('page_background_block',false),
-		'#description'=>t('If enabled Page background will be available as a block and not automatically added to pages'),
-	);
-
-	$form['#validate'][]='page_background_settings_form_validate';
-
-	return system_settings_form($form);
-}
-
-function page_background_settings_form_validate($form,&$form_state){
-	if(trim($form_state['values']['page_background_container_height'])!='' && !is_numeric($form_state['values']['page_background_container_height']) && !preg_match('/%$/i',$form_state['values']['page_background_container_height'])){
-		form_set_error('page_background_container_height',t('Height: Only numeric or percentage values accepted.'));
-	}
-
-	if(trim($form_state['values']['page_background_container_width'])!='' && !is_numeric($form_state['values']['page_background_container_width']) && !preg_match('/%$/i',$form_state['values']['page_background_container_width'])){
-		form_set_error('page_background_container_width',t('Width: Only numeric or percentage values accepted.'));
-	}
-
-	if(!is_numeric($form_state['values']['page_background_animation_timeout']) || $form_state['values']['page_background_animation_timeout']<0 ){
-		form_set_error('page_background_animation_timeout',t('Timeout: Only numeric positive values.'));
-	}
-}
-
-function page_background_preprocess_html(&$variables){
-	if(variable_get('page_background_block',false)==true) return;
-
-	$out=_page_background_get_markup_by_path(drupal_is_front_page()?'<front>':$_GET['q']);
-
-	foreach(module_implements('alter_page_background') as $module){
-		$out = module_invoke($module, 'alter_page_background',$out);
-	}
-
-	if(!isset($out['#markup']) || trim($out['#markup'])=='') return;
-
-	if(isset($out['#js']) && is_array($out['#js'])){
-		foreach($out['#js'] as $elem){
-			if(count($elem)==0) continue;
-			if(count($elem)>1){
-				drupal_add_js($elem[0],$elem[1]);
-			}else drupal_add_js($elem[0]);
-		}
-	}
-	if(isset($out['#css']) && is_array($out['#css'])){
-		foreach($out['#css'] as $elem){
-			if(is_string($elem)) {
-				drupal_add_css($elem,'inline');
-			} else if(is_array($elem) && count($elem)>1) {
-				drupal_add_css($elem[0],$elem[1]);
-			}else if(is_array($elem)) {
-				drupal_add_css($elem[0],'inline');
-			}
-		}
-	}
-
-	$variables['page']['page_top']['page_background'] = $out;
-}
-
-function _page_background_get_fids_markup($fids=array()){
-	global $language;
-	$out=array();
-	if(!$fids || count($fids)==0){
-		$fids=_page_background_get_default_fids($language);
-		if(count($fids)>1){
-			if( variable_get('page_background_default_behavior','singleframe')=='singleframe' ){
-				shuffle($fids);
-				$fids=array( array_shift($fids) );
-			}
-		}
-	}else{
-		$internal_fids=array();
-		
-		//controllo che siano tutti oggetti
-		foreach($fids as $fid){
-			if(!is_object($fid) && is_numeric($fid)){
-				$o=new stdClass();
-				$o->fid=$fid;
-				$internal_fids[]=$o;
-			}else if(is_object($fid) && isset($fid->fid)){
-				$internal_fids[]=$fid;
-			}
-		}
-		if(count($internal_fids)>0) 
-			$fids=$internal_fids;
-	}
-	
-	if(count($fids)==0) 
-		return array( 
-			'#css' => array(),
-			'#js' => array(),
-			'#fids' => array(),
-			'#numfids'=>0,
-			'#markup' => '',
-		);
-
-	foreach($fids as $fid){
-
-		// $stylename = variable_get('page_background_image_style_name','original');
-		$stylename = $fid->_stylename; // è una proprietà fittizia che posso alterare
-
-		if($stylename == 'original'){
-			$fid->file=file_load($fid->fid);
-			if(!isset($fid->file->image_dimensions)){
-				$fid->file->image_dimensions=image_get_info($fid->file->uri);
-			}
-		}else{
-			$origfile=file_load($fid->fid);
-			$style = image_style_load($stylename);
-			$destination_uri = image_style_path($stylename, $origfile->uri);
-			if( image_style_create_derivative( $style,  $origfile->uri, $destination_uri ) !== false ){
-				$fid->file=new stdClass;
-				$fid->file->uri = $destination_uri;
-				if(!isset($fid->file->image_dimensions)){
-					$fid->file->image_dimensions=image_get_info($fid->file->uri);
-				}
-			}
-		}
-
-	}
-
-	$cw=variable_get('page_background_container_width','');
-	$ch=variable_get('page_background_container_height','');
-	$fx=variable_get('page_background_animation_effect','scrollHorz');
-	$timeout=variable_get('page_background_animation_timeout',5000);
-	$speed=variable_get('page_background_animation_speed',1000);
-	$fit=variable_get('page_background_fit',true);
-	$delay=variable_get('page_background_delay',0);
-	$sync=variable_get('page_background_sync',true);
-	$slide_type=variable_get('page_background_slides_type','styled_divs');
-	
-	if($cw==''){
-		foreach($fids as $fid){
-			$cw = (is_numeric($cw)&&$cw<$fid->file->image_dimensions['width'])? $cw : $fid->file->image_dimensions['width'];
-		}
-	}
-	if($ch==''){
-		foreach($fids as $fid){
-			$ch= (is_numeric($ch)&&$ch<$fid->file->image_dimensions['height'])? $ch : $fid->file->image_dimensions['height'];
-		}
-	}
-
-	$cw=trim($cw);
-	$ch=trim($ch);
-
-	if( variable_get('page_background_block',false)==true ) {
-		$out['#css'][]='
-			#page_background_container{
-				height: '.$ch.((!preg_match('/%$/i',$ch))?'px':'').';
-				width: '.$cw.((!preg_match('/%$/i',$cw))?'px':'').';
-				overflow: hidden;
-				position: relative;
-			}
-		';
-	}else{
-		$out['#css'][]='
-			#page_background_container{
-				height: '.$ch.((!preg_match('/%$/i',$ch))?'px':'').';
-				width: '.$cw.((!preg_match('/%$/i',$cw))?'px':'').';
-				overflow: hidden;
-				position:absolute;
-				z-index: -1;
-				top: 0;
-			}
-		';
-	}
-
-	if($cw!='100%'){
-		if(!preg_match('/%$/i',$cw)){
-			$out['#css'][]='
-						#page_background_container{
-							left: 50%;
-							margin-left: -'.round($cw/2).'px;
-						}
-						';
-		}else{
-			$percent=str_replace('%','',$cw);
-			$margin=round(100-$percent)/2;
-			$out['#css'][]='
-						#page_background_container{
-							left: '.$margin.'%;
-						}
-						';
-		}
-	}
-	
-	$out['#css'][]='
-					.page_background_slide{
-						margin: 0;
-						padding: 0;
-						height: '.$ch.((!preg_match('/%$/i',$ch))?'px':'').';
-						width: '.$cw.((!preg_match('/%$/i',$cw))?'px':'').';
-					}
-					';
-	
-	if($slide_type=='images'){
-		$out['#css'][]='
-				.page_background_slide img{
-					display: block;
-					margin: auto;
-				}
-		';
-	}else{
-		$out['#css'][]='
-				.page_background_slide .img{
-					display: block;
-					margin: auto;
-				}
-		';
-	}
-	
-	$out['#markup']='<div id="page_background_container">';
-	$slides=array();
-	$pager=array();
-	foreach($fids as $key=>$fid){
-		$image = null;
-		if( $fid->bglinkurl != null && parse_url($fid->bglinkurl) === false ) $fid->bglinkurl = null;
-		switch($slide_type){
-			case 'images':
-
-				if( empty($fid->image_alt) ) $fid->image_alt = trim( check_plain(strip_tags($fid->bgtext)) );
-				if( empty($fid->image_title) ) $fid->image_title = trim( check_plain(strip_tags($fid->bgtext)) );
-
-				$image = theme('image',array( 
-								'path'=>file_create_url($fid->file->uri), 
-								'width'=>$fid->file->image_dimensions['width'], 
-								'height'=>$fid->file->image_dimensions['height'], 
-								'alt'=>$fid->image_alt, 
-								'title'=>$fid->image_title, 
-								'attributes'=>array('id'=>'page_background_slide_'.$key) 
-							)
-				);
-				break;
-			case 'styled_divs':
-			default:
-				$image = '<div id="page_background_slide_'.$key.'" class="img"></div>';
-				$out['#css'][]='
-				#page_background_slide_'.$key.'{
-					background: url('.url( file_create_url($fid->file->uri), array('absolute'=>true) ).') no-repeat center top;
-					width: '.$fid->file->image_dimensions['width'].'px;
-					height: '.$fid->file->image_dimensions['height'].'px;
-					position: absolute;top: 50%;left: 50%;
-					margin-left: -'.(round($fid->file->image_dimensions['width']/2)).'px;
-					margin-top: -'.(round($fid->file->image_dimensions['height']/2)).'px;
-				}
-				';
-				break;
-		}
-
-		// if( variable_get('page_background_slogan',false) == true ){
-		// 	$image .= (trim($fid->bgtext) != '') ? '<div class="slogan">'.check_markup($fid->bgtext, $fid->bgtextformat, $fid->bgtextlang).'</div>' : '';
-		// }		
-
-		// if( variable_get('page_background_linkurl',false) == true && $fid->bglinkurl != null ){
-		// 	$slides[]=array('#markup'=>'<div class="page_background_slide">'.l($image, $fid->bglinkurl , array('html'=>true) ).'</div>','#fid'=>$fid);
-		// } else {
-		// 	$slides[]=array('#markup'=>'<div class="page_background_slide">'.$image.'</div>','#fid'=>$fid);
-		// }
-
-		$slides[]=array('#markup'=> theme('page_background_slide' , array( 'image' => $image, 'background_row' => $fid )) ,'#fid'=>$fid);
-
-		$pager[]='<li class="pager_elem'.(($key==0)?' active':'').'" id="pager_element_'.$key.'">'.($key+1).'</li>';
-
-		foreach(module_implements('alter_page_background_slide') as $module){
-			$slides = module_invoke($module, 'alter_page_background_slide',$slides);
-		}
-
-	}
-	if(is_array($fids) && count($fids)>0){
-		if(count($fids)==1){
-			//immagine statica
-		}else{
-			if ($cycle_path = _page_background_cycle_library_path()) {
-				//slideshow
-				$out['#js'][]=array($cycle_path);				
-				/*$out['#css'].='
-					.page_background_slide{
-						margin: auto !important;
-						position: relative !important;
-					}
-					';*/
-				$out['#js'][]=array('(function($){
-						$(document).ready(function(){
-							$(\'#page_background_container\').not(\'.processed\').cycle({
-								fx: \''.$fx.'\',
-								timeout: '.$timeout.',
-								speed: '.$speed.',
-								fit: '.$fit.',
-								delay: '.$delay.',
-								sync: '.$sync.',
-								pager:	\'#page_background_pager\',
-								'.( ( variable_get('page_background_pager_generator','module') == 'module') ? 'pagerAnchorBuilder: function(){}' : '').'
-							}).addClass(\'processed\');
-						})
-					})(jQuery);','inline');
-			}else{
-				//immagine statica. la prima
-				$slides=array_slice($slides, 0,1);
-			}
-		}
-		//$out['#markup'].=implode('',$slides);
-		$markupslides = '';
-		foreach($slides as $slide){
-			$markupslides.=$slide['#markup'];
-		}
-		$out['#markup'].=$markupslides;
-	}
-	$out['#markup'].='</div>';
-	if( count($slides)>1 && variable_get('page_background_pager',true)==true ){
-		if( variable_get('page_background_pager_generator','module') == 'js' ){
-			$out['#markup'].='<div id="page_background_pager" class="pager"></div>';
-		}else{
-			$out['#markup'].='<ul id="page_background_pager" class="pager">'. implode('',$pager) .'</ul>';
-		}
-	}
-
-	$out['#fids']=$fids;
-	$out['#numfids']=count($fids);
-	return $out;
-}
-
-function theme_page_background_slide( $variables ){
-
-	$image = $variables['image'];
-	$background_row = $variables['background_row'];
-
-	$out = '';
-
-	if( variable_get('page_background_slogan',false) == true ){
-		$image .= (trim($background_row->bgtext) != '') ? '<div class="slogan">'.check_markup($background_row->bgtext, $background_row->bgtextformat, $background_row->bgtextlang).'</div>' : '';
-	}
-
-	if( variable_get('page_background_linkurl',false) == true && $background_row->bglinkurl != null ){
-		$out = '<div class="page_background_slide">'.l($image, $background_row->bglinkurl , array('html'=>true) ).'</div>';
-	} else {
-		 $out = '<div class="page_background_slide">'.$image.'</div>';
-	}
-	return $out;
-}
-
-function _page_background_get_markup_by_path($path){
-	global $theme_key, $language;
-	$admintheme=variable_get('admin_theme','');
-	if(trim(strtolower($theme_key)) == trim(strtolower($admintheme))) return "";
-
-	$out=array();
-	$out['#markup']='';
-	$out['#css']=array();
-
-	// $fids = _page_background_get_fids($path, $language);
-	// $out = _page_background_get_fids_markup($fids);
-
-	$out = _page_background_get_fids_markup(_page_background_get_fids($path, $language));
-
-	return $out;
-}
-
-function _page_background_get_fids($path='<front>',$language = null){
-
-	$query = db_select('url_background_images','bg');
-	$query->fields('bg');
-	$query->addExpression("'".variable_get('page_background_image_style_name','original')."'",'_stylename');
-	$query->condition('path',$path,'=');
-	$query->orderBy('weight');
-	$query->orderBy('created');
-
-	if( variable_get('page_background_slogan',false) == true && $language != null ){
-		$or = db_or();
-		$or->condition('bgtextlang',$language->language);
-
-		$and = db_and();
-		$and->condition('bgtextlang',null,'IS');
-		$and->condition('bgtext',null,'IS');
-
-		$or->condition($and);
-		$query->condition($or);
-	}
-	$fids = $query->execute()->fetchAll();
-	foreach($fids as &$fid){
-		foreach(module_implements('page_background_load') as $module){
-			$fid = module_invoke($module, 'page_background_load',$fid);
-		}	
-	}
-	
-	foreach(module_implements('alter_page_background_fids') as $module){
-		$fids = module_invoke($module, 'alter_page_background_fids',$fids,$path,$language );
-	}
-	
-	return $fids;
-}
-
-function _page_background_get_default_fids($language = null){
-
-	$query = db_select('url_background_images','bg');
-	$query->fields('bg');
-	$query->addExpression("'".variable_get('page_background_image_style_name','original')."'",'_stylename');
-	$query->condition('path',null,'IS');
-
-	if($language != null){
-		$or = db_or();
-		$or->condition('bgtextlang',$language->language);
-
-		$and = db_and();
-		$and->condition('bgtextlang',null,'IS');
-		$and->condition('bgtext',null,'IS');
-
-		$or->condition($and);
-		$query->condition($or);
-	}
-
-	$query->orderBy('weight');
-	$query->orderBy('created');
-
- 	$fids = $query->execute()->fetchAll();
-	foreach($fids as &$fid){
-		foreach(module_implements('page_background_load') as $module){
-			$fid = module_invoke($module, 'page_background_load',$fid);
-		}	
-	}
-
-	foreach(module_implements('alter_page_background_fids') as $module){
-		$fids = module_invoke($module, 'alter_page_background_fids',$fids,null,$language);
-	}
-	return $fids;
-}
-
 
 /**
- * Implementation of a %wildcard_load(). http://drupal.org/node/224170
+ * Page_background_form_node_form_validate().
+ */
+function page_background_form_node_form_validate($form, &$form_state) {
+  foreach ($form_state['values'] as $key => $value) {
+    if (preg_match('/^page_backgrounds_uploadfile[0-9]+$/i', $key)) {
+    }
+  }
+}
+
+/**
+ * Page_background_node_submit().
+ */
+function page_background_node_submit($node, $form, &$form_state) {
+  global $user;
+  if (isset($form_state['values']['op']) && $form_state['values']['op'] == t('Save')) {
+    foreach ($form_state['values'] as $key => $value) {
+      if (preg_match('/^page_backgrounds_uploadfile([0-9]+)$/i', $key, $matches)) {
+        if (($file = file_load($form_state['values'][$key])) !== FALSE) {
+          $file->status = FILE_STATUS_PERMANENT;
+          $file->uid = $user->uid;
+          file_save($file);
+
+          $background_row = _page_background_save(array(
+            'file' => $file,
+            'path' => 'node/' . $form_state['values']['nid'],
+            'weight' => 0,
+          ) , $form_state);
+        }
+      }
+    }
+
+    $bids = array();
+    foreach ($form_state['values'] as $key => $elem) {
+      if (stripos($key, 'page_background_bkg_') === 0 && !empty($elem)) {
+        $bids[] = preg_replace("/^page_background_bkg_/i", "", $key);
+      }
+    }
+    $numdeleted = 0;
+    if (count($bids) > 0) {
+      $numdeleted = _page_background_delete_multiple($bids);
+    }
+  }
+}
+
+/**
+ * Page_background_node_delete().
+ */
+function page_background_node_delete($node) {
+  $bids = array();
+  $query = db_select('url_background_images', 'bg')->fields('bg', array('bid'))->condition('path', 'node/' . $node->nid, '=');
+  $result = $query->execute()->fetchAll();
+  foreach ($result as $row) {
+    $bids[] = $row->bid;
+  }
+  if (count($bids) > 0) {
+    $numdeleted = _page_background_delete_multiple($bids);
+  }
+}
+
+/**
+ * Page_background_admin_filter_form().
+ */
+function page_background_admin_filter_form($form, &$form_state) {
+  $form['#method'] = 'GET';
+
+  drupal_add_css('#page-background-admin-filter-form .form-item,#page-background-admin-filter-form .form-submit{display: inline-block;}', 'inline');
+
+  $form['filter-container'] = array('#type' => 'fieldset', '#title' => 'filter', '#collapsible' => TRUE, '#collapsed' => empty($_REQUEST['filter']));
+  $form['filter-container']['filter'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Path'),
+    '#required' => TRUE,
+    '#default_value' => (!empty($_REQUEST['filter']) ? trim($_REQUEST['filter']) : ''),
+  );
+  $form['filter-container']['submit'] = array('#type' => 'submit', '#value' => t('Submit'));
+  return $form;
+}
+
+/**
+ * Page_background_admin_form().
+ */
+function page_background_admin_form($form, &$form_state) {
+  global $user;
+  $query = db_select('url_background_images', 'bg');
+  $query->fields('bg');
+  if (!empty($_REQUEST['filter'])) {
+    $or = db_or();
+    $or->condition('path', trim($_REQUEST['filter']));
+    $or->condition('path', NULL, 'IS');
+    $query->condition($or);
+    drupal_set_message(t('The page is displaying ":path" path associated backgrounds only. !showall', array(':path' => trim($_REQUEST['filter']), '!showall' => l(t('Show all'), 'admin/config/page_background'))));
+  }
+  $query->orderBy('weight');
+  $query->orderBy('created');
+  $query->extend('PagerDefault')->limit(50);
+  $result = $query->execute()->fetchAll();
+
+  $form['#attached']['js'][] = array(
+    'data' => drupal_get_path('module', 'page_background') . '/js/page_background_admin.js',
+    'type' => 'file',
+  );
+
+  $form['#validate'][] = 'page_background_admin_form_validate';
+
+  $form_filter = drupal_get_form('page_background_admin_filter_form');
+  $form['#prefix'] = render($form_filter);
+
+  foreach ($result as $bkg) {
+    $form['bkg_' . $bkg->bid] = array(
+      '#type' => 'checkbox',
+      '#infos' => serialize($bkg),
+    );
+    $form['weight_' . $bkg->bid] = array(
+      '#type' => 'textfield',
+      '#default_value' => $bkg->weight,
+      '#attributes' => array('class' => array('my-elements-weight')),
+    );
+  }
+  if ($result) {
+    $form['delete_selected'] = array('#type' => 'submit', '#value' => t('Delete Selected'));
+    $form['update_weight'] = array('#type' => 'submit', '#value' => t('Save Changes'));
+  }
+
+  $form['addfile'] = array('#type' => 'fieldset', '#title' => t('Upload a new file'));
+
+  $max_upload = (int) (ini_get('upload_max_filesize'));
+  $max_post = (int) (ini_get('post_max_size'));
+  $memory_limit = (int) (ini_get('memory_limit'));
+  $upload_mb = min($max_upload, $max_post, $memory_limit);
+
+  $extensions = explode(' ', 'jpg jpeg png');
+  foreach ($extensions as &$ext) {
+    $ext = '.' . trim($ext);
+  }
+
+  $form['uid'] = array('#type' => 'hidden', '#value' => $user->uid);
+
+  $form['addfile']['uploadfile'] = array(
+    '#type' => 'managed_file',
+    '#title' => t('Upload New Background'),
+    '#upload_validators' => array(
+      'file_validate_extensions' => array('jpg jpeg png'),
+      'file_validate_size' => array($upload_mb * 1024 * 1024),
+    ),
+    '#upload_location' => 'public://page_backgrounds/',
+    '#description' => t('extensions allowed: !extension_list , max file size: !maxfilesize MB', array('!extension_list' => implode(' ', $extensions), '!maxfilesize' => $upload_mb)),
+  );
+  $form['addfile']['path'] = array('#type' => 'textfield', '#title' => t('Path'));
+  $form['addfile']['default'] = array('#type' => 'checkbox', '#title' => t('Add to defaults'));
+
+  if (variable_get('page_background_linkurl', FALSE) == TRUE) {
+    $form['addfile']['bglinkurl'] = array('#type' => 'textfield', '#title' => t('Link Url'));
+  }
+
+  if (variable_get('page_background_slogan', FALSE) == TRUE) {
+    $form['addfile']['bgtext'] = array('#type' => 'text_format', '#title' => t('Background Slogan'));
+    $form['addfile']['bgtextlang'] = array('#type' => 'select', '#options' => _page_background_get_languages_selectoptions(), '#title' => t('Background Slogan Language'));
+  }
+
+  $form['addfile']['image_alt'] = array('#type' => 'textfield', '#title' => t('Image Alt (only if background set as Image tag)'));
+  $form['addfile']['image_title'] = array('#type' => 'textfield', '#title' => t('Image Title (only if background set as Image tag)'));
+
+  $form['addfile']['submit'] = array('#type' => 'submit', '#value' => t('Submit'));
+  return $form;
+}
+
+/**
+ * Page_background_admin_form_validate().
+ */
+function page_background_admin_form_validate($form, &$form_state) {
+  if ($form_state['values']['op'] == t('Submit')) {
+    if (($file = file_load($form_state['values']['uploadfile'])) === FALSE) {
+      form_set_error('uploadfile', t('A background image is necessary'));
+    }
+    if ($form_state['values']['default'] != 1 && (trim($form_state['values']['path']) == '' || !drupal_valid_path(drupal_get_normal_path($form_state['values']['path']), TRUE))) {
+      form_set_error('path', t('Invalid path'));
+    }
+    if (variable_get('page_background_linkurl', FALSE) == TRUE) {
+      if (trim($form_state['values']['bglinkurl']) != '' && parse_url($form_state['values']['bglinkurl']) === FALSE) {
+        form_set_error('bglinkurl', t('Invalid Link Url'));
+      }
+    }
+  }
+  elseif ($form_state['values']['op'] == t('Delete Selected')) {
+    $count = 0;
+    foreach ($form_state['values'] as $key => $elem) {
+      if (stripos($key, 'bkg_') === 0 && !empty($elem)) {
+        $count++;
+      }
+    }
+    if ($count == 0) {
+      form_set_error('', t('No image selected for deletion.'));
+    }
+  }
+}
+
+/**
+ * Page_background_admin_form_submit().
+ */
+function page_background_admin_form_submit($form, &$form_state) {
+  if ($form_state['values']['op'] == t('Submit')) {
+    if (($file = file_load($form_state['values']['uploadfile'])) !== FALSE) {
+      $file->status = FILE_STATUS_PERMANENT;
+      $file->uid = $form_state['values']['uid'];
+      file_save($file);
+
+      if ($form_state['values']['default'] == 1) {
+        $form_state['values']['path'] = NULL;
+      }
+      else {
+        $form_state['values']['path'] = drupal_get_normal_path($form_state['values']['path']);
+      }
+
+      $background_row = _page_background_save(array(
+        'file' 			=> $file,
+        'path' 			=> $form_state['values']['path'],
+        'weight' 		=> 0,
+        'bglinkurl' 	=> (isset($form_state['values']['bglinkurl']) && trim($form_state['values']['bglinkurl']) != '') ? trim($form_state['values']['bglinkurl']) : NULL,
+        'bgtextlang' 	=> (isset($form_state['values']['bgtextlang']) && trim($form_state['values']['bgtextlang']) != '') ? trim($form_state['values']['bgtextlang']) : NULL,
+        'bgtext' 		=> (isset($form_state['values']['bgtext'])) ? $form_state['values']['bgtext'] : NULL,
+        'image_alt' 	=> (isset($form_state['values']['image_alt']) && trim($form_state['values']['image_alt']) != '') ? trim($form_state['values']['image_alt']) : NULL,
+        'image_title' 	=> (isset($form_state['values']['image_title']) && trim($form_state['values']['image_title']) != '') ? trim($form_state['values']['image_title']) : NULL,
+      ) , $form_state);
+
+      drupal_set_message(t('File uploaded succesfully'));
+    }
+
+  }
+  elseif ($form_state['values']['op'] == t('Delete Selected')) {
+    $bids = array();
+    foreach ($form_state['values'] as $key => $elem) {
+      if (stripos($key, 'bkg_') === 0 && !empty($elem)) {
+        $bids[] = preg_replace("/^bkg_/i", "", $key);
+      }
+    }
+    $numdeleted = 0;
+    if (count($bids) > 0) {
+      $numdeleted = _page_background_delete_multiple($bids);
+    }
+
+    drupal_set_message(t('!numdeleted files deleted', array('!numdeleted' => $numdeleted)));
+  }
+  elseif ($form_state['values']['op'] == t('Save Changes')) {
+    $bids = array();
+    foreach ($form_state['values'] as $key => $elem) {
+      if (stripos($key, 'weight_') === 0) {
+        $bid = preg_replace("/^weight_/i", "", $key);
+        $query = db_update('url_background_images')->fields(array(
+          'weight' => $elem,
+        ))->condition('bid', $bid);
+        $query->execute();
+      }
+    }
+    drupal_set_message(t('Changes saved.'));
+  }
+  drupal_goto('admin/config/page_background');
+}
+
+/**
+ * Theme_page_background_admin_form().
+ */
+function theme_page_background_admin_form($variables) {
+  $form = $variables['form'];
+  drupal_add_tabledrag('page-background-table', 'order', 'sibling', 'my-elements-weight');
+  $out = "";
+  $rows = array();
+
+  $header = array('', t('Path'), t('Url'));
+  if (variable_get('page_background_linkurl', FALSE) == TRUE) {
+    $header[] = t('Link Url');
+  }
+  if (variable_get('page_background_slogan', FALSE) == TRUE) {
+    $header[] = t('Slogan');
+    $header[] = t('Language');
+  }
+  $header[] = t('Thumb');
+  $header[] = t('Weight');
+  $header[] = '';
+
+  foreach ($form as $key => &$elem) {
+    if (stripos($key, 'bkg_') === 0) {
+      $infos = unserialize($elem['#infos']);unset($elem['#infos']);
+
+      if ($infos->bglinkurl != NULL) {
+        if (parse_url($infos->bglinkurl) === FALSE) {
+          $infos->bglinkurl = NULL;
+        }
+      }
+
+      $file = file_load($infos->fid);
+      $themed_image = array(
+        'path' => $file->uri,
+        'style_name' => 'thumbnail',
+      );
+
+      $links = array();
+      $links[] = l(t('clone'), 'admin/config/page_background/' . $infos->bid . '/clone');
+      $links[] = l(t('edit'), 'admin/config/page_background/' . $infos->bid . '/edit');
+      $links[] = l(t('delete'), 'admin/config/page_background/' . $infos->bid . '/delete');
+
+      $row = array();
+      $row[] = array('data'	=> render($elem));
+      $row[] = array('data'	=> $infos->path == NULL ? t('Default') : check_plain($infos->path));
+      $row[] = array('data'	=> url(file_create_url($file->uri), array('absolute' => TRUE)));
+      if (variable_get('page_background_linkurl', FALSE) == TRUE) {
+        $row[] = array('data'	=> ($infos->bglinkurl == NULL) ? ' - ' : url($infos->bglinkurl, array('absolute' => TRUE)));
+      }
+      if (variable_get('page_background_slogan', FALSE) == TRUE) {
+        $row[] = array('data'	=> ($infos->bgtext == NULL) ? ' - ' : check_plain($infos->bgtext));
+        $row[] = array('data'	=> ($infos->bgtext == NULL || $infos->bgtextlang == NULL) ? ' - ' : $infos->bgtextlang);
+      }
+      $row[] = array('data'	=> theme('image_style', $themed_image));
+      $row[] = array('data'	=> render($form[str_replace("bkg_", "weight_", $key)]));
+      $row[] = array('data'	=> implode(' | ', $links));
+
+      $rows[] = array(
+        'data' => $row,
+        'class' => array('draggable'),
+      );
+    }
+  }
+  $out .= theme('table', array('header' => $header, 'rows' => $rows, 'empty' => t('No elements found'), 'attributes' => array('id' => 'page-background-table'))) . render($form['update_weight']) . '&nbsp;' . render($form['delete_selected']) . '<br /><br />';
+  return $out .= drupal_render_children($form);
+}
+
+/**
+ * Page_background_clone_form().
+ */
+function page_background_clone_form($form, &$form_state, $background_row) {
+  global $user;
+
+  $form['#attached']['js'][] = array(
+    'data' => drupal_get_path('module', 'page_background') . '/js/page_background_admin.js',
+    'type' => 'file',
+  );
+
+  $form['bid'] = array('#type' => 'hidden', '#value' => $background_row->bid);
+  $form['uid'] = array('#type' => 'hidden', '#value' => $user->uid);
+  $form['path'] = array('#type' => 'textfield', '#title' => t('Path'));
+  $form['default'] = array('#type' => 'checkbox', '#title' => t('Add to defaults'));
+  if (variable_get('page_background_linkurl', FALSE) == TRUE) {
+    $form['bglinkurl'] = array('#type' => 'textfield', '#title' => t('Link Url'));
+  }
+  if (variable_get('page_background_slogan', FALSE) == TRUE) {
+    $form['bgtext'] = array('#type' => 'text_format', '#title' => t('Background Slogan'));
+    $form['bgtextlang'] = array('#type' => 'select', '#options' => _page_background_get_languages_selectoptions(), '#title' => t('Background Slogan Language'));
+  }
+  $form['image_alt'] = array('#type' => 'hidden', '#value' => $background_row->image_alt);
+  $form['image_title'] = array('#type' => 'hidden', '#value' => $background_row->image_title);
+
+  $form['submit'] = array('#type' => 'submit', '#value' => t('Submit'));
+
+  return $form;
+}
+
+/**
+ * Page_background_clone_form_validate().
+ */
+function page_background_clone_form_validate($form, &$form_state) {
+  if (!is_numeric($form_state['values']['bid']) || ($background_row = bid_load($form_state['values']['bid'])) === FALSE) {
+    form_set_error('', t('A background image is necessary'));
+  }
+  if ($form_state['values']['default'] != 1 && (trim($form_state['values']['path']) == '' || !drupal_valid_path(drupal_get_normal_path($form_state['values']['path']), TRUE))) {
+    form_set_error('path', t('Invalid path'));
+  }
+  if (variable_get('page_background_linkurl', FALSE) == TRUE) {
+    if (trim($form_state['values']['bglinkurl']) != '' && parse_url($form_state['values']['bglinkurl']) === FALSE) {
+      form_set_error('bglinkurl', t('Invalid Link Url'));
+    }
+  }
+}
+
+/**
+ * Page_background_clone_form_submit().
+ */
+function page_background_clone_form_submit($form, &$form_state) {
+  $background_row_orig = bid_load($form_state['values']['bid']);
+
+  if ($form_state['values']['default'] == 1) {
+    $form_state['values']['path'] = NULL;
+  }
+  else {
+    $form_state['values']['path'] = drupal_get_normal_path($form_state['values']['path']);
+  }
+
+  $background_row = _page_background_save(array(
+    'fid' 			=> $background_row_orig->fid,
+    'path' 			=> $form_state['values']['path'],
+    'weight' 		=> 0,
+    'bglinkurl' 	=> (isset($form_state['values']['bglinkurl']) && trim($form_state['values']['bglinkurl']) != '') ? trim($form_state['values']['bglinkurl']) : NULL,
+    'bgtextlang' 	=> (isset($form_state['values']['bgtextlang']) && trim($form_state['values']['bgtextlang']) != '') ? trim($form_state['values']['bgtextlang']) : NULL,
+    'bgtext' 		=> (isset($form_state['values']['bgtext'])) ? $form_state['values']['bgtext'] : NULL,
+    'image_alt' 	=> (isset($form_state['values']['image_alt']) && trim($form_state['values']['image_alt']) != '') ? trim($form_state['values']['image_alt']) : NULL,
+    'image_title' 	=> (isset($form_state['values']['image_title']) && trim($form_state['values']['image_title']) != '') ? trim($form_state['values']['image_title']) : NULL,
+  ) , $form_state);
+
+  drupal_set_message(t('Background cloned succesfully'));
+  drupal_goto('admin/config/page_background');
+}
+
+/**
+ * Page_background_edit_form().
+ */
+function page_background_edit_form($form, &$form_state, $background_row) {
+  global $user;
+
+  $form['#attached']['js'][] = array(
+    'data' => drupal_get_path('module', 'page_background') . '/js/page_background_admin.js',
+    'type' => 'file',
+  );
+
+  $form['addfile'] = array('#type' => 'fieldset', '#title' => t('Modify a page background'));
+
+  $max_upload = (int) (ini_get('upload_max_filesize'));
+  $max_post = (int) (ini_get('post_max_size'));
+  $memory_limit = (int) (ini_get('memory_limit'));
+  $upload_mb = min($max_upload, $max_post, $memory_limit);
+
+  $extensions = explode(' ', 'jpg jpeg png');
+  foreach ($extensions as &$ext) {
+    $ext = '.' . trim($ext);
+  }
+
+  $form['background_row'] = array('#type' => 'value', '#value' => isset($form_state['values']['background_row']) ? $form_state['values']['background_row'] : $background_row);
+
+  if (($file = file_load($form['background_row']['#value']->fid)) !== FALSE) {
+    $fileusage = file_usage_list($file);
+    if (!isset($fileusage['page_background']['background_image'][$form['background_row']['#value']->bid]) ||
+      $fileusage['page_background']['background_image'][$form['background_row']['#value']->bid] == 0) {
+      file_usage_add($file, 'page_background', 'background_image', $form['background_row']['#value']->bid);
+    }
+  }
+
+  $form['uid'] = array('#type' => 'hidden', '#value' => $user->uid);
+
+  $form['addfile']['uploadfile'] = array(
+    '#type' => 'managed_file',
+    '#title' => t('Upload New Background'),
+    '#upload_validators' => array(
+      'file_validate_extensions' => array('jpg jpeg png'),
+      'file_validate_size' => array($upload_mb * 1024 * 1024),
+    ),
+    '#upload_location' => 'public://page_backgrounds/',
+    '#description' => t('extensions allowed: !extension_list , max file size: !maxfilesize MB', array('!extension_list' => implode(' ', $extensions), '!maxfilesize' => $upload_mb)),
+    '#default_value' => $form['background_row']['#value']->fid,
+  );
+  $form['addfile']['path'] = array('#type' => 'textfield', '#title' => t('Path'), '#default_value' => $form['background_row']['#value']->path);
+  $form['addfile']['default'] = array('#type' => 'checkbox', '#title' => t('Add to defaults'), '#default_value' => ($form['background_row']['#value']->path == NULL));
+
+  if (variable_get('page_background_linkurl', FALSE) == TRUE) {
+    $form['addfile']['bglinkurl'] = array('#type' => 'textfield', '#title' => t('Link Url'), '#default_value' => $form['background_row']['#value']->bglinkurl);
+  }
+  if (variable_get('page_background_slogan', FALSE) == TRUE) {
+    $form['addfile']['bgtext'] = array('#type' => 'text_format', '#title' => t('Background Slogan'), '#default_value' => $form['background_row']['#value']->bgtext, '#format' => $form['background_row']['#value']->bgtextformat);
+    $form['addfile']['bgtextlang'] = array('#type' => 'select', '#options' => _page_background_get_languages_selectoptions(), '#title' => t('Background Slogan Language'), '#default_value' => $form['background_row']['#value']->bgtextlang);
+  }
+
+  $form['addfile']['image_alt'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Image Alt (only if background set as Image tag)'),
+    '#default_value' => $form['background_row']['#value']->image_alt,
+  );
+  $form['addfile']['image_title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Image Title (only if background set as Image tag)'),
+    '#default_value' => $form['background_row']['#value']->image_title,
+  );
+
+  $form['addfile']['submit'] = array('#type' => 'submit', '#value' => t('Save'));
+
+  return $form;
+}
+
+/**
+ * Page_background_edit_form_validate().
+ */
+function page_background_edit_form_validate($form, &$form_state) {
+  if (($file = file_load($form_state['values']['uploadfile'])) === FALSE) {
+    form_set_error('uploadfile', t('A background image is necessary'));
+  }
+  if ($form_state['values']['default'] != 1 && (trim($form_state['values']['path']) == '' || !drupal_valid_path(drupal_get_normal_path($form_state['values']['path']), TRUE))) {
+    form_set_error('path', t('Invalid path'));
+  }
+  if (variable_get('page_background_linkurl', FALSE) == TRUE) {
+    if (trim($form_state['values']['bglinkurl']) != '' && parse_url($form_state['values']['bglinkurl']) === FALSE) {
+      form_set_error('bglinkurl', t('Invalid Link Url'));
+    }
+  }
+}
+
+/**
+ * Page_background_edit_form_submit().
+ */
+function page_background_edit_form_submit($form, &$form_state) {
+
+  if (($file = file_load($form_state['values']['uploadfile'])) !== FALSE) {
+    $file->status = FILE_STATUS_PERMANENT;
+    $file->uid = $form_state['values']['uid'];
+    file_save($file);
+
+    if ($form_state['values']['default'] == 1) {
+      $form_state['values']['path'] = NULL;
+    }
+    else {
+      $form_state['values']['path'] = drupal_get_normal_path($form_state['values']['path']);
+    }
+
+    $background_row = _page_background_save(array(
+      'bid' 			=> $form_state['values']['background_row']->bid,
+      'file' 			=> $file,
+      'path' 			=> $form_state['values']['path'],
+      'weight' 		=> 0,
+      'bglinkurl' 	=> (isset($form_state['values']['bglinkurl']) && trim($form_state['values']['bglinkurl']) != '') ? trim($form_state['values']['bglinkurl']) : NULL,
+      'bgtextlang' 	=> (isset($form_state['values']['bgtextlang']) && trim($form_state['values']['bgtextlang']) != '') ? trim($form_state['values']['bgtextlang']) : NULL,
+      'bgtext' 		=> (isset($form_state['values']['bgtext'])) ? $form_state['values']['bgtext'] : NULL,
+      'image_alt' 	=> (isset($form_state['values']['image_alt']) && trim($form_state['values']['image_alt']) != '') ? trim($form_state['values']['image_alt']) : NULL,
+      'image_title' 	=> (isset($form_state['values']['image_title']) && trim($form_state['values']['image_title']) != '') ? trim($form_state['values']['image_title']) : NULL,
+    ), $form_state);
+
+    drupal_set_message(t('File uploaded succesfully'));
+  }
+
+  drupal_set_message(t('Background modified succesfully'));
+  drupal_goto('admin/config/page_background');
+}
+
+/**
+ * Page_background_settings_form().
+ */
+function page_background_settings_form($form, &$form_state) {
+
+  $form['container'] = array('#title' => t('Container'), '#type' => 'fieldset');
+
+  $form['container']['page_background_container_width'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Container width'),
+    '#default_value' => variable_get('page_background_container_width', ''),
+  );
+
+  $form['container']['page_background_container_height'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Container height'),
+    '#default_value' => variable_get('page_background_container_height', ''),
+  );
+
+  $form['slides'] = array('#title' => t('Slides'), '#type' => 'fieldset');
+
+  $form['slides']['page_background_slides_type'] = array(
+    '#type' => 'select',
+    '#options' => array(
+      'styled_divs'	=> t('as divs'),
+      'images'			=> t('as images'),
+    ),
+    '#title' => t('Slides rendered'),
+    '#default_value' => variable_get('page_background_slides_type', 'styled_divs'),
+  );
+
+  $stylenames = array('original' => t('Original image'));
+  foreach (image_styles() as $style) {
+    $stylenames[$style['name']] = $style['name'];
+  }
+
+  $form['slides']['page_background_image_style_name'] = array(
+    '#title' => t('Image style applied to the images'),
+    '#type' => 'select',
+    '#options' => $stylenames,
+    '#default_value' => variable_get('page_background_image_style_name', 'original'),
+  );
+
+  $form['slides']['page_background_linkurl'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Page background linkurl'),
+    '#default_value' => variable_get('page_background_linkurl', FALSE),
+    '#description' => t('If enabled Page background slides will be linked to an url'),
+  );
+
+  $form['slides']['page_background_slogan'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Page background Slogan on background'),
+    '#default_value' => variable_get('page_background_slogan', FALSE),
+    '#description' => t('If enabled Page background slides will have a slogan text'),
+  );
+
+  $form['slides']['page_background_default_behavior'] = array(
+    '#type' => 'select',
+    '#title' => t('Behavior with default images'),
+    '#options' => array(
+      'singleframe' => t('Show one random single frame'),
+      'slideshow' => t('Show slideshow'),
+    ),
+    '#default_value' => variable_get('page_background_default_behavior', 'singleframe'),
+  );
+
+  $form['cycle'] = array('#title' => t('Cycle'), '#type' => 'fieldset');
+
+  $form['cycle']['page_background_animation_effect'] = array(
+    '#type' => 'select',
+    '#options' => array(
+      'none'			=> 'none',
+      'blindX'		=> 'blindX',
+      'blindY'		=> 'blindY',
+      'blindZ'		=> 'blindZ',
+      'cover'			=> 'cover',
+      'curtainX'		=> 'curtainX',
+      'curtainY'		=> 'curtainY',
+      'fade'			=> 'fade',
+      'fadeZoom'		=> 'fadeZoom',
+      'growX'			=> 'growX',
+      'growY'			=> 'growY',
+      'scrollUp'		=> 'scrollUp',
+      'scrollDown'	=> 'scrollDown',
+      'scrollLeft'	=> 'scrollLeft',
+      'scrollRight'	=> 'scrollRight',
+      'scrollHorz'	=> 'scrollHorz',
+      'scrollVert'	=> 'scrollVert',
+      'shuffle'		=> 'shuffle',
+      'slideX'		=> 'slideX',
+      'slideY'		=> 'slideY',
+      'toss'			=> 'toss',
+      'turnUp'		=> 'turnUp',
+      'turnDown'		=> 'turnDown',
+      'turnLeft'		=> 'turnLeft',
+      'turnRight'		=> 'turnRight',
+      'uncover'		=> 'uncover',
+      'wipe'			=> 'wipe',
+      'zoom'			=> 'zoom',
+    ),
+    '#title' => t('Animation effect'),
+    '#default_value' => variable_get('page_background_animation_effect', 'scrollHorz'),
+  );
+
+  $form['cycle']['page_background_animation_timeout'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Animation timeout'),
+    '#default_value' => variable_get('page_background_animation_timeout', 5000),
+  );
+
+  $form['cycle']['page_background_animation_speed'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Animation speed'),
+    '#default_value' => variable_get('page_background_animation_speed', 1000),
+  );
+
+  $form['cycle']['page_background_delay'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Animation initial delay'),
+    '#default_value' => variable_get('page_background_delay', 0),
+  );
+
+  $form['cycle']['page_background_fit'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Fit slides to container'),
+    '#default_value' => variable_get('page_background_fit', TRUE),
+  );
+
+  $form['cycle']['page_background_sync'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Sync'),
+    '#default_value' => variable_get('page_background_sync', TRUE),
+  );
+
+  $form['pager'] = array('#title' => t('Pager'), '#type' => 'fieldset');
+
+  $form['pager']['page_background_pager'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show pager'),
+    '#default_value' => variable_get('page_background_pager', TRUE),
+  );
+
+  $form['pager']['page_background_pager_generator'] = array(
+    '#type' => 'select',
+    '#title' => t('Pager generated by'),
+    '#options' => array('module' => t('Page Background'), 'js' => t('Cycle plugin')),
+    '#default_value' => variable_get('page_background_pager_generator', 'module'),
+  );
+
+  $form['other'] = array('#title' => t('Other'), '#type' => 'fieldset');
+
+  $form['other']['page_background_block'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Page background block'),
+    '#default_value' => variable_get('page_background_block', FALSE),
+    '#description' => t('If enabled Page background will be available as a block and not automatically added to pages'),
+  );
+
+  $form['#validate'][] = 'page_background_settings_form_validate';
+
+  return system_settings_form($form);
+}
+
+/**
+ * Page_background_settings_form_validate().
+ */
+function page_background_settings_form_validate($form, &$form_state) {
+  if (trim($form_state['values']['page_background_container_height']) != '' && !is_numeric($form_state['values']['page_background_container_height']) && !preg_match('/%$/i', $form_state['values']['page_background_container_height'])) {
+    form_set_error('page_background_container_height', t('Height: Only numeric or percentage values accepted.'));
+  }
+
+  if (trim($form_state['values']['page_background_container_width']) != '' && !is_numeric($form_state['values']['page_background_container_width']) && !preg_match('/%$/i', $form_state['values']['page_background_container_width'])) {
+    form_set_error('page_background_container_width', t('Width: Only numeric or percentage values accepted.'));
+  }
+
+  if (!is_numeric($form_state['values']['page_background_animation_timeout']) || $form_state['values']['page_background_animation_timeout'] < 0) {
+    form_set_error('page_background_animation_timeout', t('Timeout: Only numeric positive values.'));
+  }
+}
+
+/**
+ * Page_background_preprocess_html().
+ */
+function page_background_preprocess_html(&$variables) {
+  if (variable_get('page_background_block', FALSE) == TRUE) {
+    return;
+  }
+
+  $out = _page_background_get_markup_by_path(drupal_is_front_page() ? '<front>' : $_GET['q']);
+
+  foreach (module_implements('alter_page_background') as $module) {
+    $out = module_invoke($module, 'alter_page_background', $out);
+  }
+
+  if (!isset($out['#markup']) || trim($out['#markup']) == '') {
+    return;
+  }
+
+  if (isset($out['#js']) && is_array($out['#js'])) {
+    foreach ($out['#js'] as $elem) {
+      if (count($elem) == 0) {
+        continue;
+      }
+      if (count($elem) > 1) {
+        drupal_add_js($elem[0], $elem[1]);
+      }
+      else {
+        drupal_add_js($elem[0]);
+      }
+    }
+  }
+
+  if (isset($out['#css']) && is_array($out['#css'])) {
+    foreach ($out['#css'] as $elem) {
+      if (is_string($elem)) {
+        drupal_add_css($elem, 'inline');
+      }
+      elseif (is_array($elem) && count($elem) > 1) {
+        drupal_add_css($elem[0], $elem[1]);
+      }
+      elseif (is_array($elem)) {
+        drupal_add_css($elem[0], 'inline');
+      }
+    }
+  }
+
+  $variables['page']['page_top']['page_background'] = $out;
+}
+
+/**
+ * Page_background_get_fids_markup().
+ */
+function _page_background_get_fids_markup($fids = array()) {
+  global $language;
+  $out = array();
+  if (!$fids || count($fids) == 0) {
+    $fids = _page_background_get_default_fids($language);
+    if (count($fids) > 1) {
+      if (variable_get('page_background_default_behavior', 'singleframe') == 'singleframe') {
+        shuffle($fids);
+        $fids = array(array_shift($fids));
+      }
+    }
+  }
+  else {
+    $internal_fids = array();
+
+    foreach ($fids as $fid) {
+      if (!is_object($fid) && is_numeric($fid)) {
+        $o = new stdClass();
+        $o->fid = $fid;
+        $internal_fids[] = $o;
+      }
+      elseif (is_object($fid) && isset($fid->fid)) {
+        $internal_fids[] = $fid;
+      }
+    }
+    if (count($internal_fids) > 0) {
+      $fids = $internal_fids;
+    }
+  }
+
+  if (count($fids) == 0) {
+    return array(
+      '#css' => array(),
+      '#js' => array(),
+      '#fids' => array(),
+      '#numfids' => 0,
+      '#markup' => '',
+    );
+  }
+
+  foreach ($fids as $fid) {
+    $stylename = $fid->_stylename;
+    if ($stylename == 'original') {
+      $fid->file = file_load($fid->fid);
+      if (!isset($fid->file->image_dimensions)) {
+        $fid->file->image_dimensions = image_get_info($fid->file->uri);
+      }
+    }
+    else {
+      $origfile = file_load($fid->fid);
+      $style = image_style_load($stylename);
+      $destination_uri = image_style_path($stylename, $origfile->uri);
+      if (image_style_create_derivative($style, $origfile->uri, $destination_uri) !== FALSE) {
+        $fid->file = new stdClass();
+        $fid->file->uri = $destination_uri;
+        if (!isset($fid->file->image_dimensions)) {
+          $fid->file->image_dimensions = image_get_info($fid->file->uri);
+        }
+      }
+    }
+  }
+
+  $cw = variable_get('page_background_container_width', '');
+  $ch = variable_get('page_background_container_height', '');
+  $fx = variable_get('page_background_animation_effect', 'scrollHorz');
+  $timeout = variable_get('page_background_animation_timeout', 5000);
+  $speed = variable_get('page_background_animation_speed', 1000);
+  $fit = variable_get('page_background_fit', TRUE);
+  $delay = variable_get('page_background_delay', 0);
+  $sync = variable_get('page_background_sync', TRUE);
+  $slide_type = variable_get('page_background_slides_type', 'styled_divs');
+
+  if ($cw == '') {
+    foreach ($fids as $fid) {
+      $cw = (is_numeric($cw) && $cw < $fid->file->image_dimensions['width']) ? $cw : $fid->file->image_dimensions['width'];
+    }
+  }
+  if ($ch == '') {
+    foreach ($fids as $fid) {
+      $ch = (is_numeric($ch) && $ch < $fid->file->image_dimensions['height']) ? $ch : $fid->file->image_dimensions['height'];
+    }
+  }
+
+  $cw = trim($cw);
+  $ch = trim($ch);
+
+  if (variable_get('page_background_block', FALSE) == TRUE) {
+    $out['#css'][] = '
+      #page_background_container{
+        height: ' . $ch . ((!preg_match('/%$/i', $ch)) ? 'px' : '') . ';
+        width: ' . $cw . ((!preg_match('/%$/i', $cw)) ? 'px' : '') . ';
+        overflow: hidden;
+        position: relative;
+      }
+    ';
+  }
+  else {
+    $out['#css'][] = '
+      #page_background_container{
+        height: ' . $ch . ((!preg_match('/%$/i', $ch)) ? 'px' : '') . ';
+        width: ' . $cw . ((!preg_match('/%$/i', $cw)) ? 'px' : '') . ';
+        overflow: hidden;
+        position:absolute;
+        z-index: -1;
+        top: 0;
+      }
+    ';
+  }
+
+  if ($cw != '100%') {
+    if (!preg_match('/%$/i', $cw)) {
+      $out['#css'][] = '
+        #page_background_container{
+          left: 50%;
+          margin-left: -' . round($cw / 2) . 'px;
+        }
+      ';
+    }
+    else {
+      $percent = str_replace('%', '', $cw);
+      $margin = round(100 - $percent) / 2;
+      $out['#css'][] = '
+        #page_background_container{
+          left: ' . $margin . '%;
+        }
+      ';
+    }
+  }
+
+  $out['#css'][] = '
+    .page_background_slide{
+      margin: 0;
+      padding: 0;
+      height: ' . $ch . ((!preg_match('/%$/i', $ch)) ? 'px' : '') . ';
+      width: ' . $cw . ((!preg_match('/%$/i', $cw)) ? 'px' : '') . ';
+    }
+  ';
+
+  if ($slide_type == 'images') {
+    $out['#css'][] = '
+      .page_background_slide img{
+        display: block;
+        margin: auto;
+      }
+    ';
+  }
+  else {
+    $out['#css'][] = '
+      .page_background_slide .img{
+        display: block;
+        margin: auto;
+      }
+    ';
+  }
+
+  $out['#markup'] = '<div id="page_background_container">';
+  $slides = array();
+  $pager = array();
+  foreach ($fids as $key => $fid) {
+    $image = NULL;
+    if ($fid->bglinkurl != NULL && parse_url($fid->bglinkurl) === FALSE) {
+      $fid->bglinkurl = NULL;
+    }
+    switch ($slide_type) {
+      case 'images':
+        if (empty($fid->image_alt)) {
+          $fid->image_alt = trim(check_plain(strip_tags($fid->bgtext)));
+        }
+        if (empty($fid->image_title)) {
+          $fid->image_title = trim(check_plain(strip_tags($fid->bgtext)));
+        }
+
+        $image = theme('image',
+          array(
+            'path' => file_create_url($fid->file->uri),
+            'width' => $fid->file->image_dimensions['width'],
+            'height' => $fid->file->image_dimensions['height'],
+            'alt' => $fid->image_alt,
+            'title' => $fid->image_title,
+            'attributes' => array(
+              'id' => 'page_background_slide_' . $key,
+            ),
+          )
+        );
+        break;
+
+      case 'styled_divs':
+      default:
+        $image = '<div id="page_background_slide_' . $key . '" class="img"></div>';
+        $out['#css'][] = '
+          #page_background_slide_' . $key . '{
+            background: url(' .
+            url(
+              file_create_url($fid->file->uri),
+              array('absolute' => TRUE)
+            ) . ') no-repeat center top;
+            width: ' . $fid->file->image_dimensions['width'] . 'px;
+            height: ' . $fid->file->image_dimensions['height'] . 'px;
+            position: absolute;top: 50%;left: 50%;
+            margin-left: -' . (round($fid->file->image_dimensions['width'] / 2)) . 'px;
+            margin-top: -' . (round($fid->file->image_dimensions['height'] / 2)) . 'px;
+          }
+        ';
+        break;
+    }
+
+    $slides[] = array(
+      '#markup' => theme(
+        'page_background_slide',
+        array(
+          'image' => $image,
+          'background_row' => $fid,
+        )
+      ),
+      '#fid' => $fid,
+    );
+    $pager[] = '<li class="pager_elem' . (($key == 0) ? ' active' : '') . '" id="pager_element_' . $key . '">' . ($key + 1) . '</li>';
+
+    foreach (module_implements('alter_page_background_slide') as $module) {
+      $slides = module_invoke($module, 'alter_page_background_slide', $slides);
+    }
+  }
+
+  if (is_array($fids) && count($fids) > 0) {
+    if (count($fids) == 1) {
+    }
+    else {
+      if ($cycle_path = _page_background_cycle_library_path()) {
+        $out['#js'][] = array($cycle_path);
+        $out['#js'][] = array(
+          '(function($) {
+            $(document).ready(function() {
+              $(\'#page_background_container\').not(\'.processed\').cycle({
+                fx: \'' . $fx . '\',
+                timeout: ' . $timeout . ',
+                speed: ' . $speed . ',
+                fit: ' . $fit . ',
+                delay: ' . $delay . ',
+                sync: ' . $sync . ',
+                pager:	\'#page_background_pager\',
+                ' . ((variable_get('page_background_pager_generator', 'module') == 'module') ? 'pagerAnchorBuilder: function() {}' : '') . '
+              }).addClass(\'processed\');
+            });
+          })(jQuery)',
+          'inline',
+        );
+      }
+      else {
+        $slides = array_slice($slides, 0, 1);
+      }
+    }
+
+    $markupslides = '';
+    foreach ($slides as $slide) {
+      $markupslides .= $slide['#markup'];
+    }
+    $out['#markup'] .= $markupslides;
+  }
+  $out['#markup'] .= '</div>';
+  if (count($slides) > 1 && variable_get('page_background_pager', TRUE) == TRUE) {
+    if (variable_get('page_background_pager_generator', 'module') == 'js') {
+      $out['#markup'] .= '<div id="page_background_pager" class="pager"></div>';
+    }
+    else {
+      $out['#markup'] .= '<ul id="page_background_pager" class="pager">' . implode('', $pager) . '</ul>';
+    }
+  }
+
+  $out['#fids'] = $fids;
+  $out['#numfids'] = count($fids);
+  return $out;
+}
+
+/**
+ * Theme_page_background_slide().
+ */
+function theme_page_background_slide($variables) {
+  $image = $variables['image'];
+  $background_row = $variables['background_row'];
+
+  $out = '';
+
+  if (variable_get('page_background_slogan', FALSE) == TRUE) {
+    $image  .= (trim($background_row->bgtext) != '') ? '<div class="slogan">' . check_markup($background_row->bgtext, $background_row->bgtextformat, $background_row->bgtextlang) . '</div>' : '';
+  }
+
+  if (variable_get('page_background_linkurl', FALSE) == TRUE && $background_row->bglinkurl != NULL) {
+    $out = '<div class="page_background_slide">' . l($image, $background_row->bglinkurl, array('html' => TRUE)) . '</div>';
+  }
+  else {
+    $out = '<div class="page_background_slide">' . $image . '</div>';
+  }
+  return $out;
+}
+
+/**
+ * Page_background_get_markup_by_path().
+ */
+function _page_background_get_markup_by_path($path) {
+  global $theme_key, $language;
+  $admintheme = variable_get('admin_theme', '');
+  if (trim(strtolower($theme_key)) == trim(strtolower($admintheme))) {
+    return "";
+  }
+
+  $out = array();
+  $out['#markup'] = '';
+  $out['#css'] = array();
+
+  $out = _page_background_get_fids_markup(_page_background_get_fids($path, $language));
+
+  return $out;
+}
+
+/**
+ * Page_background_get_fids().
+ */
+function _page_background_get_fids($path = '<front>', $language = NULL) {
+  $query = db_select('url_background_images', 'bg');
+  $query->fields('bg');
+  $query->addExpression("'" . variable_get('page_background_image_style_name', 'original') . "'", '_stylename');
+  $query->condition('path', $path, '=');
+  $query->orderBy('weight');
+  $query->orderBy('created');
+
+  if (variable_get('page_background_slogan', FALSE) == TRUE && $language != NULL) {
+    $or = db_or();
+    $or->condition('bgtextlang', $language->language);
+
+    $and = db_and();
+    $and->condition('bgtextlang', NULL, 'IS');
+    $and->condition('bgtext', NULL, 'IS');
+
+    $or->condition($and);
+    $query->condition($or);
+  }
+  $fids = $query->execute()->fetchAll();
+  foreach ($fids as &$fid) {
+    foreach (module_implements('page_background_load') as $module) {
+      $fid = module_invoke($module, 'page_background_load', $fid);
+    }
+  }
+
+  foreach (module_implements('alter_page_background_fids') as $module) {
+    $fids = module_invoke($module, 'alter_page_background_fids', $fids, $path, $language);
+  }
+
+  return $fids;
+}
+
+/**
+ * Page_background_get_default_fids().
+ */
+function _page_background_get_default_fids($language = NULL) {
+  $query = db_select('url_background_images', 'bg');
+  $query->fields('bg');
+  $query->addExpression("'" . variable_get('page_background_image_style_name', 'original') . "'", '_stylename');
+  $query->condition('path', NULL, 'IS');
+
+  if ($language != NULL) {
+    $or = db_or();
+    $or->condition('bgtextlang', $language->language);
+
+    $and = db_and();
+    $and->condition('bgtextlang', NULL, 'IS');
+    $and->condition('bgtext', NULL, 'IS');
+
+    $or->condition($and);
+    $query->condition($or);
+  }
+
+  $query->orderBy('weight');
+  $query->orderBy('created');
+
+  $fids = $query->execute()->fetchAll();
+  foreach ($fids as &$fid) {
+    foreach (module_implements('page_background_load') as $module) {
+      $fid = module_invoke($module, 'page_background_load', $fid);
+    }
+  }
+
+  foreach (module_implements('alter_page_background_fids') as $module) {
+    $fids = module_invoke($module, 'alter_page_background_fids', $fids, NULL, $language);
+  }
+  return $fids;
+}
+
+/**
+ * Implementation of a %wildcard_load(). http://drupal.org/node/224170.
  *
  * Handles menu items with %bid in the path.  Seems to get called a lot(!) so we cache.
  */
-function bid_load( $bid, $reset = true ) {
+function bid_load($bid, $reset = TRUE) {
   $cache = &drupal_static(__FUNCTION__);
-  if (!isset($cache))
+  if (!isset($cache)) {
     $cache = array();
-  if (!isset($cache[$bid]) || $reset == true) {
-  	$return_background_row = db_select('url_background_images','bg')->fields('bg')->condition('bid',$bid,'=')->range(0,1)->execute()->fetch(PDO::FETCH_OBJ);
+  }
+  if (!isset($cache[$bid]) || $reset == TRUE) {
+    $return_background_row = db_select('url_background_images', 'bg')->fields('bg')->condition('bid', $bid, '=')->range(0, 1)->execute()->fetch(PDO::FETCH_OBJ);
 
-	foreach(module_implements('page_background_load') as $module){
-		$return_background_row = module_invoke($module, 'page_background_load',$return_background_row);
-	}
+    foreach (module_implements('page_background_load') as $module) {
+      $return_background_row = module_invoke($module, 'page_background_load', $return_background_row);
+    }
 
-  	$cache[$bid] = $return_background_row;
+    $cache[$bid] = $return_background_row;
   }
   return $cache[$bid];
 }
 
-
-
 /**
- * Save a background
- *
+ * Save a background.
  */
-function _page_background_save($values = array() , $form_state = null ) {
-	$orig_bkg_row = null;
+function _page_background_save($values = array(), $form_state = NULL) {
+  $orig_bkg_row = NULL;
 
-	$return_background_row = null;
+  $return_background_row = NULL;
 
-	$file = isset($values['file']) ? $values['file'] : ( isset($values['fid']) ? file_load($values['fid']) : null ) ;
-	$path = isset($values['path']) ? $values['path'] : null;
-	$weight = isset($values['weight']) ? $values['weight'] : 0;
-	$bglinkurl = isset($values['bglinkurl']) ? $values['bglinkurl'] : null;
-	$bgtext = (isset($values['bgtext']) && !empty($values['bgtext']['value'])) ? $values['bgtext']['value'] : null;
-	$bgtextformat = (isset($values['bgtext']) && !empty($values['bgtext']['value'])) ? $values['bgtext']['format'] : null;
-	$bgtextlang = (isset($values['bgtextlang']) && !empty($values['bgtextlang'])) ? $values['bgtextlang'] : null;
-	$image_alt = (isset($values['image_alt'])) ? $values['image_alt'] : null;
-	$image_title = (isset($values['image_title'])) ? $values['image_title'] : null;
+  $file = isset($values['file']) ? $values['file'] : (isset($values['fid']) ? file_load($values['fid']) : NULL);
+  $path = isset($values['path']) ? $values['path'] : NULL;
+  $weight = isset($values['weight']) ? $values['weight'] : 0;
+  $bglinkurl = isset($values['bglinkurl']) ? $values['bglinkurl'] : NULL;
+  $bgtext = (isset($values['bgtext']) && !empty($values['bgtext']['value'])) ? $values['bgtext']['value'] : NULL;
+  $bgtextformat = (isset($values['bgtext']) && !empty($values['bgtext']['value'])) ? $values['bgtext']['format'] : NULL;
+  $bgtextlang = (isset($values['bgtextlang']) && !empty($values['bgtextlang'])) ? $values['bgtextlang'] : NULL;
+  $image_alt = (isset($values['image_alt'])) ? $values['image_alt'] : NULL;
+  $image_title = (isset($values['image_title'])) ? $values['image_title'] : NULL;
 
+  $fields = array(
+    'path' 			=> $path,
+    'fid' 			=> $file->fid,
+    'weight' 		=> $weight,
+    'bglinkurl' 	=> $bglinkurl,
+    'bgtext' 		=> $bgtext,
+    'bgtextformat' 	=> $bgtextformat,
+    'bgtextlang' 	=> $bgtextlang,
+    'image_alt' 	=> $image_alt,
+    'image_title' 	=> $image_title,
+  );
 
-	$fields = array(
-		'path' 			=> $path,
-		'fid' 			=> $file->fid,
-		'weight' 		=> $weight,
-		'bglinkurl' 	=> $bglinkurl,
-		'bgtext' 		=> $bgtext,
-		'bgtextformat' 	=> $bgtextformat,
-		'bgtextlang' 	=> $bgtextlang,
-		'image_alt' 	=> $image_alt,
-		'image_title' 	=> $image_title,
-	);
+  if (isset($values['bid'])) {
+    $orig_bkg_row = bid_load($values['bid']);
+    $query = db_update('url_background_images');
+    $query->condition('bid', $values['bid'], '=');
+  }
+  else {
+    $query = db_insert('url_background_images');
+    $fields['created'] = time();
+  }
 
-	if(isset($values['bid'])){
-		$orig_bkg_row = bid_load($values['bid']);
-		$query = db_update('url_background_images');
-		$query->condition('bid',$values['bid'],'=');
-	}else{
-		$query = db_insert('url_background_images');
-		$fields['created']=time();
-	}
+  $res = $query->fields($fields)->execute();
 
-	$res = $query->fields($fields)->execute();
+  if (isset($values['bid'])) {
+    $return_background_row = bid_load($values['bid'], TRUE);
+    if ($orig_bkg_row->fid != $return_background_row->fid) {
+      if (($oldfile = file_load($orig_bkg_row->fid)) !== FALSE) {
+        file_usage_delete($oldfile, 'page_background', 'background_image', $return_background_row->bid);
+      }
 
-	if(isset($values['bid'])){
-		$return_background_row = bid_load($values['bid'], true);
-		if( $orig_bkg_row->fid != $return_background_row->fid ){
-			// elimino vecchio file usage
-			if( ($oldfile = file_load($orig_bkg_row->fid)) !== false ){
-				file_usage_delete( $oldfile, 'page_background', 'background_image', $return_background_row->bid );
-			}
+      file_usage_add($file, 'page_background', 'background_image', $return_background_row->bid);
+    }
+  }
+  else {
+    $return_background_row = bid_load($res, TRUE);
+    file_usage_add($file, 'page_background', 'background_image', $return_background_row->bid);
+  }
 
-			//aggiungo il nuovo
-			file_usage_add( $file, 'page_background', 'background_image', $return_background_row->bid );
-		}
-	}else{
-		$return_background_row = bid_load($res, true);
-		file_usage_add( $file, 'page_background', 'background_image', $return_background_row->bid );
-	}
+  foreach (module_implements('page_background_save') as $module) {
+    $return_background_row = module_invoke($module, 'page_background_save', $return_background_row, $form_state);
+  }
 
-	foreach(module_implements('page_background_save') as $module){
-		$return_background_row = module_invoke($module, 'page_background_save',$return_background_row, $form_state);
-	}
-
-	return $return_background_row;
-}
-
-function _page_background_delete( $background_row ){
-	if( is_numeric($background_row) ) $background_row = bid_load($background_row , true);
-	if(!isset($background_row->file) && is_numeric($background_row->fid) ) $background_row->file = file_load($background_row->fid);
-
-	foreach(module_implements('page_background_delete') as $module){
-		$background_row = module_invoke($module, 'page_background_delete',$background_row);
-	}
-
-	if( is_object($background_row->file) )
-		file_usage_delete( $background_row->file, 'page_background', 'background_image', $background_row->bid );
-
-	$numdeleted = db_delete('url_background_images')->condition('bid',$background_row->bid)->execute();
-
-	return $numdeleted;
-}
-
-function _page_background_delete_multiple( $bgs = array() ){
-	if( !is_array($bgs) ) $bgs = array($bgs);
-
-	$out = 0;
-	foreach($bgs as $bg){
-		$out += _page_background_delete($bg);
-	}
-
-	return $out;
+  return $return_background_row;
 }
 
 /**
-* Gets the path to the jQuery cycle library.
-*
-* @return
-*   The path to the cycle library js file, or FALSE if not found.
-*/
+ * Delete a background.
+ */
+function _page_background_delete($background_row) {
+  if (is_numeric($background_row)) {
+    $background_row = bid_load($background_row, TRUE);
+  }
+  if (!isset($background_row->file) && is_numeric($background_row->fid)) {
+    $background_row->file = file_load($background_row->fid);
+  }
+
+  foreach (module_implements('page_background_delete') as $module) {
+    $background_row = module_invoke($module, 'page_background_delete', $background_row);
+  }
+
+  if (is_object($background_row->file)) {
+    file_usage_delete($background_row->file, 'page_background', 'background_image', $background_row->bid);
+  }
+
+  $numdeleted = db_delete('url_background_images')->condition('bid', $background_row->bid)->execute();
+
+  return $numdeleted;
+}
+
+/**
+ * Delete multiple backgrounds.
+ */
+function _page_background_delete_multiple($bgs = array()) {
+  if (!is_array($bgs)) {
+    $bgs = array($bgs);
+  }
+
+  $out = 0;
+  foreach ($bgs as $bg) {
+    $out += _page_background_delete($bg);
+  }
+
+  return $out;
+}
+
+/**
+ * Gets the path to the jQuery cycle library.
+ *
+ * @return string
+ *   The path to the cycle library js file, or FALSE if not found.
+ */
 function _page_background_cycle_library_path() {
-	$cycle_path = libraries_get_path('jquery.cycle');
+  $cycle_path = libraries_get_path('jquery.cycle');
 
-	if (!empty($cycle_path)) {
-		// Attempt to use minified version of jQuery cycle plugin.
-		if (file_exists($cycle_path . '/jquery.cycle.all.min.js')) {
-			$cycle_path .= '/jquery.cycle.all.min.js';
-		}
-		// Otherwise use non-minified version if available.
-		elseif (file_exists($cycle_path . '/jquery.cycle.all.js')) {
-			$cycle_path .= '/jquery.cycle.all.js';
-		}
-		else {
-			$cycle_path = FALSE;
-		}
-	}
-	else {
-		$cycle_path = FALSE;
-	}
+  if (!empty($cycle_path)) {
+    if (file_exists($cycle_path . '/jquery.cycle.all.min.js')) {
+      $cycle_path  .= '/jquery.cycle.all.min.js';
+    }
+    elseif (file_exists($cycle_path . '/jquery.cycle.all.js')) {
+      $cycle_path  .= '/jquery.cycle.all.js';
+    }
+    else {
+      $cycle_path = FALSE;
+    }
+  }
+  else {
+    $cycle_path = FALSE;
+  }
 
-	return $cycle_path;
+  return $cycle_path;
 }
 
 /**
  * Implements hook_block_info().
  */
 function page_background_block_info() {
-  $blocks=array();
-  if(variable_get('page_background_block',false)==true) {
-	  $blocks['page_background_block'] = array(
-	    'info' => t('Page Backgrounds Block'),
-	    'cache' => DRUPAL_NO_CACHE
-	  );
+  $blocks = array();
+  if (variable_get('page_background_block', FALSE) == TRUE) {
+    $blocks['page_background_block'] = array(
+      'info' => t('Page Backgrounds Block'),
+      'cache' => DRUPAL_NO_CACHE,
+    );
   }
 
   return $blocks;
@@ -1642,42 +1687,52 @@ function page_background_block_view($delta = '') {
   $block = array();
   switch ($delta) {
     case 'page_background_block':
-		$block['subject'] = '';
+      $block['subject'] = '';
 
-		$out=_page_background_get_markup_by_path(drupal_is_front_page()?'<front>':$_GET['q']);
-		foreach(module_implements('alter_page_background') as $module){
-			$out = module_invoke($module, 'alter_page_background',$out);
-		}
+      $out = _page_background_get_markup_by_path(drupal_is_front_page() ? '<front >' : $_GET['q']);
+      foreach (module_implements('alter_page_background') as $module) {
+        $out = module_invoke($module, 'alter_page_background', $out);
+      }
 
-		if(!isset($out['#markup']) || trim($out['#markup'])=='') return;
+      if (!isset($out['#markup']) || trim($out['#markup']) == '') {
+        return;
+      }
 
-		if(isset($out['#js']) && is_array($out['#js'])){
-			foreach($out['#js'] as $elem){
-				if(count($elem)==0) continue;
-				if(count($elem)>1){
-					drupal_add_js($elem[0],$elem[1]);
-				}else drupal_add_js($elem[0]);
-			}
-		}
+      if (isset($out['#js']) && is_array($out['#js'])) {
+        foreach ($out['#js'] as $elem) {
+          if (count($elem) == 0) {
+            continue;
+          }
+          if (count($elem) > 1) {
+            drupal_add_js($elem[0], $elem[1]);
+          }
+          else {
+            drupal_add_js($elem[0]);
+          }
+        }
+      }
 
-		if(isset($out['#css']) && is_array($out['#css'])){
-			foreach($out['#css'] as $elem){
-				if(is_string($elem)) {
-					drupal_add_css($elem,'inline');
-				} else if(is_array($elem) && count($elem)>1) {
-					drupal_add_css($elem[0],$elem[1]);
-				}else if(is_array($elem)) {
-					drupal_add_css($elem[0],'inline');
-				}
-			}
-		}
+      if (isset($out['#css']) && is_array($out['#css'])) {
+        foreach ($out['#css'] as $elem) {
+          if (is_string($elem)) {
+            drupal_add_css($elem, 'inline');
+          }
+          elseif (is_array($elem) && count($elem) > 1) {
+            drupal_add_css($elem[0], $elem[1]);
+          }
+          elseif (is_array($elem)) {
+            drupal_add_css($elem[0], 'inline');
+          }
+        }
+      }
 
-		$add_css=variable_get('page_background_block_additional_css', '');
-		if(trim($add_css)!='') drupal_add_css($add_css,'inline');
+      $add_css = variable_get('page_background_block_additional_css', '');
+      if (trim($add_css) != '') {
+        drupal_add_css($add_css, 'inline');
+      }
 
-		$block['content'] = $out['#markup'];
+      $block['content'] = $out['#markup'];
       break;
-    
   }
   return $block;
 }
@@ -1697,28 +1752,38 @@ function page_background_block_configure($delta = '') {
   return $form;
 }
 
+/**
+ * Implements hook_block_save().
+ */
 function page_background_block_save($delta = '', $edit = array()) {
   if ($delta == 'page_background_block') {
     variable_set('page_background_block_additional_css', $edit['page_background_block_additional_css']);
   }
-  return;
 }
 
-function page_background_delete_form($form,&$form_state,$background_row){
-	$form['background_row'] = array(
-		'#type' => 'value',
-		'#value' => $background_row,
-	);
-	return confirm_form($form, t('Do you really want to delete the selected item?'), 'admin/config/page_background');
+/**
+ * Page_background_delete_form().
+ */
+function page_background_delete_form($form, &$form_state, $background_row) {
+  $form['background_row'] = array(
+    '#type' => 'value',
+    '#value' => $background_row,
+  );
+  return confirm_form($form, t('Do you really want to delete the selected item?'), 'admin/config/page_background');
 }
 
-function page_background_delete_form_submit($form,&$form_state){
-	$numdeleted = _page_background_delete($form_state['values']['background_row']);
-	drupal_set_title(t(':numelements elements deleted',array(':numelements'=>$numdeleted)));
-	drupal_goto('admin/config/page_background');
+/**
+ * Page_background_delete_form_submit().
+ */
+function page_background_delete_form_submit($form, &$form_state) {
+  $numdeleted = _page_background_delete($form_state['values']['background_row']);
+  drupal_set_title(t(':numelements elements deleted', array(':numelements' => $numdeleted)));
+  drupal_goto('admin/config/page_background');
 }
 
-
+/**
+ * Page_background_get_query_string().
+ */
 function _page_background_get_query_string(SelectQueryInterface $query) {
   $string = (string) $query;
   $arguments = $query->arguments();
@@ -1727,25 +1792,29 @@ function _page_background_get_query_string(SelectQueryInterface $query) {
     foreach ($arguments as $placeholder => &$value) {
       if (is_string($value)) {
         $value = "'$value'";
-      }elseif($value == null){
-      	$value = 'NULL';
+      }
+      elseif ($value == NULL) {
+        $value = 'NULL';
       }
     }
 
     $string = strtr($string, $arguments);
   }
 
-  $string = preg_replace('/\{(.*?)\}/','$1',$string);
+  $string = preg_replace('/\{(.*?)\}/', '$1', $string);
 
   return $string;
 }
 
+/**
+ * Implements hook_contextual_links_view_alter().
+ */
 function page_background_contextual_links_view_alter(&$element, &$items) {
   if (isset($element['#element']['#block']) && $element['#element']['#block']->delta == "page_background_block") {
     $element['#links']['page_background'] = array(
       'title' => 'Edit page backgrounds',
       'href' => url('admin/config/page_background', array('absolute' => TRUE)),
-      'query' => array( 'filter'=>drupal_is_front_page() ? '<front>' : drupal_get_normal_path($_GET['q']) ),
+      'query' => array('filter' => drupal_is_front_page() ? '<front>' : drupal_get_normal_path($_GET['q'])),
     );
   }
 }

@@ -1,149 +1,153 @@
-<?php 
+<?php
+
 /**
-* Implements hook_schema().
-*/
+ * @file
+ * Page Background Install
+ */
+
+/**
+ * Implements hook_schema().
+ */
 function page_background_schema() {
-	$schema['url_background_images'] = array(
-		'fields' => array(
-			'bid' => array(
-				'type' => 'serial',
-				'unsigned' => TRUE,
-				'not null' => TRUE,
-				'description' => 'Association ID',
-			),
-			'path' => array(
-				'type' => 'varchar',
-				'length' => 255,
-				'not null' => FALSE,
-				'default' => '',
-				'description' => 'Page path',
-			),
-			'fid' => array(
-				'type' => 'int',
-				'default' => 0,
-				'description' => 'File ID',
-			),
-			'weight' => array(
-				'type' => 'int',
-				'not null' => TRUE,
-				'default' => 0,
-				'description' => 'weight',
-			),
-			'bglinkurl' => array(
-				'type' => 'varchar',
-				'length' => 255,
-				'not null' => FALSE,
-				'description' => 'Background Link url',
-			),
-			'bgtext' => array(
-				'type' => 'text',
-				'not null' => FALSE,
-				'description' => 'Background Slogan Text',
-			),
-			'bgtextformat' => array(
-				'type' => 'varchar',
-				'length' => 255,
-				'not null' => FALSE,
-				'description' => 'Background Slogan Text Format',
-			),	
-			'bgtextlang' => array(
-				'type' => 'varchar',
-				'length' => 10,
-				'not null' => FALSE,
-				'description' => 'Background Slogan Text Language',
-			),
-			'image_alt' => array(
-				'type' => 'varchar',
-				'length' => 255,
-				'not null' => FALSE,
-				'description' => 'Background Image Alt Text',
-			),
-			'image_title' => array(
-				'type' => 'varchar',
-				'length' => 255,
-				'not null' => FALSE,
-				'description' => 'Background Image Title Text',
-			),
-			'created' => array(
-				'type' => 'int',
-				'not null' => TRUE,
-				'description' => 'unix time',
-			),			
-		),
-		'description' => 'Store Paths Background Images',
-		'primary key' => array('bid'),
-		'indexes' => array(
-			'path' => array('path'),
-			'bgtextlang' => array('bgtextlang'),
-		),	
-	);
-	
-	return $schema;
+  $schema['url_background_images'] = array(
+    'fields' => array(
+      'bid' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'Association ID',
+      ),
+      'path' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'default' => '',
+        'description' => 'Page path',
+      ),
+      'fid' => array(
+        'type' => 'int',
+        'default' => 0,
+        'description' => 'File ID',
+      ),
+      'weight' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'weight',
+      ),
+      'bglinkurl' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'description' => 'Background Link url',
+      ),
+      'bgtext' => array(
+        'type' => 'text',
+        'not null' => FALSE,
+        'description' => 'Background Slogan Text',
+      ),
+      'bgtextformat' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'description' => 'Background Slogan Text Format',
+      ),
+      'bgtextlang' => array(
+        'type' => 'varchar',
+        'length' => 10,
+        'not null' => FALSE,
+        'description' => 'Background Slogan Text Language',
+      ),
+      'image_alt' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'description' => 'Background Image Alt Text',
+      ),
+      'image_title' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'description' => 'Background Image Title Text',
+      ),
+      'created' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'description' => 'unix time',
+      ),
+    ),
+    'description' => 'Store Paths Background Images',
+    'primary key' => array('bid'),
+    'indexes' => array(
+      'path' => array('path'),
+      'bgtextlang' => array('bgtextlang'),
+    ),
+  );
+  return $schema;
 }
 
 /**
  * Implements hook_update_N().
  */
 function page_background_update_7000(&$sandbox) {
-	db_add_field('url_background_images', 'weight', array(
-		'type' => 'int',
-		'not null' => TRUE,
-		'default' => 0,
-		'description' => 'weight',
-	));
+  db_add_field('url_background_images', 'weight', array(
+    'type' => 'int',
+    'not null' => TRUE,
+    'default' => 0,
+    'description' => 'weight',
+  ));
 }
 
 /**
  * Implements hook_update_N().
  */
 function page_background_update_7100(&$sandbox) {
-	db_add_field('url_background_images', 'bglinkurl', array(
-		'type' => 'varchar',
-		'length' => 255,
-		'not null' => FALSE,
-		'description' => 'Background Link url',
-	));
+  db_add_field('url_background_images', 'bglinkurl', array(
+    'type' => 'varchar',
+    'length' => 255,
+    'not null' => FALSE,
+    'description' => 'Background Link url',
+  ));
 }
 
 /**
  * Implements hook_update_N().
  */
 function page_background_update_7101(&$sandbox) {
-	db_add_field('url_background_images', 'bgtext', array(
-		'type' => 'text',
-		'not null' => FALSE,
-		'description' => 'Background Slogan Text',
-	));
-	db_add_field('url_background_images', 'bgtextformat', array(
-		'type' => 'varchar',
-		'length' => 255,
-		'not null' => FALSE,
-		'description' => 'Background Slogan Text Format',
-	));	
-	db_add_field('url_background_images', 'bgtextlang', array(
-		'type' => 'varchar',
-		'length' => 2,
-		'not null' => FALSE,
-		'description' => 'Background Slogan Text Language',
-	));
-
-	db_add_index('url_background_images', 'bgtextlang',array('bgtextlang'));
+  db_add_field('url_background_images', 'bgtext', array(
+    'type' => 'text',
+    'not null' => FALSE,
+    'description' => 'Background Slogan Text',
+  ));
+  db_add_field('url_background_images', 'bgtextformat', array(
+    'type' => 'varchar',
+    'length' => 255,
+    'not null' => FALSE,
+    'description' => 'Background Slogan Text Format',
+  ));
+  db_add_field('url_background_images', 'bgtextlang', array(
+    'type' => 'varchar',
+    'length' => 2,
+    'not null' => FALSE,
+    'description' => 'Background Slogan Text Language',
+  ));
+  db_add_index('url_background_images', 'bgtextlang', array('bgtextlang'));
 }
 
 /**
  * Implements hook_update_N().
  */
 function page_background_update_7102(&$sandbox) {
-	db_add_field('url_background_images', 'image_alt', array(
-		'type' => 'varchar',
-		'length' => 255,
-		'not null' => FALSE,
-		'description' => 'Background Image Alt Text',
-	));
-	db_add_field('url_background_images', 'image_title', array(
-		'type' => 'varchar',
-		'length' => 255,
-		'not null' => FALSE,
-		'description' => 'Background Image Title Text',
-	));	
+  db_add_field('url_background_images', 'image_alt', array(
+    'type' => 'varchar',
+    'length' => 255,
+    'not null' => FALSE,
+    'description' => 'Background Image Alt Text',
+  ));
+  db_add_field('url_background_images', 'image_title', array(
+    'type' => 'varchar',
+    'length' => 255,
+    'not null' => FALSE,
+    'description' => 'Background Image Title Text',
+  ));
 }
