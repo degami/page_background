@@ -103,18 +103,18 @@ function page_background_domain_access_page_background_load($background_row) {
 function page_background_domain_access_page_background_save($background_row, $form_state) {
   if ($form_state != NULL) {
     if (isset($form_state['values']['domain_id'])) {
-      $res = db_delete('url_background_images_domain_access')->condition('bid', $background_row->bid)->execute();
+      db_delete('url_background_images_domain_access')->condition('bid', $background_row->bid)->execute();
 
       if (!empty($form_state['values']['domain_id'][DOMAIN_ALL])) {
-        $res = db_insert('url_background_images_domain_access')->fields(array(
+        db_insert('url_background_images_domain_access')->fields(array(
           'bid' => $background_row->bid,
           'domain_id' => -1,
         ))->execute();
       }
       else {
-        foreach ($form_state['values']['domain_id'] as $key => $value) {
+        foreach ($form_state['values']['domain_id'] as $value) {
           if (!empty($value)) {
-            $res = db_insert('url_background_images_domain_access')->fields(array(
+            db_insert('url_background_images_domain_access')->fields(array(
               'bid' => $background_row->bid,
               'domain_id' => $value,
             ))->execute();
