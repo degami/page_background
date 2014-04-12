@@ -40,7 +40,7 @@ function page_background_menu() {
     'type' => MENU_LOCAL_TASK,
   );
 
-  $items['admin/config/page_background/%bid/clone'] = array(
+  $items['admin/config/page_background/%page_background/clone'] = array(
     'title' => 'Page Backgrounds Clone',
     'description' => 'Page Backgrounds Clone',
     'page callback' => 'drupal_get_form',
@@ -49,7 +49,7 @@ function page_background_menu() {
     'access arguments' => array('administer page_background'),
   );
 
-  $items['admin/config/page_background/%bid/edit'] = array(
+  $items['admin/config/page_background/%page_background/edit'] = array(
     'title' => 'Edit Page Backgrounds',
     'description' => 'Edit Page Backgrounds',
     'page callback' => 'drupal_get_form',
@@ -58,7 +58,7 @@ function page_background_menu() {
     'access arguments' => array('administer page_background'),
   );
 
-  $items['admin/config/page_background/%bid/delete'] = array(
+  $items['admin/config/page_background/%page_background/delete'] = array(
     'title' => 'Delete Page Backgrounds',
     'description' => 'Delete Page Backgrounds',
     'page callback' => 'drupal_get_form',
@@ -249,7 +249,7 @@ function page_background_form_taxonomy_form_term_submit($form, &$form_state) {
           $file->uid = $user->uid;
           file_save($file);
 
-          $background_row = _page_background_save(array(
+          _page_background_save(array(
             'file' => $file,
             'path' => 'taxonomy/term/' . $form_state['values']['tid'],
             'weight' => 0,
@@ -264,15 +264,15 @@ function page_background_form_taxonomy_form_term_submit($form, &$form_state) {
         $bids[] = preg_replace("/^page_background_bkg_/i", "", $key);
       }
     }
-    $numdeleted = 0;
+
     if (count($bids) > 0) {
-      $numdeleted = _page_background_delete_multiple($bids);
+      _page_background_delete_multiple($bids);
     }
   }
 }
 
 /**
- * Page_background_taxonomy_term_delete().
+ * Implements hook_taxonomy_term_delete().
  */
 function page_background_taxonomy_term_delete($term) {
   $bids = array();
@@ -282,7 +282,7 @@ function page_background_taxonomy_term_delete($term) {
     $bids[] = $row->bid;
   }
   if (count($bids) > 0) {
-    $numdeleted = _page_background_delete_multiple($bids);
+    _page_background_delete_multiple($bids);
   }
 }
 
@@ -376,7 +376,7 @@ function page_background_form_node_form_validate($form, &$form_state) {
 }
 
 /**
- * Page_background_node_submit().
+ * Implements hook_node_submit().
  */
 function page_background_node_submit($node, $form, &$form_state) {
   global $user;
@@ -388,7 +388,7 @@ function page_background_node_submit($node, $form, &$form_state) {
           $file->uid = $user->uid;
           file_save($file);
 
-          $background_row = _page_background_save(array(
+          _page_background_save(array(
             'file' => $file,
             'path' => 'node/' . $form_state['values']['nid'],
             'weight' => 0,
@@ -403,15 +403,15 @@ function page_background_node_submit($node, $form, &$form_state) {
         $bids[] = preg_replace("/^page_background_bkg_/i", "", $key);
       }
     }
-    $numdeleted = 0;
+
     if (count($bids) > 0) {
-      $numdeleted = _page_background_delete_multiple($bids);
+      _page_background_delete_multiple($bids);
     }
   }
 }
 
 /**
- * Page_background_node_delete().
+ * Implements hook_node_delete().
  */
 function page_background_node_delete($node) {
   $bids = array();
@@ -421,7 +421,7 @@ function page_background_node_delete($node) {
     $bids[] = $row->bid;
   }
   if (count($bids) > 0) {
-    $numdeleted = _page_background_delete_multiple($bids);
+    _page_background_delete_multiple($bids);
   }
 }
 
@@ -537,7 +537,7 @@ function page_background_admin_form($form, &$form_state) {
  */
 function page_background_admin_form_validate($form, &$form_state) {
   if ($form_state['values']['op'] == t('Submit')) {
-    if (($file = file_load($form_state['values']['uploadfile'])) === FALSE) {
+    if ( file_load($form_state['values']['uploadfile']) == FALSE) {
       form_set_error('uploadfile', t('A background image is necessary'));
     }
     if ($form_state['values']['default'] != 1 && (trim($form_state['values']['path']) == '' || !drupal_valid_path(drupal_get_normal_path($form_state['values']['path']), TRUE))) {
@@ -580,14 +580,14 @@ function page_background_admin_form_submit($form, &$form_state) {
       }
 
       $background_row = _page_background_save(array(
-        'file' 			=> $file,
-        'path' 			=> $form_state['values']['path'],
-        'weight' 		=> 0,
-        'bglinkurl' 	=> (isset($form_state['values']['bglinkurl']) && trim($form_state['values']['bglinkurl']) != '') ? trim($form_state['values']['bglinkurl']) : NULL,
-        'bgtextlang' 	=> (isset($form_state['values']['bgtextlang']) && trim($form_state['values']['bgtextlang']) != '') ? trim($form_state['values']['bgtextlang']) : NULL,
-        'bgtext' 		=> (isset($form_state['values']['bgtext'])) ? $form_state['values']['bgtext'] : NULL,
-        'image_alt' 	=> (isset($form_state['values']['image_alt']) && trim($form_state['values']['image_alt']) != '') ? trim($form_state['values']['image_alt']) : NULL,
-        'image_title' 	=> (isset($form_state['values']['image_title']) && trim($form_state['values']['image_title']) != '') ? trim($form_state['values']['image_title']) : NULL,
+        'file'      => $file,
+        'path'      => $form_state['values']['path'],
+        'weight'    => 0,
+        'bglinkurl'   => (isset($form_state['values']['bglinkurl']) && trim($form_state['values']['bglinkurl']) != '') ? trim($form_state['values']['bglinkurl']) : NULL,
+        'bgtextlang'  => (isset($form_state['values']['bgtextlang']) && trim($form_state['values']['bgtextlang']) != '') ? trim($form_state['values']['bgtextlang']) : NULL,
+        'bgtext'    => (isset($form_state['values']['bgtext'])) ? $form_state['values']['bgtext'] : NULL,
+        'image_alt'   => (isset($form_state['values']['image_alt']) && trim($form_state['values']['image_alt']) != '') ? trim($form_state['values']['image_alt']) : NULL,
+        'image_title'   => (isset($form_state['values']['image_title']) && trim($form_state['values']['image_title']) != '') ? trim($form_state['values']['image_title']) : NULL,
       ) , $form_state);
 
       drupal_set_message(t('File uploaded succesfully'));
@@ -667,19 +667,19 @@ function theme_page_background_admin_form($variables) {
       $links[] = l(t('delete'), 'admin/config/page_background/' . $infos->bid . '/delete');
 
       $row = array();
-      $row[] = array('data'	=> render($elem));
-      $row[] = array('data'	=> $infos->path == NULL ? t('Default') : check_plain($infos->path));
-      $row[] = array('data'	=> url(file_create_url($file->uri), array('absolute' => TRUE)));
+      $row[] = array('data' => render($elem));
+      $row[] = array('data' => $infos->path == NULL ? t('Default') : check_plain($infos->path));
+      $row[] = array('data' => url(file_create_url($file->uri), array('absolute' => TRUE)));
       if (variable_get('page_background_linkurl', FALSE) == TRUE) {
-        $row[] = array('data'	=> ($infos->bglinkurl == NULL) ? ' - ' : url($infos->bglinkurl, array('absolute' => TRUE)));
+        $row[] = array('data' => ($infos->bglinkurl == NULL) ? ' - ' : url($infos->bglinkurl, array('absolute' => TRUE)));
       }
       if (variable_get('page_background_slogan', FALSE) == TRUE) {
-        $row[] = array('data'	=> ($infos->bgtext == NULL) ? ' - ' : check_plain($infos->bgtext));
-        $row[] = array('data'	=> ($infos->bgtext == NULL || $infos->bgtextlang == NULL) ? ' - ' : $infos->bgtextlang);
+        $row[] = array('data' => ($infos->bgtext == NULL) ? ' - ' : check_plain($infos->bgtext));
+        $row[] = array('data' => ($infos->bgtext == NULL || $infos->bgtextlang == NULL) ? ' - ' : $infos->bgtextlang);
       }
-      $row[] = array('data'	=> theme('image_style', $themed_image));
-      $row[] = array('data'	=> render($form[str_replace("bkg_", "weight_", $key)]));
-      $row[] = array('data'	=> implode(' | ', $links));
+      $row[] = array('data' => theme('image_style', $themed_image));
+      $row[] = array('data' => render($form[str_replace("bkg_", "weight_", $key)]));
+      $row[] = array('data' => implode(' | ', $links));
 
       $rows[] = array(
         'data' => $row,
@@ -725,7 +725,7 @@ function page_background_clone_form($form, &$form_state, $background_row) {
  * Page_background_clone_form_validate().
  */
 function page_background_clone_form_validate($form, &$form_state) {
-  if (!is_numeric($form_state['values']['bid']) || ($background_row = bid_load($form_state['values']['bid'])) === FALSE) {
+  if (!is_numeric($form_state['values']['bid']) || ($background_row = page_background_load($form_state['values']['bid'])) === FALSE) {
     form_set_error('', t('A background image is necessary'));
   }
   if ($form_state['values']['default'] != 1 && (trim($form_state['values']['path']) == '' || !drupal_valid_path(drupal_get_normal_path($form_state['values']['path']), TRUE))) {
@@ -742,7 +742,7 @@ function page_background_clone_form_validate($form, &$form_state) {
  * Page_background_clone_form_submit().
  */
 function page_background_clone_form_submit($form, &$form_state) {
-  $background_row_orig = bid_load($form_state['values']['bid']);
+  $background_row_orig = page_background_load($form_state['values']['bid']);
 
   if ($form_state['values']['default'] == 1) {
     $form_state['values']['path'] = NULL;
@@ -752,14 +752,14 @@ function page_background_clone_form_submit($form, &$form_state) {
   }
 
   $background_row = _page_background_save(array(
-    'fid' 			=> $background_row_orig->fid,
-    'path' 			=> $form_state['values']['path'],
-    'weight' 		=> 0,
-    'bglinkurl' 	=> (isset($form_state['values']['bglinkurl']) && trim($form_state['values']['bglinkurl']) != '') ? trim($form_state['values']['bglinkurl']) : NULL,
-    'bgtextlang' 	=> (isset($form_state['values']['bgtextlang']) && trim($form_state['values']['bgtextlang']) != '') ? trim($form_state['values']['bgtextlang']) : NULL,
-    'bgtext' 		=> (isset($form_state['values']['bgtext'])) ? $form_state['values']['bgtext'] : NULL,
-    'image_alt' 	=> (isset($form_state['values']['image_alt']) && trim($form_state['values']['image_alt']) != '') ? trim($form_state['values']['image_alt']) : NULL,
-    'image_title' 	=> (isset($form_state['values']['image_title']) && trim($form_state['values']['image_title']) != '') ? trim($form_state['values']['image_title']) : NULL,
+    'fid'       => $background_row_orig->fid,
+    'path'      => $form_state['values']['path'],
+    'weight'    => 0,
+    'bglinkurl'   => (isset($form_state['values']['bglinkurl']) && trim($form_state['values']['bglinkurl']) != '') ? trim($form_state['values']['bglinkurl']) : NULL,
+    'bgtextlang'  => (isset($form_state['values']['bgtextlang']) && trim($form_state['values']['bgtextlang']) != '') ? trim($form_state['values']['bgtextlang']) : NULL,
+    'bgtext'    => (isset($form_state['values']['bgtext'])) ? $form_state['values']['bgtext'] : NULL,
+    'image_alt'   => (isset($form_state['values']['image_alt']) && trim($form_state['values']['image_alt']) != '') ? trim($form_state['values']['image_alt']) : NULL,
+    'image_title'   => (isset($form_state['values']['image_title']) && trim($form_state['values']['image_title']) != '') ? trim($form_state['values']['image_title']) : NULL,
   ) , $form_state);
 
   drupal_set_message(t('Background cloned succesfully'));
@@ -873,16 +873,16 @@ function page_background_edit_form_submit($form, &$form_state) {
       $form_state['values']['path'] = drupal_get_normal_path($form_state['values']['path']);
     }
 
-    $background_row = _page_background_save(array(
-      'bid' 			=> $form_state['values']['background_row']->bid,
-      'file' 			=> $file,
-      'path' 			=> $form_state['values']['path'],
-      'weight' 		=> 0,
-      'bglinkurl' 	=> (isset($form_state['values']['bglinkurl']) && trim($form_state['values']['bglinkurl']) != '') ? trim($form_state['values']['bglinkurl']) : NULL,
-      'bgtextlang' 	=> (isset($form_state['values']['bgtextlang']) && trim($form_state['values']['bgtextlang']) != '') ? trim($form_state['values']['bgtextlang']) : NULL,
-      'bgtext' 		=> (isset($form_state['values']['bgtext'])) ? $form_state['values']['bgtext'] : NULL,
-      'image_alt' 	=> (isset($form_state['values']['image_alt']) && trim($form_state['values']['image_alt']) != '') ? trim($form_state['values']['image_alt']) : NULL,
-      'image_title' 	=> (isset($form_state['values']['image_title']) && trim($form_state['values']['image_title']) != '') ? trim($form_state['values']['image_title']) : NULL,
+    _page_background_save(array(
+      'bid'       => $form_state['values']['background_row']->bid,
+      'file'      => $file,
+      'path'      => $form_state['values']['path'],
+      'weight'    => 0,
+      'bglinkurl'   => (isset($form_state['values']['bglinkurl']) && trim($form_state['values']['bglinkurl']) != '') ? trim($form_state['values']['bglinkurl']) : NULL,
+      'bgtextlang'  => (isset($form_state['values']['bgtextlang']) && trim($form_state['values']['bgtextlang']) != '') ? trim($form_state['values']['bgtextlang']) : NULL,
+      'bgtext'    => (isset($form_state['values']['bgtext'])) ? $form_state['values']['bgtext'] : NULL,
+      'image_alt'   => (isset($form_state['values']['image_alt']) && trim($form_state['values']['image_alt']) != '') ? trim($form_state['values']['image_alt']) : NULL,
+      'image_title'   => (isset($form_state['values']['image_title']) && trim($form_state['values']['image_title']) != '') ? trim($form_state['values']['image_title']) : NULL,
     ), $form_state);
 
     drupal_set_message(t('File uploaded succesfully'));
@@ -916,8 +916,8 @@ function page_background_settings_form($form, &$form_state) {
   $form['slides']['page_background_slides_type'] = array(
     '#type' => 'select',
     '#options' => array(
-      'styled_divs'	=> t('as divs'),
-      'images'			=> t('as images'),
+      'styled_divs' => t('as divs'),
+      'images'      => t('as images'),
     ),
     '#title' => t('Slides rendered'),
     '#default_value' => variable_get('page_background_slides_type', 'styled_divs'),
@@ -964,34 +964,34 @@ function page_background_settings_form($form, &$form_state) {
   $form['cycle']['page_background_animation_effect'] = array(
     '#type' => 'select',
     '#options' => array(
-      'none'			=> 'none',
-      'blindX'		=> 'blindX',
-      'blindY'		=> 'blindY',
-      'blindZ'		=> 'blindZ',
-      'cover'			=> 'cover',
-      'curtainX'		=> 'curtainX',
-      'curtainY'		=> 'curtainY',
-      'fade'			=> 'fade',
-      'fadeZoom'		=> 'fadeZoom',
-      'growX'			=> 'growX',
-      'growY'			=> 'growY',
-      'scrollUp'		=> 'scrollUp',
-      'scrollDown'	=> 'scrollDown',
-      'scrollLeft'	=> 'scrollLeft',
-      'scrollRight'	=> 'scrollRight',
-      'scrollHorz'	=> 'scrollHorz',
-      'scrollVert'	=> 'scrollVert',
-      'shuffle'		=> 'shuffle',
-      'slideX'		=> 'slideX',
-      'slideY'		=> 'slideY',
-      'toss'			=> 'toss',
-      'turnUp'		=> 'turnUp',
-      'turnDown'		=> 'turnDown',
-      'turnLeft'		=> 'turnLeft',
-      'turnRight'		=> 'turnRight',
-      'uncover'		=> 'uncover',
-      'wipe'			=> 'wipe',
-      'zoom'			=> 'zoom',
+      'none' => t('none'),
+      'blindX' => t('blindX'),
+      'blindY' => t('blindY'),
+      'blindZ' => t('blindZ'),
+      'cover' => t('cover'),
+      'curtainX' => t('curtainX'),
+      'curtainY' => t('curtainY'),
+      'fade' => t('fade'),
+      'fadeZoom' => t('fadeZoom'),
+      'growX' => t('growX'),
+      'growY' => t('growY'),
+      'scrollUp' => t('scrollUp'),
+      'scrollDown' => t('scrollDown'),
+      'scrollLeft' => t('scrollLeft'),
+      'scrollRight' => t('scrollRight'),
+      'scrollHorz' => t('scrollHorz'),
+      'scrollVert' => t('scrollVert'),
+      'shuffle' => t('shuffle'),
+      'slideX' => t('slideX'),
+      'slideY' => t('slideY'),
+      'toss' => t('toss'),
+      'turnUp' => t('turnUp'),
+      'turnDown' => t('turnDown'),
+      'turnLeft' => t('turnLeft'),
+      'turnRight' => t('turnRight'),
+      'uncover' => t('uncover'),
+      'wipe' => t('wipe'),
+      'zoom' => t('zoom'),
     ),
     '#title' => t('Animation effect'),
     '#default_value' => variable_get('page_background_animation_effect', 'scrollHorz'),
@@ -1074,7 +1074,7 @@ function page_background_settings_form_validate($form, &$form_state) {
 }
 
 /**
- * Page_background_preprocess_html().
+ * Implements hook_preprocess_html().
  */
 function page_background_preprocess_html(&$variables) {
   if (variable_get('page_background_block', FALSE) == TRUE) {
@@ -1364,7 +1364,7 @@ function _page_background_get_fids_markup($fids = array()) {
                 fit: ' . $fit . ',
                 delay: ' . $delay . ',
                 sync: ' . $sync . ',
-                pager:	\'#page_background_pager\',
+                pager:  \'#page_background_pager\',
                 ' . ((variable_get('page_background_pager_generator', 'module') == 'module') ? 'pagerAnchorBuilder: function() {}' : '') . '
               }).addClass(\'processed\');
             });
@@ -1515,9 +1515,9 @@ function _page_background_get_default_fids($language = NULL) {
 /**
  * Implementation of a %wildcard_load(). http://drupal.org/node/224170.
  *
- * Handles menu items with %bid in the path.  Seems to get called a lot(!) so we cache.
+ * Handles menu items with %page_background in the path.  Seems to get called a lot(!) so we cache.
  */
-function bid_load($bid, $reset = TRUE) {
+function page_background_load($bid, $reset = TRUE) {
   $cache = &drupal_static(__FUNCTION__);
   if (!isset($cache)) {
     $cache = array();
@@ -1553,19 +1553,19 @@ function _page_background_save($values = array(), $form_state = NULL) {
   $image_title = (isset($values['image_title'])) ? $values['image_title'] : NULL;
 
   $fields = array(
-    'path' 			=> $path,
-    'fid' 			=> $file->fid,
-    'weight' 		=> $weight,
-    'bglinkurl' 	=> $bglinkurl,
-    'bgtext' 		=> $bgtext,
-    'bgtextformat' 	=> $bgtextformat,
-    'bgtextlang' 	=> $bgtextlang,
-    'image_alt' 	=> $image_alt,
-    'image_title' 	=> $image_title,
+    'path'      => $path,
+    'fid'       => $file->fid,
+    'weight'    => $weight,
+    'bglinkurl'   => $bglinkurl,
+    'bgtext'    => $bgtext,
+    'bgtextformat'  => $bgtextformat,
+    'bgtextlang'  => $bgtextlang,
+    'image_alt'   => $image_alt,
+    'image_title'   => $image_title,
   );
 
   if (isset($values['bid'])) {
-    $orig_bkg_row = bid_load($values['bid']);
+    $orig_bkg_row = page_background_load($values['bid']);
     $query = db_update('url_background_images');
     $query->condition('bid', $values['bid'], '=');
   }
@@ -1577,7 +1577,7 @@ function _page_background_save($values = array(), $form_state = NULL) {
   $res = $query->fields($fields)->execute();
 
   if (isset($values['bid'])) {
-    $return_background_row = bid_load($values['bid'], TRUE);
+    $return_background_row = page_background_load($values['bid'], TRUE);
     if ($orig_bkg_row->fid != $return_background_row->fid) {
       if (($oldfile = file_load($orig_bkg_row->fid)) !== FALSE) {
         file_usage_delete($oldfile, 'page_background', 'background_image', $return_background_row->bid);
@@ -1587,7 +1587,7 @@ function _page_background_save($values = array(), $form_state = NULL) {
     }
   }
   else {
-    $return_background_row = bid_load($res, TRUE);
+    $return_background_row = page_background_load($res, TRUE);
     file_usage_add($file, 'page_background', 'background_image', $return_background_row->bid);
   }
 
@@ -1603,7 +1603,7 @@ function _page_background_save($values = array(), $form_state = NULL) {
  */
 function _page_background_delete($background_row) {
   if (is_numeric($background_row)) {
-    $background_row = bid_load($background_row, TRUE);
+    $background_row = page_background_load($background_row, TRUE);
   }
   if (!isset($background_row->file) && is_numeric($background_row->fid)) {
     $background_row->file = file_load($background_row->fid);
@@ -1789,7 +1789,7 @@ function _page_background_get_query_string(SelectQueryInterface $query) {
   $arguments = $query->arguments();
 
   if (!empty($arguments) && is_array($arguments)) {
-    foreach ($arguments as $placeholder => &$value) {
+    foreach ($arguments as &$value) {
       if (is_string($value)) {
         $value = "'$value'";
       }
