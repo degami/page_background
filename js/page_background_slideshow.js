@@ -9,7 +9,7 @@
       sync: Drupal.settings.page_background.sync,
       pager:  '#page_background_pager'
     };
-    if( Drupal.settings.page_background.page_background_pager_generator == 'module' ){
+    if(Drupal.settings.page_background.page_background_pager_generator == 'module'){
      page_background_cycle_options['pagerAnchorBuilder'] = function() {};
     }
     $('#page_background_container')
