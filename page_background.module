@@ -615,7 +615,7 @@ function page_background_admin_form_submit($form, &$form_state) {
         $form_state['values']['path'] = drupal_get_normal_path($form_state['values']['path']);
       }
 
-      $background_row = _page_background_save(array(
+      _page_background_save(array(
         'file'      => $file,
         'path'      => $form_state['values']['path'],
         'weight'    => 0,
@@ -777,7 +777,7 @@ function page_background_clone_form($form, &$form_state, $background_row) {
  * Page_background_clone_form_validate().
  */
 function page_background_clone_form_validate($form, &$form_state) {
-  if (!is_numeric($form_state['values']['bid']) || ($background_row = page_background_load($form_state['values']['bid'])) === FALSE) {
+  if (!is_numeric($form_state['values']['bid']) || (page_background_load($form_state['values']['bid'])) === FALSE) {
     form_set_error('', t('A background image is necessary'));
   }
   if ($form_state['values']['default'] != 1 && (trim($form_state['values']['path']) == '' || !drupal_valid_path(drupal_get_normal_path($form_state['values']['path']), TRUE))) {
@@ -803,7 +803,7 @@ function page_background_clone_form_submit($form, &$form_state) {
     $form_state['values']['path'] = drupal_get_normal_path($form_state['values']['path']);
   }
 
-  $background_row = _page_background_save(array(
+  _page_background_save(array(
     'fid'       => $background_row_orig->fid,
     'path'      => $form_state['values']['path'],
     'weight'    => 0,
@@ -923,7 +923,7 @@ function page_background_edit_form($form, &$form_state, $background_row) {
  * Page_background_edit_form_validate().
  */
 function page_background_edit_form_validate($form, &$form_state) {
-  if (($file = file_load($form_state['values']['uploadfile'])) === FALSE) {
+  if ((file_load($form_state['values']['uploadfile'])) === FALSE) {
     form_set_error('uploadfile', t('A background image is necessary'));
   }
   if ($form_state['values']['default'] != 1 && (trim($form_state['values']['path']) == '' || !drupal_valid_path(drupal_get_normal_path($form_state['values']['path']), TRUE))) {
