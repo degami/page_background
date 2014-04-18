@@ -12,6 +12,11 @@
     if(Drupal.settings.page_background.page_background_pager_generator == 'module'){
      page_background_cycle_options['pagerAnchorBuilder'] = function() {};
     }
+    if(Drupal.settings.page_background.page_background_nav_links == true){
+      page_background_cycle_options['prev'] = '#page_background_prev-slide';
+      page_background_cycle_options['next'] = '#page_background_next-slide';
+    }
+
     $('#page_background_container')
       .not('.processed')
       .cycle(page_background_cycle_options)
