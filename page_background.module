@@ -1789,7 +1789,7 @@ function page_background_block_view($delta = '') {
     case 'page_background_block':
       $block['subject'] = '';
 
-      $out = _page_background_get_markup_by_path(drupal_is_front_page() ? '<front >' : $_GET['q']);
+      $out = _page_background_get_markup_by_path(drupal_is_front_page() ? '<front>' : $_GET['q']);
       foreach (module_implements('alter_page_background') as $module) {
         $out = module_invoke($module, 'alter_page_background', $out);
       }
