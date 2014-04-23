@@ -5,6 +5,8 @@
  * Page Background
  */
 
+define('PAGE_BACKGROUND_ANY_LANGUAGE', '-any-');
+
 /**
  * Implements hook_menu().
  */
@@ -125,10 +127,10 @@ function page_background_addmore_uploads_callback($form, $form_state) {
 }
 
 /**
- * Page_background_addmore_uploads_callback().
+ * Page_background_get_languages_selectoptions().
  */
 function _page_background_get_languages_selectoptions() {
-  $out = array('' => t('Any'));
+  $out = array(PAGE_BACKGROUND_ANY_LANGUAGE => t('Any'));
   foreach (language_list() as $language) {
     $out[$language->language] = $language->name;
   }
@@ -1559,6 +1561,8 @@ function _page_background_get_fids($path = '<front>', $language = NULL) {
   if (variable_get('page_background_slogan', FALSE) == TRUE && $language != NULL) {
     $or = db_or();
     $or->condition('bgtextlang', $language->language);
+
+    $or->condition('bgtextlang', PAGE_BACKGROUND_ANY_LANGUAGE);
 
     $and = db_and();
     $and->condition('bgtextlang', NULL, 'IS');
