@@ -16,6 +16,10 @@
       page_background_cycle_options['prev'] = '#page_background_prev-slide';
       page_background_cycle_options['next'] = '#page_background_next-slide';
     }
+    if(Drupal.settings.page_background.page_background_pauseonhover == true){
+     page_background_cycle_options['pause'] = true;
+     page_background_cycle_options['pauseOnPagerHover'] = true;
+    }
 
     $('#page_background_container')
       .not('.processed')

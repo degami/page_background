@@ -1109,6 +1109,12 @@ function page_background_settings_form($form, &$form_state) {
 
   $form['slideshow'] = array('#title' => t('Slideshow Controls'), '#type' => 'fieldset');
 
+  $form['slideshow']['page_background_pauseonhover'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Pause on mousehover'),
+    '#default_value' => variable_get('page_background_pauseonhover', TRUE),
+  );
+
   $form['slideshow']['page_background_pager'] = array(
     '#type' => 'checkbox',
     '#title' => t('Show pager'),
@@ -1452,6 +1458,7 @@ function _page_background_get_fids_markup($fids = array()) {
               'sync' => $sync,
               'page_background_pager_generator' => variable_get('page_background_pager_generator', 'module'),
               'page_background_nav_links' => variable_get('page_background_nav_links', TRUE),
+              'page_background_pauseonhover' => variable_get('page_background_pauseonhover', TRUE),
             ),
           ),
           'setting',
