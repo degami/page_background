@@ -116,6 +116,12 @@ function page_background_theme($existing, $type, $theme, $path) {
     'page_background_slide' => array(
       'variables' => array('image' => NULL, 'background_row' => NULL),
     ),
+    'page_background_nav_link' => array(
+      'variables' => array('type' => NULL, 'text' => NULL),
+    ),
+    'page_background_pager_item' => array(
+      'variables' => array('key' => NULL),
+    ),
   );
 }
 
@@ -1435,7 +1441,8 @@ function _page_background_get_fids_markup($fids = array()) {
       ),
       '#fid' => $fid,
     );
-    $pager[] = '<li class="pager_elem' . (($key == 0) ? ' active' : '') . '" id="pager_element_' . $key . '">' . ($key + 1) . '</li>';
+
+    $pager[] = theme('page_background_pager_item', array('key' => $key));
 
     foreach (module_implements('alter_page_background_slide') as $module) {
       $slides = module_invoke($module, 'alter_page_background_slide', $slides);
@@ -1485,7 +1492,7 @@ function _page_background_get_fids_markup($fids = array()) {
   if (count($slides) > 1) {
     // $out['#markup'] .= '<div id="page_background_slideshow_navigation">';
     if (variable_get('page_background_nav_links', TRUE) == TRUE) {
-      $out['#markup'] .= '<a href="#" id="page_background_prev-slide">' . t('Previous') . '</a>';
+      $out['#markup'] .= theme('page_background_nav_link', array('type' => 'prev', 'text' => t('Previous')));
     }
     if (variable_get('page_background_pager', TRUE) == TRUE) {
       if (variable_get('page_background_pager_generator', 'module') == 'js') {
@@ -1496,7 +1503,7 @@ function _page_background_get_fids_markup($fids = array()) {
       }
     }
     if (variable_get('page_background_nav_links', TRUE) == TRUE) {
-      $out['#markup'] .= '<a href="#" id="page_background_next-slide">' . t('Next') . '</a>';
+      $out['#markup'] .= theme('page_background_nav_link', array('type' => 'next', 'text' => t('Next')));
     }
     // $out['#markup'] .= '</div>';
   }
@@ -1525,6 +1532,29 @@ function theme_page_background_slide($variables) {
   else {
     $out = '<div class="page_background_slide">' . $image . '</div>';
   }
+  return $out;
+}
+
+/**
+ * Theme_page_background_nav_link().
+ */
+function theme_page_background_nav_link($variables) {
+  $type = $variables['type'];
+  $text = $variables['text'];
+
+  $out = '<a href="#" id="page_background_' . $type . '-slide">' . $text . '</a>';
+
+  return $out;
+}
+
+/**
+ * Theme_page_background_pager_item().
+ */
+function theme_page_background_pager_item($variables) {
+  $key = $variables['key'];
+
+  $out = '<li class="pager_elem' . (($key == 0) ? ' activeSlide' : '') . '" id="pager_element_' . $key . '">' . ($key + 1) . '</li>';
+
   return $out;
 }
 
