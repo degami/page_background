@@ -2,10 +2,10 @@
   $(document).ready(function() {
     var page_background_cycle_options = {
       fx: Drupal.settings.page_background.fx,
-      timeout: Drupal.settings.page_background.timeout,
-      speed: Drupal.settings.page_background.speed,
+      timeout: parseInt(Drupal.settings.page_background.timeout,10),
+      speed: parseInt(Drupal.settings.page_background.speed,10),
       fit: Drupal.settings.page_background.fit,
-      delay: Drupal.settings.page_background.delay,
+      delay: parseInt(Drupal.settings.page_background.delay,10),
       sync: Drupal.settings.page_background.sync,
       pager:  '#page_background_pager'
     };
