@@ -1,0 +1,10 @@
+name = Page Background Views Integration
+description = Page Background Views Integration
+package = Page Background
+core = 7.x
+
+dependencies[] = page_background
+dependencies[] = views
+
+files[] = page_background_image_handler_field_image.inc
+files[] = page_background_views_integration_views_handler_relationship.inc
