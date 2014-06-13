@@ -1918,7 +1918,7 @@ function page_background_delete_form($form, &$form_state, $background_row) {
  */
 function page_background_delete_form_submit($form, &$form_state) {
   $numdeleted = _page_background_delete($form_state['values']['background_row']);
-  drupal_set_title(t(':numelements elements deleted', array(':numelements' => $numdeleted)));
+  drupal_set_message(t(':numelements elements deleted', array(':numelements' => $numdeleted)));
   drupal_goto('admin/config/page_background');
 }
 
