@@ -6,9 +6,9 @@
  */
 
 /**
- * Implementation of hook_drush_command().
+ * Implements hook_drush_command().
  */
-function page_background_drush_command(){
+function page_background_drush_command() {
   $items['page_background-list'] = array(
     'callback' => 'drush_page_background_list',
     'description' => dt('List defined Backgrounds'),
@@ -70,28 +70,37 @@ function page_background_drush_command(){
 }
 
 /**
- * Implementation of hook_drush_help().
+ * Implements hook_drush_help().
  */
 function page_background_drush_help($section) {
   switch ($section) {
     case 'drush:page_background-list':
       return dt('List defined Backgrounds');
+
     case 'drush:page_background-add':
       return dt('Add a new page background');
+
     case 'drush:page_background-delete':
       return dt('Delete a page background');
+
     case 'drush:page_background-clone':
       return dt('Clone a page background image with a new path');
   }
 }
 
-function drush_page_background_add($path,$image) {
-  if(strtolower($path) == "null") $path = null;
-  if($path != null)
+/**
+ * Add new page background.
+ */
+function drush_page_background_add($path, $image) {
+  if (strtolower($path) == "null") {
+    $path = NULL;
+  }
+  if ($path != NULL) {
     $path = drupal_get_normal_path($path);
+  }
 
   $imagecontents = file_get_contents($image);
-  $file = file_save_data($imagecontents, 'public://page_backgrounds/'.basename($image) );
+  $file = file_save_data($imagecontents, 'public://page_backgrounds/' . basename($image));
 
   $values = array(
     'file' => $file,
@@ -114,34 +123,43 @@ function drush_page_background_add($path,$image) {
     $values['bgtextlang'] = $bgtextlang;
   }
 
-  $fake_form_state = array('values'=>array());
+  $fake_form_state = array('values' => array());
   _page_background_save($values, $fake_form_state);
 
   drupal_set_message(t('Background saved succesfully'));
 }
 
-function drush_page_background_delete($bid){
-  if( ($background_row = page_background_load($bid)) !== FALSE ){
+/**
+ * Delete page background.
+ */
+function drush_page_background_delete($bid) {
+  if (($background_row = page_background_load($bid)) !== FALSE) {
     $numdeleted = _page_background_delete($background_row);
     drupal_set_message(t(':numelements elements deleted', array(':numelements' => $numdeleted)));
   }
 }
 
-function drush_page_background_clone($bid,$path){
-  if(strtolower($path) == "null") $path = NULL;
-  if($path != NULL)
+/**
+ * Clone page background.
+ */
+function drush_page_background_clone($bid, $path) {
+  if (strtolower($path) == "null") {
+    $path = NULL;
+  }
+  if ($path != NULL) {
     $path = drupal_get_normal_path($path);
-  if( ($background_row_orig = page_background_load($bid)) !== FALSE ){
+  }
+  if (($background_row_orig = page_background_load($bid)) !== FALSE) {
 
     $values = array(
-      'fid'  => $background_row_orig->fid,
+      'fid' => $background_row_orig->fid,
       'path' => $path,
       'weight' => 0,
-      'bglinkurl'   => $background_row_orig->bglinkurl,
-      'bgtextlang'  => $background_row_orig->bgtextlang,
-      'bgtext'    => $background_row_orig->bgtext,
-      'image_alt'   => $background_row_orig->image_alt,
-      'image_title'   => $background_row_orig->image_title,
+      'bglinkurl' => $background_row_orig->bglinkurl,
+      'bgtextlang' => $background_row_orig->bgtextlang,
+      'bgtext' => $background_row_orig->bgtext,
+      'image_alt' => $background_row_orig->image_alt,
+      'image_title' => $background_row_orig->image_title,
     );
 
     if ($image_alt = drush_get_option('image_alt')) {
@@ -160,14 +178,17 @@ function drush_page_background_clone($bid,$path){
       $values['bgtextlang'] = $bgtextlang;
     }
 
-    $fake_form_state = array('values'=>array());
+    $fake_form_state = array('values' => array());
     _page_background_save($values, $fake_form_state);
 
     drupal_set_message(t('Background cloned succesfully'));
   }
 }
 
-function drush_page_background_list(){
+/**
+ * Lists page backgrounds.
+ */
+function drush_page_background_list() {
   $query = db_select('url_background_images', 'bg');
   $query->fields('bg');
   $query->orderBy('weight');
@@ -178,7 +199,7 @@ function drush_page_background_list(){
   $rows[] = array(
     dt('Bid'),
     dt('Path'),
-    dt('File uri')
+    dt('File uri'),
   );
   foreach ($result as $bkg) {
     $file = file_load($bkg->fid);
