@@ -1628,6 +1628,8 @@ function _page_background_get_default_fids($language = NULL) {
     $or = db_or();
     $or->condition('bgtextlang', $language->language);
 
+    $or->condition('bgtextlang', PAGE_BACKGROUND_ANY_LANGUAGE);
+
     $and = db_and();
     $and->condition('bgtextlang', NULL, 'IS');
     $and->condition('bgtext', NULL, 'IS');
