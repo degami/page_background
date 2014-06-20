@@ -19,7 +19,7 @@ function page_background_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('page_background_admin_form'),
     'access callback' => '_page_background_check_access',
-    'access arguments' => array('administer page_background'),
+    'access arguments' => array(array('administer page_background', 'add page_background to element')),
     'type' => MENU_NORMAL_ITEM,
   );
   $items['admin/config/page_background/list'] = array(
@@ -28,7 +28,7 @@ function page_background_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('page_background_admin_form'),
     'access callback' => '_page_background_check_access',
-    'access arguments' => array('administer page_background'),
+    'access arguments' => array(array('administer page_background', 'add page_background to element')),
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
 
@@ -48,7 +48,7 @@ function page_background_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('page_background_clone_form', 3),
     'access callback' => '_page_background_check_access',
-    'access arguments' => array('administer page_background'),
+    'access arguments' => array(array('administer page_background', 'add page_background to element')),
   );
 
   $items['admin/config/page_background/%page_background/edit'] = array(
@@ -57,7 +57,7 @@ function page_background_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('page_background_edit_form', 3),
     'access callback' => '_page_background_check_access',
-    'access arguments' => array('administer page_background'),
+    'access arguments' => array(array('administer page_background', 'add page_background to element')),
   );
 
   $items['admin/config/page_background/%page_background/delete'] = array(
@@ -66,7 +66,7 @@ function page_background_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('page_background_delete_form', 3),
     'access callback' => '_page_background_check_access',
-    'access arguments' => array('administer page_background'),
+    'access arguments' => array(array('administer page_background', 'add page_background to element')),
   );
   return $items;
 }
@@ -80,6 +80,10 @@ function page_background_permission() {
     'administer page_background' => array(
       'title' => t('Administer Page Background'),
       'description' => t('Perform administration tasks for Page Background.'),
+    ),
+    'add page_background to element' => array(
+      'title' => t('Add Background to Elements'),
+      'description' => t('Add Background to Elements.'),
     ),
   );
 }
@@ -147,6 +151,11 @@ function _page_background_get_languages_selectoptions() {
  * Implements hook_form_BASE_FORM_ID_alter().
  */
 function page_background_form_taxonomy_form_term_alter(&$form, &$form_state, $form_id) {
+
+  if (!_page_background_check_access(array('administer page_background', 'add page_background to element'))) {
+    return;
+  }
+
   $term = (object) $form['#term'];
   $form['page_backgrounds'] = array(
     '#type' => 'fieldset',
@@ -304,6 +313,11 @@ function page_background_taxonomy_term_delete($term) {
  * Implements hook_form_BASE_FORM_ID_alter().
  */
 function page_background_form_node_form_alter(&$form, &$form_state, $form_id) {
+
+  if (!_page_background_check_access(array('administer page_background', 'add page_background to element'))) {
+    return;
+  }
+
   $node = $form['#node'];
   $form['page_backgrounds'] = array('#type' => 'fieldset', '#title' => t('Page Backgrounds'));
   $form['page_backgrounds']['#group'] = 'additional_settings';
