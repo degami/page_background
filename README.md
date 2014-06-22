@@ -10,6 +10,6 @@ specified path.
 More images on the same path will become a slideshow
 (if jquery.cycle is installed) .
 You can also associate images to "default" , so if the path you're visiting has
-no images directly
-attached one random image (or a slideshow) from the "default" is shown.
+no images directly attached one random image (or a slideshow) from the "default"
+is shown.
 Backgrounds can also be exposed as a block.
