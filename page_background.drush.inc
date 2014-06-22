@@ -210,5 +210,5 @@ function drush_page_background_list() {
     );
   }
 
-  drush_print_table($rows, $header = TRUE);
+  drush_print_table($rows, TRUE);
 }

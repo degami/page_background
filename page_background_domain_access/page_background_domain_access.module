@@ -1,11 +1,9 @@
 <?php
 
-
 /**
  * @file
- * Page Background Domain Integration
+ * Page Background Domain Integration.
  */
-
 
 /**
  * Implements hook_form_alter().
