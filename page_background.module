@@ -13,7 +13,7 @@ define('PAGE_BACKGROUND_ANY_LANGUAGE', '-any-');
 function page_background_menu() {
   $items = array();
 
-  $items['admin/config/page_background'] = array(
+  $items['admin/config/media/page_background'] = array(
     'title' => 'Page Backgrounds',
     'description' => 'Page Backgrounds',
     'page callback' => 'drupal_get_form',
@@ -22,7 +22,7 @@ function page_background_menu() {
     'access arguments' => array(array('administer page_background', 'add page_background to element')),
     'type' => MENU_NORMAL_ITEM,
   );
-  $items['admin/config/page_background/list'] = array(
+  $items['admin/config/media/page_background/list'] = array(
     'title' => 'Page Backgrounds',
     'description' => 'Page Backgrounds',
     'page callback' => 'drupal_get_form',
@@ -32,7 +32,7 @@ function page_background_menu() {
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
 
-  $items['admin/config/page_background/settings'] = array(
+  $items['admin/config/media/page_background/settings'] = array(
     'title' => 'Page Backgrounds Settings',
     'description' => 'Page Backgrounds Settings',
     'page callback' => 'drupal_get_form',
@@ -42,7 +42,7 @@ function page_background_menu() {
     'type' => MENU_LOCAL_TASK,
   );
 
-  $items['admin/config/page_background/%page_background/clone'] = array(
+  $items['admin/config/media/page_background/%page_background/clone'] = array(
     'title' => 'Page Backgrounds Clone',
     'description' => 'Page Backgrounds Clone',
     'page callback' => 'drupal_get_form',
@@ -51,7 +51,7 @@ function page_background_menu() {
     'access arguments' => array(array('administer page_background', 'add page_background to element')),
   );
 
-  $items['admin/config/page_background/%page_background/edit'] = array(
+  $items['admin/config/media/page_background/%page_background/edit'] = array(
     'title' => 'Edit Page Backgrounds',
     'description' => 'Edit Page Backgrounds',
     'page callback' => 'drupal_get_form',
@@ -60,7 +60,7 @@ function page_background_menu() {
     'access arguments' => array(array('administer page_background', 'add page_background to element')),
   );
 
-  $items['admin/config/page_background/%page_background/delete'] = array(
+  $items['admin/config/media/page_background/%page_background/delete'] = array(
     'title' => 'Delete Page Backgrounds',
     'description' => 'Delete Page Backgrounds',
     'page callback' => 'drupal_get_form',
@@ -500,7 +500,7 @@ function page_background_admin_form($form, &$form_state) {
           ':path' => trim($_REQUEST['filter']),
           '!showall' => l(
             t('Show all'),
-            'admin/config/page_background'
+            'admin/config/media/page_background'
           ),
         )
       )
@@ -679,7 +679,7 @@ function page_background_admin_form_submit($form, &$form_state) {
     }
     drupal_set_message(t('Changes saved.'));
   }
-  drupal_goto('admin/config/page_background');
+  drupal_goto('admin/config/media/page_background');
 }
 
 /**
@@ -720,9 +720,9 @@ function theme_page_background_admin_form($variables) {
       );
 
       $links = array();
-      $links[] = l(t('clone'), 'admin/config/page_background/' . $infos->bid . '/clone');
-      $links[] = l(t('edit'), 'admin/config/page_background/' . $infos->bid . '/edit');
-      $links[] = l(t('delete'), 'admin/config/page_background/' . $infos->bid . '/delete');
+      $links[] = l(t('clone'), 'admin/config/media/page_background/' . $infos->bid . '/clone');
+      $links[] = l(t('edit'), 'admin/config/media/page_background/' . $infos->bid . '/edit');
+      $links[] = l(t('delete'), 'admin/config/media/page_background/' . $infos->bid . '/delete');
 
       $row = array();
       $row[] = array('data' => render($elem));
@@ -837,7 +837,7 @@ function page_background_clone_form_submit($form, &$form_state) {
   ), $form_state);
 
   drupal_set_message(t('Background cloned succesfully'));
-  drupal_goto('admin/config/page_background');
+  drupal_goto('admin/config/media/page_background');
 }
 
 /**
@@ -991,13 +991,17 @@ function page_background_edit_form_submit($form, &$form_state) {
   }
 
   drupal_set_message(t('Background modified succesfully'));
-  drupal_goto('admin/config/page_background');
+  drupal_goto('admin/config/media/page_background');
 }
 
 /**
  * Page_background_settings_form().
  */
 function page_background_settings_form($form, &$form_state) {
+
+  if (($cycle_path = _page_background_cycle_library_path()) == FALSE) {
+    drupal_set_message(t("Cycle library not installed. Slideshows won't be available."), 'warning');
+  }
 
   $form['container'] = array('#title' => t('Container'), '#type' => 'fieldset');
 
@@ -1926,7 +1930,7 @@ function page_background_delete_form($form, &$form_state, $background_row) {
     '#type' => 'value',
     '#value' => $background_row,
   );
-  return confirm_form($form, t('Do you really want to delete the selected item?'), 'admin/config/page_background');
+  return confirm_form($form, t('Do you really want to delete the selected item?'), 'admin/config/media/page_background');
 }
 
 /**
@@ -1935,7 +1939,7 @@ function page_background_delete_form($form, &$form_state, $background_row) {
 function page_background_delete_form_submit($form, &$form_state) {
   $numdeleted = _page_background_delete($form_state['values']['background_row']);
   drupal_set_message(t(':numelements elements deleted', array(':numelements' => $numdeleted)));
-  drupal_goto('admin/config/page_background');
+  drupal_goto('admin/config/media/page_background');
 }
 
 /**
@@ -1970,8 +1974,37 @@ function page_background_contextual_links_view_alter(&$element, &$items) {
   if (isset($element['#element']['#block']) && $element['#element']['#block']->delta == "page_background_block") {
     $element['#links']['page_background'] = array(
       'title' => 'Edit page backgrounds',
-      'href' => url('admin/config/page_background', array('absolute' => TRUE)),
+      'href' => url('admin/config/media/page_background', array('absolute' => TRUE)),
       'query' => array('filter' => drupal_is_front_page() ? '<front>' : drupal_get_normal_path($_GET['q'])),
     );
   }
+}
+
+/**
+ * Implements hook_help().
+ */
+function page_background_help($path, $arg) {
+  $out = "";
+  switch ($path) {
+    case 'admin/help#page_background':
+      $out = '<h3>About</h3><p>' . t('A simple way to associate an image or a
+slideshow to a path. You can upload an image and set it to be shown as background
+image for the specified path. more images on the same path will become a slideshow
+(if jquery.cycle is installed) . You can also associate images to "default" , so
+if the path you\'re visiting has no images directly attached one random image
+(or a slideshow) from the "default" is shown. Backgrounds can also be exposed as a block.
+Drush commands also available.') . '</p>';
+      break;
+
+    case 'admin/config/media/page_background':
+      $out = '<p>' . t('Defined page background list. from here you can have an
+        overview of the defined backgrounds and create new one / edit existing /
+        clone or remove elements.') . '</p>';
+      break;
+
+    case 'admin/config/media/page_background/settings':
+      $out = '<p>' . t('Page Background module settings.') . '</p>';
+      break;
+  }
+  return $out;
 }
