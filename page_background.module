@@ -131,6 +131,9 @@ function page_background_theme($existing, $type, $theme, $path) {
 
 /**
  * Page_background_addmore_uploads_callback().
+ *
+ * Add a new image callback.
+ * You'd have thought? let's add a period at the end of the sentence.
  */
 function page_background_addmore_uploads_callback($form, $form_state) {
   return $form['page_backgrounds']['uploads_fieldset']['page_backgrounds_uploadfile' . $form['page_backgrounds']['page_backgrounds_num_uploads']['#value']];
@@ -138,6 +141,9 @@ function page_background_addmore_uploads_callback($form, $form_state) {
 
 /**
  * Page_background_get_languages_selectoptions().
+ *
+ * Returns the languages list for the select element.
+ * You'd have thought? let's add a period at the end of the sentence.
  */
 function _page_background_get_languages_selectoptions() {
   $out = array(PAGE_BACKGROUND_ANY_LANGUAGE => t('Any'));
@@ -248,6 +254,9 @@ function page_background_form_taxonomy_form_term_alter(&$form, &$form_state, $fo
 
 /**
  * Page_background_form_taxonomy_form_term_validate().
+ *
+ * Validate backgrounds on term form.
+ * You'd have thought? let's add a period at the end of the sentence.
  */
 function page_background_form_taxonomy_form_term_validate($form, &$form_state) {
   foreach ($form_state['values'] as $key => $value) {
@@ -258,6 +267,9 @@ function page_background_form_taxonomy_form_term_validate($form, &$form_state) {
 
 /**
  * Page_background_form_taxonomy_form_term_submit().
+ *
+ * Actually adds backgrounds to the term.
+ * You'd have thought? let's add a period at the end of the sentence.
  */
 function page_background_form_taxonomy_form_term_submit($form, &$form_state) {
   global $user;
@@ -296,6 +308,9 @@ function page_background_form_taxonomy_form_term_submit($form, &$form_state) {
 
 /**
  * Implements hook_taxonomy_term_delete().
+ *
+ * Removes associated backgrounds on term deletion.
+ * You'd have thought? let's add a period at the end of the sentence.
  */
 function page_background_taxonomy_term_delete($term) {
   $bids = array();
@@ -400,6 +415,9 @@ function page_background_form_node_form_alter(&$form, &$form_state, $form_id) {
 
 /**
  * Page_background_form_node_form_validate().
+ *
+ * Validate backgrounds on node form.
+ * You'd have thought? let's add a period at the end of the sentence.
  */
 function page_background_form_node_form_validate($form, &$form_state) {
   foreach ($form_state['values'] as $key => $value) {
@@ -410,6 +428,9 @@ function page_background_form_node_form_validate($form, &$form_state) {
 
 /**
  * Implements hook_node_submit().
+ *
+ * Actually adds backgrounds to the node.
+ * You'd have thought? let's add a period at the end of the sentence.
  */
 function page_background_node_submit($node, $form, &$form_state) {
   global $user;
@@ -445,6 +466,9 @@ function page_background_node_submit($node, $form, &$form_state) {
 
 /**
  * Implements hook_node_delete().
+ *
+ * Removes associated backgrounds on node deletion.
+ * You'd have thought? let's add a period at the end of the sentence.
  */
 function page_background_node_delete($node) {
   $bids = array();
@@ -460,6 +484,9 @@ function page_background_node_delete($node) {
 
 /**
  * Page_background_admin_filter_form().
+ *
+ * Filter by path form for the administration page.
+ * You'd have thought? let's add a period at the end of the sentence.
  */
 function page_background_admin_filter_form($form, &$form_state) {
   $form['#method'] = 'GET';
@@ -484,6 +511,9 @@ function page_background_admin_filter_form($form, &$form_state) {
 
 /**
  * Page_background_admin_form().
+ *
+ * Administration page form.
+ * You'd have thought? let's add a period at the end of the sentence.
  */
 function page_background_admin_form($form, &$form_state) {
   global $user;
@@ -592,6 +622,9 @@ function page_background_admin_form($form, &$form_state) {
 
 /**
  * Page_background_admin_form_validate().
+ *
+ * Validates the administration page form.
+ * You'd have thought? let's add a period at the end of the sentence.
  */
 function page_background_admin_form_validate($form, &$form_state) {
   if ($form_state['values']['op'] == t('Submit')) {
@@ -622,6 +655,9 @@ function page_background_admin_form_validate($form, &$form_state) {
 
 /**
  * Page_background_admin_form_submit().
+ *
+ * Actually saves the admonistration page form changes.
+ * You'd have thought? let's add a period at the end of the sentence.
  */
 function page_background_admin_form_submit($form, &$form_state) {
   if ($form_state['values']['op'] == t('Submit')) {
@@ -684,6 +720,9 @@ function page_background_admin_form_submit($form, &$form_state) {
 
 /**
  * Theme_page_background_admin_form().
+ *
+ * Renders the administration page form as i wanted to be.
+ * You'd have thought? let's add a period at the end of the sentence.
  */
 function theme_page_background_admin_form($variables) {
   $form = $variables['form'];
@@ -763,6 +802,9 @@ function theme_page_background_admin_form($variables) {
 
 /**
  * Page_background_clone_form().
+ *
+ * Clones an existing page background.
+ * You'd have thought? let's add a period at the end of the sentence.
  */
 function page_background_clone_form($form, &$form_state, $background_row) {
   global $user;
@@ -797,6 +839,9 @@ function page_background_clone_form($form, &$form_state, $background_row) {
 
 /**
  * Page_background_clone_form_validate().
+ *
+ * Validate a cloning submission.
+ * You'd have thought? let's add a period at the end of the sentence.
  */
 function page_background_clone_form_validate($form, &$form_state) {
   if (!is_numeric($form_state['values']['bid']) || (page_background_load($form_state['values']['bid'])) === FALSE) {
@@ -814,6 +859,9 @@ function page_background_clone_form_validate($form, &$form_state) {
 
 /**
  * Page_background_clone_form_submit().
+ *
+ * Actually clones a background.
+ * You'd have thought? let's add a period at the end of the sentence.
  */
 function page_background_clone_form_submit($form, &$form_state) {
   $background_row_orig = page_background_load($form_state['values']['bid']);
@@ -842,6 +890,9 @@ function page_background_clone_form_submit($form, &$form_state) {
 
 /**
  * Page_background_edit_form().
+ *
+ * Edit an existing page background.
+ * You'd have thought? let's add a period at the end of the sentence.
  */
 function page_background_edit_form($form, &$form_state, $background_row) {
   global $user;
@@ -943,6 +994,9 @@ function page_background_edit_form($form, &$form_state, $background_row) {
 
 /**
  * Page_background_edit_form_validate().
+ *
+ * Validate a editing submission.
+ * You'd have thought? let's add a period at the end of the sentence.
  */
 function page_background_edit_form_validate($form, &$form_state) {
   if ((file_load($form_state['values']['uploadfile'])) === FALSE) {
@@ -960,6 +1014,9 @@ function page_background_edit_form_validate($form, &$form_state) {
 
 /**
  * Page_background_edit_form_submit().
+ *
+ * Actually update a background.
+ * You'd have thought? let's add a period at the end of the sentence.
  */
 function page_background_edit_form_submit($form, &$form_state) {
 
@@ -996,10 +1053,13 @@ function page_background_edit_form_submit($form, &$form_state) {
 
 /**
  * Page_background_settings_form().
+ *
+ * Settings form for the module.
+ * You'd have thought? let's add a period at the end of the sentence.
  */
 function page_background_settings_form($form, &$form_state) {
 
-  if (($cycle_path = _page_background_cycle_library_path()) == FALSE) {
+  if (_page_background_cycle_library_path() == FALSE) {
     drupal_set_message(t("Cycle library not installed. Slideshows won't be available."), 'warning');
   }
 
@@ -1176,6 +1236,9 @@ function page_background_settings_form($form, &$form_state) {
 
 /**
  * Page_background_settings_form_validate().
+ *
+ * Validate the module's settings form.
+ * You'd have thought? let's add a period at the end of the sentence.
  */
 function page_background_settings_form_validate($form, &$form_state) {
   if (trim($form_state['values']['page_background_container_height']) != '' && !is_numeric($form_state['values']['page_background_container_height']) && !preg_match('/%$/i', $form_state['values']['page_background_container_height'])) {
@@ -1242,6 +1305,9 @@ function page_background_preprocess_html(&$variables) {
 
 /**
  * Page_background_get_fids_markup().
+ *
+ * Returns the markup for the backgrounds array passed as parameter.
+ * You'd have thought? let's add a period at the end of the sentence.
  */
 function _page_background_get_fids_markup($fids = array()) {
   global $language;
@@ -1533,6 +1599,9 @@ function _page_background_get_fids_markup($fids = array()) {
 
 /**
  * Theme_page_background_slide().
+ *
+ * Return the markup for a single slide.
+ * You'd have thought? let's add a period at the end of the sentence.
  */
 function theme_page_background_slide($variables) {
   $image = $variables['image'];
@@ -1555,6 +1624,9 @@ function theme_page_background_slide($variables) {
 
 /**
  * Theme_page_background_nav_link().
+ *
+ * Return the markup for a navigation link.
+ * You'd have thought? let's add a period at the end of the sentence.
  */
 function theme_page_background_nav_link($variables) {
   $type = $variables['type'];
@@ -1567,6 +1639,9 @@ function theme_page_background_nav_link($variables) {
 
 /**
  * Theme_page_background_pager_item().
+ *
+ * Return the markup for a single pager item.
+ * You'd have thought? let's add a period at the end of the sentence.
  */
 function theme_page_background_pager_item($variables) {
   $key = $variables['key'];
@@ -1578,6 +1653,9 @@ function theme_page_background_pager_item($variables) {
 
 /**
  * Page_background_get_markup_by_path().
+ *
+ * Returns the markup for a specified path.
+ * You'd have thought? let's add a period at the end of the sentence.
  */
 function _page_background_get_markup_by_path($path) {
   global $theme_key, $language;
@@ -1597,6 +1675,9 @@ function _page_background_get_markup_by_path($path) {
 
 /**
  * Page_background_get_fids().
+ *
+ * Return an array of background for the specified path.
+ * You'd have thought? let's add a period at the end of the sentence.
  */
 function _page_background_get_fids($path = '<front>', $language = NULL) {
   $query = db_select('url_background_images', 'bg');
@@ -1635,6 +1716,9 @@ function _page_background_get_fids($path = '<front>', $language = NULL) {
 
 /**
  * Page_background_get_default_fids().
+ *
+ * Return the default backgrounds.
+ * You'd have thought? let's add a period at the end of the sentence.
  */
 function _page_background_get_default_fids($language = NULL) {
   $query = db_select('url_background_images', 'bg');
@@ -1924,6 +2008,9 @@ function page_background_block_save($delta = '', $edit = array()) {
 
 /**
  * Page_background_delete_form().
+ *
+ * Delete form for a background.
+ * You'd have thought? let's add a period at the end of the sentence.
  */
 function page_background_delete_form($form, &$form_state, $background_row) {
   $form['background_row'] = array(
@@ -1935,6 +2022,9 @@ function page_background_delete_form($form, &$form_state, $background_row) {
 
 /**
  * Page_background_delete_form_submit().
+ *
+ * Actually deletes a background.
+ * You'd have thought? let's add a period at the end of the sentence.
  */
 function page_background_delete_form_submit($form, &$form_state) {
   $numdeleted = _page_background_delete($form_state['values']['background_row']);
