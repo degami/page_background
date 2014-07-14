@@ -46,7 +46,7 @@ function page_background_menu() {
     'title' => 'Page Backgrounds Clone',
     'description' => 'Page Backgrounds Clone',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('page_background_clone_form', 3),
+    'page arguments' => array('page_background_clone_form', 4),
     'access callback' => '_page_background_check_access',
     'access arguments' => array(array('administer page_background', 'add page_background to element')),
   );
@@ -55,7 +55,7 @@ function page_background_menu() {
     'title' => 'Edit Page Backgrounds',
     'description' => 'Edit Page Backgrounds',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('page_background_edit_form', 3),
+    'page arguments' => array('page_background_edit_form', 4),
     'access callback' => '_page_background_check_access',
     'access arguments' => array(array('administer page_background', 'add page_background to element')),
   );
@@ -64,7 +64,7 @@ function page_background_menu() {
     'title' => 'Delete Page Backgrounds',
     'description' => 'Delete Page Backgrounds',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('page_background_delete_form', 3),
+    'page arguments' => array('page_background_delete_form', 4),
     'access callback' => '_page_background_check_access',
     'access arguments' => array(array('administer page_background', 'add page_background to element')),
   );
