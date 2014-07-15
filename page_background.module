@@ -1063,7 +1063,11 @@ function page_background_settings_form($form, &$form_state) {
     drupal_set_message(t("Cycle library not installed. Slideshows won't be available."), 'warning');
   }
 
-  $form['container'] = array('#title' => t('Container'), '#type' => 'fieldset');
+  $form['page_background'] = array(
+    '#type' => 'vertical_tabs',
+  );
+
+  $form['container'] = array('#title' => t('Container'), '#type' => 'fieldset','#group'=>'page_background');
 
   $form['container']['page_background_container_width'] = array(
     '#type' => 'textfield',
@@ -1077,7 +1081,7 @@ function page_background_settings_form($form, &$form_state) {
     '#default_value' => variable_get('page_background_container_height', ''),
   );
 
-  $form['slides'] = array('#title' => t('Slides'), '#type' => 'fieldset');
+  $form['slides'] = array('#title' => t('Slides'), '#type' => 'fieldset','#group'=>'page_background');
 
   $form['slides']['page_background_slides_type'] = array(
     '#type' => 'select',
@@ -1125,7 +1129,7 @@ function page_background_settings_form($form, &$form_state) {
     '#default_value' => variable_get('page_background_default_behavior', 'singleframe'),
   );
 
-  $form['cycle'] = array('#title' => t('Cycle'), '#type' => 'fieldset');
+  $form['cycle'] = array('#title' => t('Cycle'), '#type' => 'fieldset','#group'=>'page_background');
 
   $form['cycle']['page_background_animation_effect'] = array(
     '#type' => 'select',
@@ -1193,7 +1197,7 @@ function page_background_settings_form($form, &$form_state) {
     '#default_value' => variable_get('page_background_sync', TRUE),
   );
 
-  $form['slideshow'] = array('#title' => t('Slideshow Controls'), '#type' => 'fieldset');
+  $form['slideshow'] = array('#title' => t('Slideshow Controls'), '#type' => 'fieldset','#group'=>'page_background');
 
   $form['slideshow']['page_background_pauseonhover'] = array(
     '#type' => 'checkbox',
@@ -1220,7 +1224,7 @@ function page_background_settings_form($form, &$form_state) {
     '#default_value' => variable_get('page_background_nav_links', TRUE),
   );
 
-  $form['other'] = array('#title' => t('Other'), '#type' => 'fieldset');
+  $form['other'] = array('#title' => t('Other'), '#type' => 'fieldset','#group'=>'page_background');
 
   $form['other']['page_background_block'] = array(
     '#type' => 'checkbox',
@@ -1395,8 +1399,12 @@ function _page_background_get_fids_markup($fids = array()) {
   $cw = trim($cw);
   $ch = trim($ch);
 
+  $page_background_container_css=array();
+  $page_background_slide_css=array();
+  $slides_css=array();
+
   if (variable_get('page_background_block', FALSE) == TRUE) {
-    $out['#css'][] = '
+    $page_background_container_css[] = '
       #page_background_container{
         height: ' . $ch . ((!preg_match('/%$/i', $ch)) ? 'px' : '') . ';
         width: ' . $cw . ((!preg_match('/%$/i', $cw)) ? 'px' : '') . ';
@@ -1406,7 +1414,7 @@ function _page_background_get_fids_markup($fids = array()) {
     ';
   }
   else {
-    $out['#css'][] = '
+    $page_background_container_css[] = '
       #page_background_container{
         height: ' . $ch . ((!preg_match('/%$/i', $ch)) ? 'px' : '') . ';
         width: ' . $cw . ((!preg_match('/%$/i', $cw)) ? 'px' : '') . ';
@@ -1416,11 +1424,13 @@ function _page_background_get_fids_markup($fids = array()) {
         top: 0;
       }
     ';
+
+    $out['#css'][] = $page_container_css;
   }
 
   if ($cw != '100%') {
     if (!preg_match('/%$/i', $cw)) {
-      $out['#css'][] = '
+      $page_background_container_css[] = '
         #page_background_container{
           left: 50%;
           margin-left: -' . round($cw / 2) . 'px;
@@ -1430,7 +1440,7 @@ function _page_background_get_fids_markup($fids = array()) {
     else {
       $percent = str_replace('%', '', $cw);
       $margin = round(100 - $percent) / 2;
-      $out['#css'][] = '
+      $page_background_container_css[] = '
         #page_background_container{
           left: ' . $margin . '%;
         }
@@ -1438,7 +1448,7 @@ function _page_background_get_fids_markup($fids = array()) {
     }
   }
 
-  $out['#css'][] = '
+  $page_background_slide_css[] = '
     .page_background_slide{
       margin: 0;
       padding: 0;
@@ -1448,7 +1458,7 @@ function _page_background_get_fids_markup($fids = array()) {
   ';
 
   if ($slide_type == 'images') {
-    $out['#css'][] = '
+    $page_background_slide_css[] = '
       .page_background_slide img{
         display: block;
         margin: auto;
@@ -1456,7 +1466,7 @@ function _page_background_get_fids_markup($fids = array()) {
     ';
   }
   else {
-    $out['#css'][] = '
+    $page_background_slide_css[] = '
       .page_background_slide .img{
         display: block;
         margin: auto;
@@ -1498,7 +1508,7 @@ function _page_background_get_fids_markup($fids = array()) {
       case 'styled_divs':
       default:
         $image = '<div id="page_background_slide_' . $key . '" class="img"></div>';
-        $out['#css'][] = '
+        $this_slide_css = '
           #page_background_slide_' . $key . '{
             background: url(' .
             url(
@@ -1512,6 +1522,12 @@ function _page_background_get_fids_markup($fids = array()) {
             margin-top: -' . (round($fid->file->image_dimensions['height'] / 2)) . 'px;
           }
         ';
+
+        // foreach (module_implements('alter_page_background_slide_'.$key.'_css') as $module) {
+        //   $this_slide_css = module_invoke($module, 'alter_page_background_slide_'.$key.'_css', $this_slide_css);
+        // }
+
+        $slides_css[] = $this_slide_css;
         break;
     }
 
@@ -1591,6 +1607,19 @@ function _page_background_get_fids_markup($fids = array()) {
     }
     // $out['#markup'] .= '</div>';
   }
+
+
+  foreach (module_implements('alter_page_background_container_css') as $module) {
+    $page_background_container_css = module_invoke($module, 'alter_page_background_container_css', $page_background_container_css);
+  }
+  foreach (module_implements('alter_page_background_slide_css') as $module) {
+    $page_background_slide_css = module_invoke($module, 'alter_page_background_slide_css', $page_background_slide_css);
+  }
+  foreach (module_implements('alter_page_background_slides_css') as $module) {
+    $slides_css = module_invoke($module, 'alter_page_background_slides_css', $slides_css);
+  }
+
+  $out['#css'] = array_merge($page_background_container_css,$page_background_slide_css,$slides_css);
 
   $out['#fids'] = $fids;
   $out['#numfids'] = count($fids);
