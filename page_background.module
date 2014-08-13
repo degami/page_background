@@ -1067,7 +1067,11 @@ function page_background_settings_form($form, &$form_state) {
     '#type' => 'vertical_tabs',
   );
 
-  $form['container'] = array('#title' => t('Container'), '#type' => 'fieldset','#group'=>'page_background');
+  $form['container'] = array(
+    '#title' => t('Container'),
+    '#type' => 'fieldset',
+    '#group' => 'page_background',
+  );
 
   $form['container']['page_background_container_width'] = array(
     '#type' => 'textfield',
@@ -1081,7 +1085,11 @@ function page_background_settings_form($form, &$form_state) {
     '#default_value' => variable_get('page_background_container_height', ''),
   );
 
-  $form['slides'] = array('#title' => t('Slides'), '#type' => 'fieldset','#group'=>'page_background');
+  $form['slides'] = array(
+    '#title' => t('Slides'),
+    '#type' => 'fieldset',
+    '#group' => 'page_background',
+  );
 
   $form['slides']['page_background_slides_type'] = array(
     '#type' => 'select',
@@ -1129,7 +1137,11 @@ function page_background_settings_form($form, &$form_state) {
     '#default_value' => variable_get('page_background_default_behavior', 'singleframe'),
   );
 
-  $form['cycle'] = array('#title' => t('Cycle'), '#type' => 'fieldset','#group'=>'page_background');
+  $form['cycle'] = array(
+    '#title' => t('Cycle'),
+    '#type' => 'fieldset',
+    '#group' => 'page_background',
+  );
 
   $form['cycle']['page_background_animation_effect'] = array(
     '#type' => 'select',
@@ -1197,7 +1209,11 @@ function page_background_settings_form($form, &$form_state) {
     '#default_value' => variable_get('page_background_sync', TRUE),
   );
 
-  $form['slideshow'] = array('#title' => t('Slideshow Controls'), '#type' => 'fieldset','#group'=>'page_background');
+  $form['slideshow'] = array(
+    '#title' => t('Slideshow Controls'),
+    '#type' => 'fieldset',
+    '#group' => 'page_background',
+  );
 
   $form['slideshow']['page_background_pauseonhover'] = array(
     '#type' => 'checkbox',
@@ -1224,7 +1240,11 @@ function page_background_settings_form($form, &$form_state) {
     '#default_value' => variable_get('page_background_nav_links', TRUE),
   );
 
-  $form['other'] = array('#title' => t('Other'), '#type' => 'fieldset','#group'=>'page_background');
+  $form['other'] = array(
+    '#title' => t('Other'),
+    '#type' => 'fieldset',
+    '#group' => 'page_background',
+  );
 
   $form['other']['page_background_block'] = array(
     '#type' => 'checkbox',
