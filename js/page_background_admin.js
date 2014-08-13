@@ -1,3 +1,8 @@
+/**
+ * @file
+ * Page Background Admin JS.
+ */
+
 (function($){
   $(document).ready(function(){
     $('#edit-default').change(function(){

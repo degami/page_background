@@ -1,3 +1,8 @@
+/**
+ * @file
+ * Page Background Slideshow JS.
+ */
+
 (function($) {
   $(document).ready(function() {
     var page_background_cycle_options = {
