@@ -1633,7 +1633,6 @@ function _page_background_get_fids_markup($fids = array()) {
     // $out['#markup'] .= '</div>';
   }
 
-
   foreach (module_implements('alter_page_background_container_css') as $module) {
     $page_background_container_css = module_invoke($module, 'alter_page_background_container_css', $page_background_container_css);
   }
