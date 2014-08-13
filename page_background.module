@@ -1419,9 +1419,9 @@ function _page_background_get_fids_markup($fids = array()) {
   $cw = trim($cw);
   $ch = trim($ch);
 
-  $page_background_container_css=array();
-  $page_background_slide_css=array();
-  $slides_css=array();
+  $page_background_container_css = array();
+  $page_background_slide_css = array();
+  $slides_css = array();
 
   if (variable_get('page_background_block', FALSE) == TRUE) {
     $page_background_container_css[] = '
@@ -1444,8 +1444,6 @@ function _page_background_get_fids_markup($fids = array()) {
         top: 0;
       }
     ';
-
-    $out['#css'][] = $page_container_css;
   }
 
   if ($cw != '100%') {
@@ -1543,10 +1541,15 @@ function _page_background_get_fids_markup($fids = array()) {
           }
         ';
 
-        // foreach (module_implements('alter_page_background_slide_'.$key.'_css') as $module) {
-        //   $this_slide_css = module_invoke($module, 'alter_page_background_slide_'.$key.'_css', $this_slide_css);
-        // }
-
+/*
+        foreach (module_implements('alter_page_background_slide_'.$key.'_css') as $module) {
+          $this_slide_css = module_invoke(
+            $module,
+            'alter_page_background_slide_'.$key.'_css',
+            $this_slide_css
+          );
+        }
+*/
         $slides_css[] = $this_slide_css;
         break;
     }
