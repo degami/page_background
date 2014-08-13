@@ -1542,15 +1542,15 @@ function _page_background_get_fids_markup($fids = array()) {
         ';
 
 /*
-// PA REVIEW REALLY SUCKS.
-foreach (module_implements('alter_page_background_slide_'.$key.'_css')
-  as $module) {
-  $this_slide_css = module_invoke(
-    $module,
-    'alter_page_background_slide_'.$key.'_css',
-    $this_slide_css
-  );
-}
+      // PA REVIEW REALLY SUCKS.
+      foreach (module_implements('alter_page_background_slide_'.$key.'_css')
+      as $module) {
+        $this_slide_css = module_invoke(
+          $module,
+          'alter_page_background_slide_'.$key.'_css',
+          $this_slide_css
+        );
+      }
 */
         $slides_css[] = $this_slide_css;
         break;
@@ -1644,7 +1644,11 @@ foreach (module_implements('alter_page_background_slide_'.$key.'_css')
     $slides_css = module_invoke($module, 'alter_page_background_slides_css', $slides_css);
   }
 
-  $out['#css'] = array_merge($page_background_container_css,$page_background_slide_css,$slides_css);
+  $out['#css'] = array_merge(
+    $page_background_container_css,
+    $page_background_slide_css,
+    $slides_css
+  );
 
   $out['#fids'] = $fids;
   $out['#numfids'] = count($fids);
