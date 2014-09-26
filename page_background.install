@@ -151,3 +151,29 @@ function page_background_update_7102(&$sandbox) {
     'description' => 'Background Image Title Text',
   ));
 }
+
+/**
+ * Implements hook_requirements().
+ */
+function page_background_requirements($phase) {
+  $requirements = array();
+
+  // Ensure translations do not break at install time.
+  $t = get_t();
+
+  if ($phase == 'runtime') {
+    $requirements['jquery.cycle'] = array(
+      'title' => $t('jQuery Cycle Library'),
+    );
+
+    if (_page_background_cycle_library_path() != FALSE) {
+      $requirements['jquery.cycle']['value'] = $t('Installed');
+      $requirements['jquery.cycle']['severity'] = REQUIREMENT_OK;
+    } else {
+      $requirements['jquery.cycle']['value'] = $t('Not Installed');
+      $requirements['jquery.cycle']['severity'] = REQUIREMENT_INFO;
+      $requirements['jquery.cycle']['description'] = $t("Cycle library not installed. Page Background Slideshows won't be available.");
+    }
+  }
+  return $requirements;
+}
