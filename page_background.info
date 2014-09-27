@@ -4,4 +4,4 @@ package = Page Background
 core = 7.x
 
 dependencies[] = libraries
-configure = admin/config/page_background
+configure = admin/config/media/page_background
