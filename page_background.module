@@ -536,9 +536,25 @@ function page_background_admin_form($form, &$form_state) {
       )
     );
   }
+
+
+  $query_count = clone $query;
+  $query_count->addExpression('COUNT(*)','totale');
+  $count=$query_count->execute()->fetch(PDO::FETCH_OBJ);
+
+  $pager=array();
+  $pager['total_rows']=$count->totale;
+  $pager['items_per_page'] = variable_get('page_background_admin_items_per_page',100);
+
+  $start = 0;
+  if(isset($_REQUEST['page']) && is_numeric($_REQUEST['page'])){
+    $start=$_REQUEST['page']*$pager['items_per_page'];
+  }
+
   $query->orderBy('weight');
   $query->orderBy('created');
-  $query->extend('PagerDefault')->limit(50);
+  $query->range($start,$pager['items_per_page']);
+
   $result = $query->execute()->fetchAll();
 
   $form['#attached']['js'][] = array(
@@ -566,6 +582,12 @@ function page_background_admin_form($form, &$form_state) {
     $form['delete_selected'] = array('#type' => 'submit', '#value' => t('Delete Selected'));
     $form['update_weight'] = array('#type' => 'submit', '#value' => t('Save Changes'));
   }
+
+  pager_default_initialize($pager['total_rows'], $pager['items_per_page']);
+  $output_pager = theme('pager', array('quantity' => 10));
+  $form['pager'] = array(
+    '#markup'=>$output_pager,
+  );
 
   $form['addfile'] = array('#type' => 'fieldset', '#title' => t('Upload a new file'));
 
@@ -796,6 +818,7 @@ function theme_page_background_admin_form($variables) {
   )) .
   render($form['update_weight']) . '&nbsp;' .
   render($form['delete_selected']) .
+  render($form['pager']) .
   '<br /><br />';
   return $out .= drupal_render_children($form);
 }
@@ -1253,6 +1276,15 @@ function page_background_settings_form($form, &$form_state) {
     '#description' => t('If enabled Page background will be available as a block and not automatically added to pages'),
   );
 
+  $form['other']['page_background_admin_items_per_page'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Admin form items per page'),
+    '#default_value' => variable_get('page_background_admin_items_per_page',100),
+    '#description' => t('Number of items per page on the administration form'),
+  );
+
+
+
   $form['#validate'][] = 'page_background_settings_form_validate';
 
   return system_settings_form($form);
@@ -1275,6 +1307,10 @@ function page_background_settings_form_validate($form, &$form_state) {
 
   if (!is_numeric($form_state['values']['page_background_animation_timeout']) || $form_state['values']['page_background_animation_timeout'] < 0) {
     form_set_error('page_background_animation_timeout', t('Timeout: Only numeric positive values.'));
+  }
+
+  if (!is_numeric($form_state['values']['page_background_admin_items_per_page']) || $form_state['values']['page_background_admin_items_per_page'] < 0) {
+    form_set_error('page_background_admin_items_per_page', t('Admin form items per page: Only numeric positive values.'));
   }
 }
 
